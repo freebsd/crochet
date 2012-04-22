@@ -8,10 +8,9 @@
 # MB and GB are predefined for convenience here
 #
 # This is usually the same size as your card,
-# but it can be smaller.  Making it smaller will
-# make things a little bit faster.
+# but it can be smaller.
 #
-SD_SIZE=$((32 * MB)) # Smallest size that works.
+SD_SIZE=$((512 * MB)) # Smallest size that works.
 #SD_SIZE=$((4 * GB)) # 4 Gigabyte card
 #SD_SIZE=$((8 * GB)) # 8 Gigabyte card
 #SD_SIZE=$((16 * GB)) # 16 Gigabyte card
@@ -63,4 +62,4 @@ KERNCONF=BEAGLEBONE
 # Where the disk image will be built.
 # This file will be as large as SD_SIZE above, so make sure it's located
 # somewhere with enough space.
-IMG=${BUILDOBJ}/_.disk.full
+IMG=${BUILDOBJ}/freebsd-beaglebone.img

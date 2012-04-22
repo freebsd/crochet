@@ -81,10 +81,10 @@ if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
 fi
 
 #
-# Build FreeBSD for Beagle
+# Build FreeBSD for BeagleBone
 #
 if [ ! -f ${BUILDOBJ}/_.built-world ]; then
-    echo "Building FreeBSD-armv6 world. (Logging to ${BUILDOBJ}/_.buildworld.log)"
+    echo "Building FreeBSD-armv6 world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
     cd $FREEBSD_SRC
     make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
     cd $TOPDIR
@@ -92,11 +92,11 @@ if [ ! -f ${BUILDOBJ}/_.built-world ]; then
 fi
 
 if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
-    echo "Building FreeBSD-armv6 kernel. (Logging to ${BUILDOBJ}/_.buildkernel.log)"
+    echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
     cd $FREEBSD_SRC
     make TARGET_ARCH=arm KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
     cd $TOPDIR
-    touch ${BUILDOBJ}/_.built-world
+    touch ${BUILDOBJ}/_.built-kernel
 fi
 
 # TODO: Build ubldr
@@ -120,54 +120,54 @@ gpart commit ${MD}
 echo "Formatting the FAT partition"
 # Note: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
 newfs_msdos -L "boot" -F 12 ${MD}s1
-rmdir ${BUILDOBJ}/_.mounted_p1
-mkdir ${BUILDOBJ}/_.mounted_p1
-mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_p1
+rmdir ${BUILDOBJ}/_.mounted_fat
+mkdir ${BUILDOBJ}/_.mounted_fat
+mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
 echo "Formatting the UFS partition"
 bsdlabel -w ${MD}s2
 newfs ${MD}s2a
-rmdir ${BUILDOBJ}/_.mounted_p2
-mkdir ${BUILDOBJ}/_.mounted_p2
-mount /dev/${MD}s2a ${BUILDOBJ}/_.mounted_p2
+rmdir ${BUILDOBJ}/_.mounted_ufs
+mkdir ${BUILDOBJ}/_.mounted_ufs
+mount /dev/${MD}s2a ${BUILDOBJ}/_.mounted_ufs
 
 #
 # Install U-Boot onto slice 1.
 #
 echo "Installing U-Boot onto the FAT partition"
-cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_p1/
-cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_p1/
-cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_p1/
+cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
+cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
+cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 
 #
 # TODO: Install FreeBSD's ubldr onto slice 1
-#cp /usr/obj/arm.arm/usr/src/sys/boot/arm/uboot/ubldr ${BUILDOBJ}/_.mounted_p1/ubldr
+#cp /usr/obj/arm.arm/usr/src/sys/boot/arm/uboot/ubldr ${BUILDOBJ}/_.mounted_fat/ubldr
 
 # TODO: Install FreeBSD kernel somewhere
 
 #
 # Install FreeBSD kernel and world onto slice 2
 #
-echo "Installing FreeBSD onto the UFS partition"
+echo "Installing FreeBSD onto the UFS partition at "`date`
 cd $FREEBSD_SRC
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_p2 installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_p2 installworld > ${BUILDOBJ}/_.installworld.log 2>&1
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_p2 distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_p2 distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
+make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
+make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
 
 # Configure FreeBSD
 # These could be generated dynamically if we needed.
 echo "Configuring FreeBSD"
-cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_p2/etc/
-cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_p2/etc/
+cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
+cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
 
 #
 # Unmount and clean up.
 #
 echo "Unmounting the disk image"
 cd $TOPDIR
-umount ${BUILDOBJ}/_.mounted_p1
-umount ${BUILDOBJ}/_.mounted_p2
+umount ${BUILDOBJ}/_.mounted_fat
+umount ${BUILDOBJ}/_.mounted_ufs
 mdconfig -d -u ${MD}
 
 #
