@@ -39,7 +39,7 @@ FREEBSD_SRC=$TOPDIR/src-armv6
 
 # Directory to hold U-Boot source code.
 # The U-Boot source is about 120MB. U-Boot will also be compiled
-# in this directory, so you'll need about 200MB total space here.
+# in this directory, so you'll need about 150MB total space here.
 #
 # This directory doesn't need to exist yet.
 # When you run the script, it will tell you how to get
@@ -47,11 +47,11 @@ FREEBSD_SRC=$TOPDIR/src-armv6
 #
 UBOOT_SRC=$TOPDIR/u-boot
 
-# Directory where build artifacts will go; this should be a directory
-# with at least 4G of free space, plus enough space for the final disk
-# image.
+# XXX Directory where build artifacts will go; this should be a
+# directory with at least 4G of free space, plus enough space for the
+# final disk image.
 #
-BUILDOBJ=$TOPDIR/obj
+BUILDOBJ=$TOPDIR/work
 
 # Kernel configuration to use.
 # The BEAGLEBONE configuration is in the armv6 sources.
