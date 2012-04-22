@@ -1,13 +1,9 @@
 HOW TO GET A BEAGLEBONE
 
 The BeagleBone is an ARM-based development/test board from the
-BeagleBoard project.  It features a modern ARMv7 Cortex-A8 processor
+BeagleBoard project.  It features a modern ARMv7 processor
 and a wealth of on-chip peripheral support.  Details can be found at:
    http://beagleboard.org/bone
-
-The BeagleBone is designed partly as a hobby/experimenters board and
-partly as a complete example system for people who want to build their
-own hardware around one of the TI AM335x chips.
 
 The BeagleBone is an easy way to learn about ARM development: it is
 inexpensive (about $85) and does not require any special skills or
@@ -32,7 +28,7 @@ Using the script to build an image consists of three steps:
 
 1. EDIT beaglebsd-config.sh
 
-You need to set the image size to match the micro SDHC card you'll be using
+You need to set the image size to match the MicroSDHC card you'll be using
 and verify that certain directories have enough free space.  There are
 lots of comments in this file to help you.
 
@@ -54,7 +50,7 @@ can take several hours.
 The script will print the command you need to do this.
 
 To verify the image, try mounting the card on your FreeBSD system.  It
-should show up with two slices: The first slice is MSDOS formatted and
+should show up with two slices: The first slice is FAT formatted and
 contains the necessary boot machinery, including the U-Boot loader.
 The second slice is a standard FreeBSD UFS partition with the actual
 system installed.
@@ -79,26 +75,21 @@ Ethernet port.
 
 ANATOMY of a BEAGLEBONE BOOT IMAGE
 
-The AM3358 SoC contains ROM code that can identify a bootable FAT
-partition and load a first-stage boot program from a file.  So the
-MicroSDHC card is partitioned into two slices: The first is a
-relatively small FAT partition that contains the initial boot
-software.  The rest of the space is a FreeBSD UFS partition that is
-mounted as the root filesystem.
+The AM3358 SoC ROM code expects the MicroSDHC card to use
+MBR partitioning and to have a bootable FAT partition.
 
 The ROM code loads a file called "MLO" from the FAT filesystem into
 on-chip RAM.  The MLO program is responsible for initializing the
-external RAM and loading the next-stage boot.
+external RAM and loading the next-stage boot.  The on-chip RAM is 128k
+and some is used for ROM execution, so the MLO must be less than 110k.
 
-In this case, MLO is a stripped-down version of the U-Boot boot loader
-that fits within the on-chip RAM.  From there, it can initialize the
-external RAM and then load the full U-Boot loader as the next stage.
+In our case, MLO is a stripped-down version of the U-Boot boot loader.
+It initializes the external RAM and then loads the full U-Boot program.
 
-The U-Boot loader is a GPL project to produce a highly modular
-boot loader system that can be used on a wide variety of
-systems.  The loader is configured with built-in script commands
-that can be partially overridden by additional commands in
-the uEnv.txt file.
+U-Boot is a highly modular boot loader system that can be used on a
+wide variety of systems.  The loader is configured with built-in
+script commands that can be partially overridden by additional
+commands in the uEnv.txt file.
 
 The uEnv.txt file supplied here directs U-Boot to load
 XXXXX YYYYY.
