@@ -13,7 +13,10 @@ GB=$((1024 * $MB))
 
 
 mkdir -p ${BUILDOBJ}
+# Why does this have no effect?
 MAKEOBJDIRPREFIX=${BUILDOBJ}/_freebsd_build
+# Clean out old log files before we start.
+rm ${BUILDOBJ}/*.log
 
 #
 # Check various prerequisites
@@ -109,32 +112,33 @@ echo "Creating the raw disk image in ${IMG}"
 dd if=/dev/zero of=${IMG} bs=1 seek=${SD_SIZE} count=0
 MD=`mdconfig -a -t vnode -f ${IMG}`
 
-echo "Partitioning the raw disk image"
+echo "Partitioning the raw disk image at "`date`
 # TI AM335x ROM code requires we use MBR partitioning.
 gpart create -s MBR ${MD}
 gpart add -b 63 -s10m -t '!12' ${MD}
 gpart set -a active -i 1 ${MD}
 gpart add -t freebsd ${MD}
+echo gpart commit ${MD}
 gpart commit ${MD}
 
-echo "Formatting the FAT partition"
+echo "Formatting the FAT partition at "`date`
 # Note: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
 newfs_msdos -L "boot" -F 12 ${MD}s1
-rmdir ${BUILDOBJ}/_.mounted_fat
+[ -d ${BUILDOBJ}/_.mounted_fat ] && rmdir ${BUILDOBJ}/_.mounted_fat
 mkdir ${BUILDOBJ}/_.mounted_fat
 mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
-echo "Formatting the UFS partition"
+echo "Formatting the UFS partition at "`date`
 bsdlabel -w ${MD}s2
 newfs ${MD}s2a
-rmdir ${BUILDOBJ}/_.mounted_ufs
+[ -d ${BUILDOBJ}/_.mounted_ufs ] && rmdir ${BUILDOBJ}/_.mounted_ufs
 mkdir ${BUILDOBJ}/_.mounted_ufs
 mount /dev/${MD}s2a ${BUILDOBJ}/_.mounted_ufs
 
 #
 # Install U-Boot onto slice 1.
 #
-echo "Installing U-Boot onto the FAT partition"
+echo "Installing U-Boot onto the FAT partition at "`date`
 cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
 cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
 cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
@@ -150,7 +154,7 @@ cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 #
 echo "Installing FreeBSD onto the UFS partition at "`date`
 cd $FREEBSD_SRC
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
 make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
 make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
 make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
