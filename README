@@ -38,11 +38,11 @@ FreeBSD-CURRENT (March 2012 or later).
 
 Using the script to build an image consists of three steps:
 
-1. EDIT beaglebsd-config.sh
+1. EDIT beaglebsd-config.sh.
 
-You need to set the image size to match the MicroSDHC card you'll be using
-and verify that certain directories have enough free space.  There are
-lots of comments in this file to help you.
+You need to set the image size to match the MicroSDHC card you'll be
+using and verify that certain directories have enough free space.
+There are lots of comments in this file to help you.
 
 2. RUN beaglebsd.sh as root
 
@@ -59,7 +59,7 @@ can take several hours.
 
 3. COPY the image to a MicroSDHC card.
 
-The script will print the command you need to do this.
+The script will suggest a command to do this.
 
 To verify the image, try mounting the card on your FreeBSD system.  It
 should show up with two slices: The first slice is FAT formatted and
