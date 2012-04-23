@@ -197,4 +197,5 @@ echo "DONE.  Completed disk image is in: ${IMG}"
 echo
 echo "Copy to a MicroSDHC card using a command such as:"
 echo "dd if=${IMG} of=/dev/da0"
+echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
 echo
