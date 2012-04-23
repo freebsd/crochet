@@ -1,16 +1,17 @@
 #
 # CONFIGURATION
 #
+# This fragment of shell script will be
+# read into beaglebsd.sh when it runs.
 
 #
 # Size of the disk image that will be built.
-#
-# MB and GB are predefined for convenience here
-#
 # This is usually the same size as your card,
 # but it can be smaller.
 #
-SD_SIZE=$((512 * MB)) # Smallest size that works.
+# MB and GB are predefined for convenience here
+#
+SD_SIZE=$((300 * MB)) # Smallest size that works.
 #SD_SIZE=$((4 * GB)) # 4 Gigabyte card
 #SD_SIZE=$((8 * GB)) # 8 Gigabyte card
 #SD_SIZE=$((16 * GB)) # 16 Gigabyte card
@@ -19,7 +20,7 @@ SD_SIZE=$((512 * MB)) # Smallest size that works.
 #
 # TOPDIR is the directory containing this script.
 # As long as TOPDIR is on a disk with at least
-# 10G or so of free space, you can probably
+# 5G or so of free space, you can probably
 # use the settings below unchanged.
 #
 
@@ -51,6 +52,9 @@ UBOOT_SRC=$TOPDIR/u-boot
 # directory with at least 4G of free space, plus enough space for the
 # final disk image.
 #
+# XXX The freebsd-armv6 build doesn't go here; it goes
+# into /usr/obj/arm.arm instead.
+#
 BUILDOBJ=$TOPDIR/work
 
 # Kernel configuration to use.
@@ -59,7 +63,7 @@ BUILDOBJ=$TOPDIR/work
 #
 KERNCONF=BEAGLEBONE
 
-# Where the disk image will be built.
+# The name of the final disk image.
 # This file will be as large as SD_SIZE above, so make sure it's located
 # somewhere with enough space.
-IMG=${BUILDOBJ}/freebsd-beaglebone.img
+IMG=${BUILDOBJ}/FreeBSD-${KERNCONF}.img
