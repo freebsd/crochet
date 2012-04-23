@@ -63,8 +63,8 @@ HOW TO BOOT A BEAGLEBONE
 The Mini-USB connector is on the bottom of the BeagleBone.
 
 2. ACCESS the serial console on the board from your desktop:
-   $ tip XXXXXX
-(You'll need the XXX driver loaded into your kernel.)
+   $ sudo cu -l /dev/ttyU1 -s 115200
+(If this doesn't work, you may need to load the uftdi driver into your kernel.)
 
 3. INSERT the MicroSDHC card into your BeagleBone
 
@@ -92,5 +92,16 @@ script commands that can be partially overridden by additional
 commands in the uEnv.txt file.
 
 The uEnv.txt file supplied here directs U-Boot to load
-XXXXX YYYYY.
+a file called kernel.bin and execute it at address
+0x80200000.
+
+TODO:  I think it would be better overall to have U-Boot
+load ubldr (a version of loader(8) that uses U-Boot
+for system device access) and ubldr load the kernel.
+In particular, ubldr can load the kernel directly
+from UFS, which would allow us to use installkernel
+to install the kernel.  Unfortunately, ubldr does not
+yet support MBR partitions.
+
+
 
