@@ -49,8 +49,7 @@ FREEBSD_SRC=$TOPDIR/src-armv6
 UBOOT_SRC=$TOPDIR/u-boot
 
 # XXX Directory where build artifacts will go; this should be a
-# directory with at least 4G of free space, plus enough space for the
-# final disk image.
+# directory with enough space for the final disk image.
 #
 # XXX The freebsd-armv6 build doesn't go here; it goes
 # into /usr/obj/arm.arm instead.

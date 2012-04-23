@@ -16,7 +16,7 @@ mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
 MAKEOBJDIRPREFIX=${BUILDOBJ}/_freebsd_build
 # Clean out old log files before we start.
-rm ${BUILDOBJ}/*.log
+rm -f ${BUILDOBJ}/*.log
 
 #
 # Check various prerequisites
@@ -70,11 +70,11 @@ if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
-    patch -p1 < ../files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log
+    patch -p1 < ../files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn on some additional U-Boot features not ordinarily present in TIs build.
-    patch -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log
+    patch -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
-    patch -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log
+    patch -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
     echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
     gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
