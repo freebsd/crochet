@@ -119,11 +119,10 @@ MD=`mdconfig -a -t vnode -f ${IMG}`
 
 echo "Partitioning the raw disk image at "`date`
 # TI AM335x ROM code requires we use MBR partitioning.
-gpart create -s MBR ${MD}
-gpart add -b 63 -s10m -t '!12' ${MD}
-gpart set -a active -i 1 ${MD}
-gpart add -t freebsd ${MD}
-echo gpart commit ${MD}
+gpart create -s MBR -f x ${MD}
+gpart add -b 63 -s10m -t '!12' -f x ${MD}
+gpart set -a active -i 1 -f x ${MD}
+gpart add -t freebsd -f x ${MD}
 gpart commit ${MD}
 
 echo "Formatting the FAT partition at "`date`
@@ -134,11 +133,13 @@ mkdir ${BUILDOBJ}/_.mounted_fat
 mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
 echo "Formatting the UFS partition at "`date`
-bsdlabel -w ${MD}s2
-newfs ${MD}s2a
+newfs ${MD}s2
+tunefs -n enable /dev/${MD}s2
+tunefs -j enable /dev/${MD}s2
+tunefs -N enable /dev/${MD}s2
 [ -d ${BUILDOBJ}/_.mounted_ufs ] && rmdir ${BUILDOBJ}/_.mounted_ufs
 mkdir ${BUILDOBJ}/_.mounted_ufs
-mount /dev/${MD}s2a ${BUILDOBJ}/_.mounted_ufs
+mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
 
 #
 # Install U-Boot onto UFS partition.
