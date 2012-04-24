@@ -9,8 +9,13 @@ GB=$((1024 * $MB))
 #
 # Get the config values:
 #
+echo "Loading configuration values"
 . $TOPDIR/beaglebsd-config.sh
 
+if [ -f $TOPDIR/beaglebsd-config-local.sh ]; then
+    echo "Loading local configuration overrides"
+    . $TOPDIR/beaglebsd-config-local.sh
+fi
 
 mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
