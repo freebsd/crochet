@@ -1,3 +1,3 @@
-bootfile=ubldr
-kloadaddr=0x82000000
-uenvcmd=fatload mmc \${mmc_dev} \${kloadaddr} \${bootfile};bootelf \${kloadaddr}"
+bootfile=kernel.bin
+kloadaddr=0x80200000
+uenvcmd=fatload mmc \${mmc_dev} \${kloadaddr} \${bootfile};go \${kloadaddr}"
