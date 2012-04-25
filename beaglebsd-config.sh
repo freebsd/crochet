@@ -11,8 +11,8 @@
 #
 # MB and GB are predefined for convenience here
 #
-SD_SIZE=$((320 * MB)) # Smallest size that works.
-#SD_SIZE=$((4 * GB)) # 4 Gigabyte card
+SD_SIZE=$((350 * MB)) # Smallest size that works.
+#SD_SIZE=$((3900 * GB)) # 4 Gigabyte card
 #SD_SIZE=$((8 * GB)) # 8 Gigabyte card
 #SD_SIZE=$((16 * GB)) # 16 Gigabyte card
 #SD_SIZE=$((32 * GB)) # 32 Gigabyte card

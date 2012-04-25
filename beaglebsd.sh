@@ -3,8 +3,8 @@
 # Directory containing this script.
 TOPDIR=`cd \`dirname $0\`; pwd`
 # Useful values
-MB=$((1024 * 1024))
-GB=$((1024 * $MB))
+MB=$((1000 * 1000))
+GB=$((1000 * $MB))
 
 #
 # Get the config values:
