@@ -17,6 +17,9 @@ if [ -f $TOPDIR/beaglebsd-config-local.sh ]; then
     . $TOPDIR/beaglebsd-config-local.sh
 fi
 
+# Round down to sector multiple.
+SD_SIZE=$(( (SD_SIZE / 512) * 512))
+
 mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
 MAKEOBJDIRPREFIX=${BUILDOBJ}/_freebsd_build
