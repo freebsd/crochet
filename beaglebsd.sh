@@ -137,9 +137,17 @@ mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
 echo "Formatting the UFS partition at "`date`
 newfs ${MD}s2
+# Turn on Softupdates
 tunefs -n enable /dev/${MD}s2
+# Turn on SUJ
+# This makes reboots tolerable if you just pull power on the BB
 tunefs -j enable /dev/${MD}s2
+# Turn on NFSv4 ACLs
 tunefs -N enable /dev/${MD}s2
+# SUJ journal to 4M (minimum size)
+# A slow SDHC reads about 1MB/s, so the default 30M journal
+# can introduce a 30s delay into the boot.
+tunefs -S 4194304 /dev/${MD}s2
 [ -d ${BUILDOBJ}/_.mounted_ufs ] && rmdir ${BUILDOBJ}/_.mounted_ufs
 mkdir ${BUILDOBJ}/_.mounted_ufs
 mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
