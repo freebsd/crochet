@@ -116,3 +116,14 @@ install the kernel.  Unfortunately, ubldr does not yet support MBR
 partitions.
 
 ============================================================
+
+Notes and Errata
+----------------------------------------
+
+April 27, 2012:  To buildworld natively on the BeagleBone,
+you'll want a 4G card, copy the FreeBSD source tree to /usr/src
+on the card, and use the following command:
+  $ make TARGET_CPUTYPE=armv6 buildworld
+This took about 36 hours last time I tried, though that
+was with an old Class 4 card; I expect the card performance
+makes a big difference.

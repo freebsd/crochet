@@ -187,6 +187,11 @@ echo "Configuring FreeBSD"
 cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
 cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
 
+
+# Copy source onto card as well.
+#echo "Copying source to /usr/src on disk image"
+#(cd $FREEBSD_SRC ; tar cf - *) | (cd ${BUILDOBJ}/_.mounted_ufs/usr/src ; tar xpf -)
+
 #
 # Unmount and clean up.
 #
