@@ -123,7 +123,7 @@ MD=`mdconfig -a -t vnode -f ${IMG}`
 echo "Partitioning the raw disk image at "`date`
 # TI AM335x ROM code requires we use MBR partitioning.
 gpart create -s MBR -f x ${MD}
-gpart add -b 63 -s10m -t '!12' -f x ${MD}
+gpart add -b 63 -s3m -t '!12' -f x ${MD}
 gpart set -a active -i 1 -f x ${MD}
 gpart add -t freebsd -f x ${MD}
 gpart commit ${MD}
