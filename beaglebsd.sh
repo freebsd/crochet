@@ -56,7 +56,7 @@ if [ -z `which arm-freebsd-cc` ]; then
 fi
 echo "Found FreeBSD xdev tools for ARM"
 
-# We need Damjan Marion's FreeBSD-armv6 tree (we can tell it's the right
+# We need the FreeBSD-armv6 tree (we can tell it's the right
 # one by the presence of the BEAGLEBONE configuration file).
 # Someday, this will all be merged and we can just rely on FreeBSD-CURRENT.
 if [ \! -f "$FREEBSD_SRC/sys/arm/conf/BEAGLEBONE" ]; then
