@@ -3,8 +3,14 @@ freebsd-beaglebone
 
 Automate building a bootable FreeBSD image for BeagleBone.
 
-This basically automates Damjan Marion's instructions at
+This started from Damjan Marion's instructions at
   http://people.freebsd.org/~dmarion/beaglebone/creating_bootable_sd_card/
+but has several improvements:
+ * For speed, it builds an image file on disk rather than
+   directly on the MicroSDHC card.
+ * Uses the standard FreeBSD boot loader to load the dynamic
+   kernel from UFS.  Among other benefits, this supports all
+   standard FreeBSD load-time configuration options.
 
 ============================================================
 
@@ -106,14 +112,15 @@ script commands that can be partially overridden by additional
 commands in the uEnv.txt file.
 
 The uEnv.txt file supplied here directs U-Boot to load a file called
-kernel.bin and execute it at address 0x80200000.
+ubldr and execute it at address 0x80100000.
 
-TODO: I think it would be better overall to have U-Boot load ubldr (a
-version of loader(8) that uses U-Boot for system device access) and
-ubldr load the kernel.  In particular, ubldr can load the kernel
-directly from UFS, which would allow us to use installkernel to
-install the kernel.  Unfortunately, ubldr does not yet support MBR
-partitions.
+ubldr is a variant of FreeBSD's standard loader(8) program that
+is designed to be chain-loaded from U-Boot.  It calls into U-Boot
+for low-level device access, which allows ubldr to load FreeBSD
+on any system that supports U-Boot.
+
+ubldr then locates the UFS partition, reads the dynamic
+kernel from UFS to address 0x80200000 and executes it.
 
 ============================================================
 
@@ -127,3 +134,9 @@ on the card, and use the following command:
 This took about 36 hours last time I tried, though that
 was with an old Class 4 card; I expect the card performance
 makes a big difference.
+
+May 6, 2012: The ubldr binary used here requires some patches
+that I have in my local tree.  These patches probably break
+ubldr on other platforms so cannot (yet) be committed to the
+FreeBSD tree.  I'm working to generalize them.  Contact me if
+you'd like to get copies of the patches.
