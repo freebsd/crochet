@@ -4,6 +4,11 @@
 # This fragment of shell script will be
 # read into beaglebsd.sh when it runs.
 
+
+# Uncomment to populate /usr/src
+#
+#INSTALL_USR_SRC=yes
+
 #
 # Size of the disk image that will be built.
 # This is usually the same size as your card,

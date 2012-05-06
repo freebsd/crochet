@@ -188,8 +188,13 @@ cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
 cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
 
 # Copy source onto card as well.
-#echo "Copying source to /usr/src on disk image"
-#(cd $FREEBSD_SRC ; tar cf - *) | (cd ${BUILDOBJ}/_.mounted_ufs/usr/src ; tar xpf -)
+if [ -n "$INSTALL_USR_SRC" ]; then
+    echo "Copying source to /usr/src on disk image"
+    mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/src
+    cd ${BUILDOBJ}/_.mounted_ufs/usr/src
+    # Note: Omits the .svn directory.
+    (cd $FREEBSD_SRC ; tar cf - *) | tar xpf -
+fi
 
 #
 # Unmount and clean up.
