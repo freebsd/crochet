@@ -195,6 +195,7 @@ make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs dist
 # Configure FreeBSD
 # These could be generated dynamically if we needed.
 echo "Configuring FreeBSD"
+mkdir -p ${BUILDOBJ}/_.mounted_ufs/etc
 cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
 cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
 
