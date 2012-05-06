@@ -160,27 +160,14 @@ cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
 cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
 cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 
+# Install FreeBSD's ubldr onto FAT partition.
 #
-# TODO: Install FreeBSD's ubldr onto FAT partition.
-# For this to work:
-#   1) ubldr needs to be linked with a start address of 0x80200000 when built for BeagleBone
-#   2) ubldr needs to understand MBR partitioning
-#   3) ubldr needs to load the kernel from the first UFS slice even if that slice is not marked as the active partition
-#   4) files/uEnv.txt needs to be tweaked to load ubldr instead of kernel.bin
-#   5) files/uEnv.txt needs to use 'bootelf' to start the ELF ubldr image instead of 'go' to start the binary kernel image
+# TODO: This is a binary blob for the moment until I get
+#  some local patches committed and find a cleaner way to
+#  build and install ubldr.
 #
-# Advantages of having U-Boot load ubldr and having ubldr load the kernel:
-#  1) We can use kernel modules.
-#  2) We can use installkernel to put the kernel onto the UFS partition.
-#  3) It's easier to be self-hosting.
-#
-#cp /usr/obj/arm.arm/${FREEBSD_SRC}/sys/boot/arm/uboot/ubldr ${BUILDOBJ}/_.mounted_fat/
-#
-
-# Install FreeBSD kernel.bin into the FAT partition
-# TODO: Remove this once ubldr works.  ubldr can load
-# the ELF kernel directly from UFS.
-cp /usr/obj/arm.arm/${FREEBSD_SRC}/sys/${KERNCONF}/kernel.bin ${BUILDOBJ}/_.mounted_fat/
+#cp /usr/obj/arm.arm/usr/src/sys/boot/arm/uboot/ubldr ${BUILDOBJ}/_.mounted_fat/
+cp files/ubldr ${BUILDOBJ}/_.mounted_fat/
 
 #
 # Install FreeBSD kernel and world onto UFS partition.
