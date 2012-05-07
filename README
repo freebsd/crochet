@@ -1,16 +1,22 @@
 freebsd-beaglebone
 ==================
 
-Automate building a bootable FreeBSD image for BeagleBone.
+Script to build a bootable FreeBSD image for BeagleBone.
 
 This started from Damjan Marion's instructions at
   http://people.freebsd.org/~dmarion/beaglebone/creating_bootable_sd_card/
+
 but has several improvements:
+
  * For speed, it builds an image file on disk rather than
    directly on the MicroSDHC card.
+
  * Uses the standard FreeBSD boot loader to load the dynamic
    kernel from UFS.  Among other benefits, this supports all
    standard FreeBSD load-time configuration options.
+
+Note:  This relies on the armv6 FreeBSD tree that is still
+very much under active development.  Expect bumps.
 
 ============================================================
 
@@ -18,8 +24,9 @@ What is a BeagleBone?
 --------------------
 
 The BeagleBone is an ARM-based development/test board from the
-BeagleBoard project.  It features a modern ARMv7 processor
-and a wealth of on-chip peripheral support.  Details can be found at:
+BeagleBoard project.  It features a modern ARMv7 processor and a
+wealth of on-chip peripheral support.  Details can be found at:
+
    http://beagleboard.org/bone
 
 The BeagleBone is an easy way to learn about ARM development: it is
@@ -44,28 +51,28 @@ FreeBSD-CURRENT (March 2012 or later).
 
 Using the script to build an image consists of three steps:
 
-1. EDIT beaglebsd-config.sh.
+1. EDIT beaglebsd-config.sh
 
-You need to set the image size to match the MicroSDHC card you'll be
-using and verify that certain directories have enough free space.
-There are lots of comments in this file to help you.
+   You need to set the image size to match the MicroSDHC card you'll
+   be using and verify that certain directories have enough free
+   space.  There are lots of comments in this file to help you.
 
 2. RUN beaglebsd.sh as root
 
    $ sudo /bin/sh beaglebsd.sh
 
-The script will first check that you have all the needed sources.  If
-you don't, the script will tell you exactly how to obtain the missing
-pieces.  Follow the instructions and re-run the script until you have
-everything.
+   The script will first check that you have all the needed sources.
+   If you don't, the script will tell you exactly how to obtain the
+   missing pieces.  Follow the instructions and re-run the script
+   until you have everything.
 
-As soon as it finds all the required pieces, the script will then
-compile everything and build the disk image.  This part of the process
-can take several hours.
+   As soon as it finds all the required pieces, the script will then
+   compile everything and build the disk image.  This part of the
+   process can take several hours.
 
 3. COPY the image to a MicroSDHC card.
 
-The script will suggest a command to do this.
+   The script will suggest a command to do this.
 
 To verify the image, try mounting the card on your FreeBSD system.  It
 should show up with two slices: The first slice is FAT formatted and
@@ -79,48 +86,76 @@ How to boot the BeagleBone
 --------------------------
 
 1. CONNECT the board to your FreeBSD system using a Mini-USB cable.
-The Mini-USB connector is on the bottom of the BeagleBone.
+   The Mini-USB connector is on the bottom of the BeagleBone.
 
 2. ACCESS the serial console on the board from your desktop:
    $ sudo cu -l /dev/ttyU1 -s 115200
-(If this doesn't work, you may need to load the uftdi driver into your kernel.)
+
+   (You may need to load the uftdi driver into your kernel.)
 
 3. INSERT the MicroSDHC card into your BeagleBone
 
-4. REBOOT the BeagleBone by depressing the small switch next to the
-Ethernet port.
+4. REBOOT the BeagleBone by depressing the small
+   switch next to the Ethernet port.
+
+============================================================
+
+IF SOMETHING GOES WRONG
+-----------------------
+
+If the image fails to boot, it's probably because FreeBSD failed to
+build correctly (the armv6 tree is under very active development).
+The script continues to run and builds the image, but it will
+have things missing.
+
+Look at the build and install logs under the 'work' directory, and ask
+on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
+help.
 
 ============================================================
 
 Anatomy of a BeagleBone Boot Image
 ----------------------------------
 
-The AM3358 SoC ROM code expects the MicroSDHC card to use
-MBR partitioning and to have a bootable FAT partition.
+The FreeBSD bootable image for BeagleBone has both FAT
+and UFS partitions containing the following files:
 
-The ROM code loads a file called "MLO" from the FAT filesystem into
-on-chip RAM.  The MLO program is responsible for initializing the
-external RAM and loading the next-stage boot.  The on-chip RAM is 128k
-and some is used for ROM execution, so the MLO must be less than 110k.
+  FAT Partition
+     MLO  - First stage boot, from U-Boot
+     u-boot.img - Second stage: U-Boot
+     uEnv.txt - configuration for U-Boot
+     ubldr - Third stage: FreeBSD bootloader
 
-In our case, MLO is a stripped-down version of the U-Boot boot loader.
-It initializes the external RAM and then loads the full U-Boot program.
+  UFS Partition
+     /boot/kernel - dynamic kernel
+     ... rest of FreeBSD ...
 
-U-Boot is a highly modular boot loader system that can be used on a
-wide variety of systems.  The loader is configured with built-in
-script commands that can be partially overridden by additional
-commands in the uEnv.txt file.
+The boot process works like this:
 
-The uEnv.txt file supplied here directs U-Boot to load a file called
-ubldr and execute it at address 0x80100000.
+ 1) AM3358 SoC ROM code inspects the MicroSDHC card, finds the MBR
+    partition table and loads "MLO" from the first FAT partition.
 
-ubldr is a variant of FreeBSD's standard loader(8) program that
-is designed to be chain-loaded from U-Boot.  It calls into U-Boot
-for low-level device access, which allows ubldr to load FreeBSD
-on any system that supports U-Boot.
+    MLO is loaded before external RAM is initialized, so it has to be
+    under 110k to fit within the on-chip RAM.  MLO here is a
+    stripped-down version of U-Boot.
 
-ubldr then locates the UFS partition, reads the dynamic
-kernel from UFS to address 0x80200000 and executes it.
+ 2) MLO loads u-boot.img from the first FAT partition.
+
+    U-Boot is a highly modular boot loader system that can be used on
+    a wide variety of systems.  The loader is configured with built-in
+    script commands that can be partially overridden by additional
+    commands in the uEnv.txt file.
+
+ 3) U-Boot loads uEnv.txt and follows those commands to load ubldr at
+    address 0x80100000.
+
+    ubldr is a variant of FreeBSD's standard loader(8) program that is
+    designed to be chain-loaded from U-Boot.  It calls into U-Boot for
+    low-level device access, which allows ubldr to load FreeBSD on any
+    system that supports U-Boot.
+
+ 4) ubldr locates the UFS partition, loads /boot/kernel/kernel from
+    UFS to address 0x80200000 and executes it.
 
 ============================================================
 
@@ -135,8 +170,9 @@ This took about 36 hours last time I tried, though that
 was with an old Class 4 card; I expect the card performance
 makes a big difference.
 
-May 6, 2012: The ubldr binary used here requires some patches
-that I have in my local tree.  These patches probably break
-ubldr on other platforms so cannot (yet) be committed to the
-FreeBSD tree.  I'm working to generalize them.  Contact me if
-you'd like to get copies of the patches.
+May 6, 2012: The ubldr binary used here was compiled from my local
+tree and relies on some local patches I've been working on.  These
+patches probably break ubldr on other platforms so cannot (yet) be
+committed to the FreeBSD tree.  I'm working to generalize them and get
+them committed.  Contact me if you'd like to get copies of the
+patches.
