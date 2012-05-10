@@ -4,10 +4,15 @@
 # This fragment of shell script will be
 # read into beaglebsd.sh when it runs.
 
-
 # Uncomment to populate /usr/src
+# Make sure you have at least a 2GB card
+# (4GB recommended).
 #
 #INSTALL_USR_SRC=yes
+
+# Uncomment to initialize /usr/ports
+#
+#INSTALL_USR_PORTS=yes
 
 #
 # Size of the disk image that will be built.

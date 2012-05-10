@@ -192,8 +192,16 @@ if [ -n "$INSTALL_USR_SRC" ]; then
     echo "Copying source to /usr/src on disk image"
     mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/src
     cd ${BUILDOBJ}/_.mounted_ufs/usr/src
-    # Note: Omits the .svn directory.
-    (cd $FREEBSD_SRC ; tar cf - *) | tar xpf -
+    # Note: Includes the .svn directory.
+    (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
+fi
+
+if [ -n "$INSTALL_USR_PORTS" ]; then
+    mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/ports
+    echo "Updating ports snapshot"
+    portsnap fetch
+    echo "Installing ports tree"
+    portsnap -p ${BUILDOBJ}/_.mounted_ufs/usr/ports extract
 fi
 
 #
