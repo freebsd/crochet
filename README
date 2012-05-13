@@ -176,3 +176,12 @@ patches probably break ubldr on other platforms so cannot (yet) be
 committed to the FreeBSD tree.  I'm working to generalize them and get
 them committed.  Contact me if you'd like to get copies of the
 patches.
+
+May 11, 2012: Caveat:  Commit 234858 broke the armv6 tree building.
+You may need to roll back to just before this commit to get
+a clean build.  Hopefully the dust will settle soon.
+
+May 12, 2012: TI's most recent U-Boot sources seem to have broken
+building on FreeBSD.  If you see errors about "region .sram is full",
+try checking out revision d0e52e5 (which is the revision I've been
+using).
