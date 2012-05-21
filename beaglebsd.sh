@@ -89,6 +89,8 @@ if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
     echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
     gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
     cd $TOPDIR
+else
+    echo "Using U-Boot from previous build."
 fi
 
 #
@@ -100,6 +102,8 @@ if [ ! -f ${BUILDOBJ}/_.built-world ]; then
     make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-world
+else
+    echo "Using FreeBSD world from previous build"
 fi
 
 if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
@@ -108,6 +112,8 @@ if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
     make TARGET_ARCH=arm KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-kernel
+else
+    echo "Using FreeBSD kernel from previous build"
 fi
 
 # TODO: Build ubldr (see below)
@@ -117,7 +123,7 @@ fi
 #
 echo "Creating the raw disk image in ${IMG}"
 [ -f ${IMG} ] && rm -f ${IMG}
-dd if=/dev/zero of=${IMG} bs=1 seek=${SD_SIZE} count=0
+dd if=/dev/zero of=${IMG} bs=1 seek=${SD_SIZE} count=0 >/dev/null 2>&1
 MD=`mdconfig -a -t vnode -f ${IMG}`
 
 echo "Partitioning the raw disk image at "`date`
@@ -130,13 +136,13 @@ gpart commit ${MD}
 
 echo "Formatting the FAT partition at "`date`
 # Note: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
-newfs_msdos -L "boot" -F 12 ${MD}s1
+newfs_msdos -L "boot" -F 12 ${MD}s1 >/dev/null
 [ -d ${BUILDOBJ}/_.mounted_fat ] && rmdir ${BUILDOBJ}/_.mounted_fat
 mkdir ${BUILDOBJ}/_.mounted_fat
 mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
 echo "Formatting the UFS partition at "`date`
-newfs ${MD}s2
+newfs ${MD}s2 >/dev/null
 # Turn on Softupdates
 tunefs -n enable /dev/${MD}s2
 # Turn on SUJ
@@ -153,7 +159,7 @@ mkdir ${BUILDOBJ}/_.mounted_ufs
 mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
 
 #
-# Install U-Boot onto UFS partition.
+# Install U-Boot onto FAT partition.
 #
 echo "Installing U-Boot onto the FAT partition at "`date`
 cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
@@ -182,14 +188,14 @@ make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs dist
 
 # Configure FreeBSD
 # These could be generated dynamically if we needed.
-echo "Configuring FreeBSD"
+echo "Configuring FreeBSD at "`date`
 mkdir -p ${BUILDOBJ}/_.mounted_ufs/etc
 cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
 cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
 
 # Copy source onto card as well.
 if [ -n "$INSTALL_USR_SRC" ]; then
-    echo "Copying source to /usr/src on disk image"
+    echo "Copying source to /usr/src on disk image at "`date`
     mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/src
     cd ${BUILDOBJ}/_.mounted_ufs/usr/src
     # Note: Includes the .svn directory.
@@ -198,16 +204,16 @@ fi
 
 if [ -n "$INSTALL_USR_PORTS" ]; then
     mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/ports
-    echo "Updating ports snapshot"
-    portsnap fetch
-    echo "Installing ports tree"
-    portsnap -p ${BUILDOBJ}/_.mounted_ufs/usr/ports extract
+    echo "Updating ports snapshot at "`date`
+    portsnap fetch > ${BUILDOBJ}/_.portsnap.fetch.log
+    echo "Installing ports tree at "`date`
+    portsnap -p ${BUILDOBJ}/_.mounted_ufs/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
 fi
 
 #
 # Unmount and clean up.
 #
-echo "Unmounting the disk image"
+echo "Unmounting the disk image at "`date`
 cd $TOPDIR
 umount ${BUILDOBJ}/_.mounted_fat
 umount ${BUILDOBJ}/_.mounted_ufs
@@ -216,9 +222,11 @@ mdconfig -d -u ${MD}
 #
 # We have a finished image; explain what to do with it.
 #
-echo "DONE.  Completed disk image is in: ${IMG}"
+echo "DONE."
+echo "Completed disk image is in: ${IMG}"
 echo
 echo "Copy to a MicroSDHC card using a command such as:"
 echo "dd if=${IMG} of=/dev/da0"
 echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
 echo
+date
