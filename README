@@ -162,14 +162,6 @@ The boot process works like this:
 Notes and Errata
 ----------------------------------------
 
-April 27, 2012:  To buildworld natively on the BeagleBone,
-you'll want a 4G card, copy the FreeBSD source tree to /usr/src
-on the card, and use the following command:
-  $ make TARGET_CPUTYPE=armv6 buildworld
-This took about 36 hours last time I tried, though that
-was with an old Class 4 card; I expect the card performance
-makes a big difference.
-
 May 6, 2012: The ubldr binary used here was compiled from my local
 tree and relies on some local patches I've been working on.  These
 patches probably break ubldr on other platforms so cannot (yet) be
@@ -177,11 +169,21 @@ committed to the FreeBSD tree.  I'm working to generalize them and get
 them committed.  Contact me if you'd like to get copies of the
 patches.
 
-May 11, 2012: Caveat:  Commit 234858 broke the armv6 tree building.
-You may need to roll back to just before this commit to get
-a clean build.  Hopefully the dust will settle soon.
+May 27, 2012: Caveat: FreeBSD's armv6 tree is still a little wonky.
+If you have trouble building, try checking out revision 234857.
 
-May 12, 2012: TI's most recent U-Boot sources seem to have broken
-building on FreeBSD.  If you see errors about "region .sram is full",
-try checking out revision d0e52e5 (which is the revision I've been
-using).
+May 27, 2012: I believe I've fixed the U-boot building;
+the Arago sources had bloated the MLO some so it could no longer
+link.  Thanks to jhofstee for suggesting a specific fix.
+(If you still see errors about "region .sram is full",
+try checking out commit d0e52e5 of the Arago sources.)
+
+May 27, 2012:  Full in-place source upgrades work natively
+on the BeagleBone now.  You probably want at least a 6G image,
+uncomment INSTALL_USR_SRC in the configuration file to populate
+/usr/src on the card, and use the following command:
+  $ make TARGET_CPUTYPE=armv6 buildworld
+  $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE buildkernel
+  $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE installkernel
+  $ make TARGET_CPUTYPE=armv6 installworld
+Buildworld took about 30 hours last time I tried.
