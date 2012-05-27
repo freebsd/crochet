@@ -26,7 +26,7 @@
 #
 SD_SIZE=$((350 * MB)) # Smallest size that works.
 #SD_SIZE=$((1950 * MB)) # for 2 Gigabyte card
-#SD_SIZE=$((3950 * MB)) # for 4 Gigabyte card
+#SD_SIZE=$((3900 * MB)) # for 4 Gigabyte card
 #SD_SIZE=$((7900 * MB)) # for 8 Gigabyte card
 #SD_SIZE=$((15900 * MB)) # for 16 Gigabyte card
 #SD_SIZE=$((31900 * MB)) # for 32 Gigabyte card
