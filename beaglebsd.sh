@@ -83,6 +83,8 @@ if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
     patch -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
     patch -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    # Turn off some features that bloat the MLO so it can't link
+    patch -p1 < ../files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
     echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
     gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
