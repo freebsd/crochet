@@ -154,9 +154,6 @@ gpart commit ${MD}
 echo "Formatting the FAT partition at "`date`
 # Note: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
 newfs_msdos -L "boot" -F 12 ${MD}s1 >/dev/null
-[ -d ${BUILDOBJ}/_.mounted_fat ] && rmdir ${BUILDOBJ}/_.mounted_fat
-mkdir ${BUILDOBJ}/_.mounted_fat
-mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
 
 echo "Formatting the UFS partition at "`date`
 newfs ${MD}s2 >/dev/null
@@ -171,7 +168,16 @@ tunefs -N enable /dev/${MD}s2
 # A slow SDHC reads about 1MB/s, so the default 30M journal
 # can introduce a 30s delay into the boot.
 tunefs -S 4194304 /dev/${MD}s2
-[ -d ${BUILDOBJ}/_.mounted_ufs ] && rmdir ${BUILDOBJ}/_.mounted_ufs
+
+echo "Mounting the virtual disk partitions"
+if [ -d ${BUILDOBJ}/_.mounted_fat ]; then
+    rmdir ${BUILDOBJ}/_.mounted_fat
+fi
+mkdir ${BUILDOBJ}/_.mounted_fat
+mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
+if [ -d ${BUILDOBJ}/_.mounted_ufs ]; then
+    rmdir ${BUILDOBJ}/_.mounted_ufs
+fi
 mkdir ${BUILDOBJ}/_.mounted_ufs
 mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
 
