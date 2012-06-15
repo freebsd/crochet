@@ -74,7 +74,7 @@ echo "Found FreeBSD-armv6 source tree in $FREEBSD_SRC"
 #
 # Build and configure U-Boot
 #
-if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
+if [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
@@ -86,14 +86,28 @@ if [ ! -f "$UBOOT_SRC/u-boot.img" ]; then
     # Turn off some features that bloat the MLO so it can't link
     patch -p1 < ../files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
+    touch ${BUILDOBJ}/_.uboot.patched
+    rm -f ${BUILDOBJ}/_.uboot.configured
+fi
+
+if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
+    cd "$UBOOT_SRC"
     echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
     gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
+    touch ${BUILDOBJ}/_.uboot.configured
+    rm -f ${BUILDOBJ}/_.uboot.built
+fi
+
+if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
+    cd "$UBOOT_SRC"
     echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
     gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
-    cd $TOPDIR
+    touch ${BUILDOBJ}/_.uboot.built
 else
     echo "Using U-Boot from previous build."
 fi
+
+cd $TOPDIR
 
 #
 # Build FreeBSD for BeagleBone
