@@ -184,10 +184,13 @@ cp files/ubldr ${BUILDOBJ}/_.mounted_fat/
 cd $FREEBSD_SRC
 echo "Installing FreeBSD kernel onto the UFS partition at "`date`
 make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
-echo "Installing FreeBSD world onto the UFS partition at "`date`
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+
+if [ -z "$NO_WORLD" ]; then
+    echo "Installing FreeBSD world onto the UFS partition at "`date`
+    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
+    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
+    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+fi
 
 # Configure FreeBSD
 # These could be generated dynamically if we needed.

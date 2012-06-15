@@ -14,6 +14,11 @@
 #
 #INSTALL_USR_PORTS=yes
 
+# Uncomment to avoid installworld (useful when debugging
+# boot issues)
+#
+# NO_WORLD=yes
+
 #
 # Size of the disk image that will be built.
 # This is usually the same size as your card,
