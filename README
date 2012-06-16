@@ -170,11 +170,6 @@ June 15, 2012: The armv6 tree builds again reliably after
 revision 236527.  If you're using an older version, please
 upgrade and let us know how it works for you.
 
-June 15, 2012: There's a conflict between the ubldr version
-here and the most recent U-Boot built from the Arago sources.
-I believe it still works if you go back to an earlier version
-of the Arago sources.  (Try commit d0e52e5 if you can.)
-
 May 27, 2012:  Full in-place source upgrades (from the armv6
 tree) work natively on the BeagleBone now.  You probably
 want at least a 6G image, uncomment INSTALL_USR_SRC in the
