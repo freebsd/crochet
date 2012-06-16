@@ -162,26 +162,24 @@ The boot process works like this:
 Notes and Errata
 ----------------------------------------
 
-May 6, 2012: The ubldr binary used here was compiled from my local
-tree and relies on some local patches I've been working on.  These
-patches probably break ubldr on other platforms so cannot (yet) be
-committed to the FreeBSD tree.  I'm working to generalize them and get
-them committed.  Contact me if you'd like to get copies of the
-patches.
+June 15, 2012: The changes needed to build ubldr directly
+from FreeBSD sources have all been committed; I'll soon
+have the script updated to build ubldr from source.
 
-May 27, 2012: Caveat: FreeBSD's armv6 tree is still a little wonky.
-If you have trouble building, try checking out revision 234857.
+June 15, 2012: The armv6 tree builds again reliably after
+revision 236527.  If you're using an older version, please
+upgrade and let us know how it works for you.
 
-May 27, 2012: I believe I've fixed the U-boot building;
-the Arago sources had bloated the MLO some so it could no longer
-link.  Thanks to jhofstee for suggesting a specific fix.
-(If you still see errors about "region .sram is full",
-try checking out commit d0e52e5 of the Arago sources.)
+June 15, 2012: There's a conflict between the ubldr version
+here and the most recent U-Boot built from the Arago sources.
+I believe it still works if you go back to an earlier version
+of the Arago sources.  (Try commit d0e52e5 if you can.)
 
-May 27, 2012:  Full in-place source upgrades work natively
-on the BeagleBone now.  You probably want at least a 6G image,
-uncomment INSTALL_USR_SRC in the configuration file to populate
-/usr/src on the card, and use the following command:
+May 27, 2012:  Full in-place source upgrades (from the armv6
+tree) work natively on the BeagleBone now.  You probably
+want at least a 6G image, uncomment INSTALL_USR_SRC in the
+configuration file to populate /usr/src on the card, and use
+the following commands:
   $ make TARGET_CPUTYPE=armv6 buildworld
   $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE buildkernel
   $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE installkernel
