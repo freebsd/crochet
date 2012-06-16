@@ -147,7 +147,7 @@ The boot process works like this:
     commands in the uEnv.txt file.
 
  3) U-Boot loads uEnv.txt and follows those commands to load ubldr at
-    address 0x80100000.
+    address 0x88000000.
 
     ubldr is a variant of FreeBSD's standard loader(8) program that is
     designed to be chain-loaded from U-Boot.  It calls into U-Boot for
