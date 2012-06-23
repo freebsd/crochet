@@ -216,8 +216,9 @@ fi
 # These could be generated dynamically if we needed.
 echo "Configuring FreeBSD at "`date`
 mkdir -p ${BUILDOBJ}/_.mounted_ufs/etc
-cp ${TOPDIR}/files/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
-cp ${TOPDIR}/files/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
+cp ${TOPDIR}/files/etc/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
+cp ${TOPDIR}/files/etc/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
+cp ${TOPDIR}/files/etc/src.conf ${BUILDOBJ}/_.mounted_ufs/etc/
 
 # Copy source onto card as well.
 if [ -n "$INSTALL_USR_SRC" ]; then
