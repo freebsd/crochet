@@ -132,7 +132,27 @@ else
     echo "Using FreeBSD kernel from previous build"
 fi
 
-# TODO: Build ubldr (see below)
+#
+# Build FreeBSD's ubldr
+#
+if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
+    echo "Building FreeBSD arm:arm ubldr"
+    rm -rf ${BUILDOBJ}/ubldr
+    mkdir -p ${BUILDOBJ}/ubldr
+    # Assumes commits have been merged!
+    cd ${FREEBSD_SRC}
+    #cd /usr/src
+    ubldr_makefiles=`pwd`/share/mk
+    buildenv=`make TARGET_ARCH=arm buildenvvars`
+    cd sys/boot
+    eval $buildenv make -m $ubldr_makefiles obj > ${BUILDOBJ}/_.ubldr.build.log
+    eval $buildenv make -m $ubldr_makefiles depend >> ${BUILDOBJ}/_.ubldr.build.log
+    eval $buildenv make UBLDR_LOADADDR=0x88000000 -m $ubldr_makefiles all >> ${BUILDOBJ}/_.ubldr.build.log
+    cd arm/uboot
+    eval $buildenv make DESTDIR=${BUILDOBJ}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${BUILDOBJ}/_.ubldr.build.log
+else
+    echo "Using FreeBSD arm:arm ubldr from previous build"
+fi
 
 #
 # Create and partition the disk image
@@ -189,14 +209,12 @@ cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
 cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
 cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 
-# Install FreeBSD's ubldr onto FAT partition.
 #
-# TODO: This is a binary blob for the moment until I get
-#  some local patches committed and find a cleaner way to
-#  build and install ubldr.
+# Install ubldr onto FAT partition.
 #
-#cp /usr/obj/arm.arm/usr/src/sys/boot/arm/uboot/ubldr ${BUILDOBJ}/_.mounted_fat/
-cp files/ubldr ${BUILDOBJ}/_.mounted_fat/
+echo "Installing ubldr onto the FAT partition at "`date`
+cp ${BUILDOBJ}/ubldr/ubldr ${BUILDOBJ}/_.mounted_fat/
+cp ${BUILDOBJ}/ubldr/loader.help ${BUILDOBJ}/_.mounted_fat/
 
 #
 # Install FreeBSD kernel and world onto UFS partition.

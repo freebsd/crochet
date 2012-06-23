@@ -11,12 +11,24 @@ but has several improvements:
  * For speed, it builds an image file on disk rather than
    directly on the MicroSDHC card.
 
- * Uses the standard FreeBSD boot loader to load the dynamic
+ * Uses the standard FreeBSD boot loader (ubldr) to load the
    kernel from UFS.  Among other benefits, this supports all
    standard FreeBSD load-time configuration options.
 
 Note:  This relies on the armv6 FreeBSD tree that is still
 very much under active development.  Expect bumps.
+
+============================================================
+
+Errata
+----------------------------------------
+
+June 23, 2012: You need r237506 or later of the armv6 tree.
+This script now builds ubldr directly from source, and this
+is the first revision that has all the necessary changes.
+
+June 23, 2012: I'm having some issues with the cpsw Ethernet
+driver.  Hope to work on this next.
 
 ============================================================
 
@@ -159,24 +171,74 @@ The boot process works like this:
 
 ============================================================
 
-Notes and Errata
-----------------------------------------
+NATIVE SOURCE REBUILDS
+---------------------------------------
 
-June 15, 2012: The changes needed to build ubldr directly
-from FreeBSD sources have all been committed; I'll soon
-have the script updated to build ubldr from source.
+One of my goals is for the usual "make buildworld",
+"make installworld", "make buildkernel", and
+"make installkernel" to all work natively on the BeagleBone.
 
-June 15, 2012: The armv6 tree builds again reliably after
-revision 236527.  If you're using an older version, please
-upgrade and let us know how it works for you.
+If you want to try this:
+ * You probably want at least a 6G image.
+ * Uncomment INSTALL_USR_SRC in beaglebsd-config.sh
+ * You may need to set up a swap partition; the script
+   doesn't do this automatically (see PROJECTS list below)
 
-May 27, 2012:  Full in-place source upgrades (from the armv6
-tree) work natively on the BeagleBone now.  You probably
-want at least a 6G image, uncomment INSTALL_USR_SRC in the
-configuration file to populate /usr/src on the card, and use
-the following commands:
-  $ make TARGET_CPUTYPE=armv6 buildworld
-  $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE buildkernel
-  $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE installkernel
-  $ make TARGET_CPUTYPE=armv6 installworld
-Buildworld took about 30 hours last time I tried.
+After you boot the resulting image, you'll have a fully
+populated /usr/src and can try rebuilding the system
+natively.
+
+Here are the commands you can try.  Patches appreciated
+if you figure out how to deal with any of the issues here:
+
+Buildworld:
+ $ make TARGET_CPUTYPE=armv6 buildworld
+Status:  this works for me today.
+Issue: the TARGET_CPUTYPE shouldn't be necessary here.
+Issue: This takes about 30 hours right now; I suspect
+that's mostly due to the slow speed of the SD driver.
+
+Installworld:
+ $ make TARGET_CPUTYPE=armv6 installworld
+Status: This seems fine.
+Issue:  as above
+
+Buildkernel (this is broken right now):
+ $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE buildkernel
+Status:  Breakage seems to be due to mismatches with how
+various parts of the source handle CPU-specific issues.
+We should probably be using TARGET_ARCH (which is inferred
+from the system) instead of TARGET_CPUTYPE, but a lot of the
+code relies on TARGET_CPUTYPE right now.  There's some
+discussion on arm@freebsd.org about how to fix this.  Ask
+if you're interested in helping.
+
+============================================================
+
+PROJECTS
+-----------------------------------------
+
+If you're interested, there are a lot of things still to
+be done:
+
+ * Test ports.  I've tried building a few ports natively with
+   somewhat mixed success.  Try things and let us know what
+   you find.
+ * Improve cpsw Ethernet driver.  Damjan Marion's initial
+   driver works, but could certainly use more work.
+ * USB.  Benjamin Gray has written a driver, it's in the
+   tree, but I haven't had time to try to get it to actually
+   work.  (Among other things, USB disk might be faster,
+   allowing for faster native buildworlds/buildkernel.)
+ * Modular kernel.  The kernel can load modules, I've successfully
+   built and loaded cpsw as a module.
+ * Memory.  Some recent change reduced available memory quite
+   a bit.  Easy fix is to turn off things in rc.conf.
+   There are probably also kernel tweaks possible.
+ * Swap.  The script should allow you to specify a swap size
+   and automatically adjust the disk layout accordingly.
+ * USB client.  The Linux distros have a virtual Ethernet
+   client that allows true single-cable development.  I would
+   like to do something similar for FreeBSD.
+
+============================================================
