@@ -125,7 +125,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
     echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
     cd $FREEBSD_SRC
-    make -DKERNFAST TARGET_ARCH=arm KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
+    make TARGET_ARCH=arm KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-kernel
 else
