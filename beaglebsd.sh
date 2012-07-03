@@ -45,7 +45,7 @@ fi
 echo "Found U-Boot sources in $UBOOT_SRC"
 
 # We need the cross-tools for arm, if they're not already built.
-if [ -z `which arm-freebsd-cc` ]; then
+if [ -z `which armv6-freebsd-cc` ]; then
     echo "Can't find FreeBSD xdev tools for ARM."
     echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
     echo
@@ -78,13 +78,13 @@ if [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
-    patch -p1 < ../files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ../files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn on some additional U-Boot features not ordinarily present in TIs build.
-    patch -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
-    patch -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn off some features that bloat the MLO so it can't link
-    patch -p1 < ../files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ../files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
     touch ${BUILDOBJ}/_.uboot.patched
     rm -f ${BUILDOBJ}/_.uboot.configured
@@ -93,7 +93,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
     cd "$UBOOT_SRC"
     echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
-    gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
+    gmake CROSS_COMPILE=armv6-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
     touch ${BUILDOBJ}/_.uboot.configured
     rm -f ${BUILDOBJ}/_.uboot.built
 fi
@@ -101,7 +101,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
     cd "$UBOOT_SRC"
     echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
-    gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
+    gmake CROSS_COMPILE=armv6-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
     touch ${BUILDOBJ}/_.uboot.built
 else
     echo "Using U-Boot from previous build."
@@ -115,7 +115,7 @@ cd $TOPDIR
 if [ ! -f ${BUILDOBJ}/_.built-world ]; then
     echo "Building FreeBSD-armv6 world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
+    make TARGET_ARCH=armv6 buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-world
 else
@@ -125,7 +125,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
     echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
     cd $FREEBSD_SRC
-    make -DKERNFAST TARGET_ARCH=arm KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
+    make TARGET_ARCH=armv6 KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-kernel
 else
@@ -143,7 +143,7 @@ if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
     cd ${FREEBSD_SRC}
     #cd /usr/src
     ubldr_makefiles=`pwd`/share/mk
-    buildenv=`make TARGET_ARCH=arm buildenvvars`
+    buildenv=`make TARGET_ARCH=armv6 buildenvvars`
     cd sys/boot
     eval $buildenv make -m $ubldr_makefiles obj > ${BUILDOBJ}/_.ubldr.build.log
     eval $buildenv make -m $ubldr_makefiles depend >> ${BUILDOBJ}/_.ubldr.build.log
@@ -221,13 +221,13 @@ cp ${BUILDOBJ}/ubldr/loader.help ${BUILDOBJ}/_.mounted_fat/
 #
 cd $FREEBSD_SRC
 echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
 
 if [ -z "$NO_WORLD" ]; then
     echo "Installing FreeBSD world onto the UFS partition at "`date`
-    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
-    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
-    make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
+    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
+    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
 fi
 
 # Copy configuration files
