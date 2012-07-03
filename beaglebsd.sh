@@ -230,13 +230,11 @@ if [ -z "$NO_WORLD" ]; then
     make TARGET_ARCH=arm TARGET_CPUTYPE=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
 fi
 
-# Configure FreeBSD
+# Copy configuration files
 # These could be generated dynamically if we needed.
 echo "Configuring FreeBSD at "`date`
-mkdir -p ${BUILDOBJ}/_.mounted_ufs/etc
-cp ${TOPDIR}/files/etc/rc.conf ${BUILDOBJ}/_.mounted_ufs/etc/
-cp ${TOPDIR}/files/etc/fstab ${BUILDOBJ}/_.mounted_ufs/etc/
-cp ${TOPDIR}/files/etc/src.conf ${BUILDOBJ}/_.mounted_ufs/etc/
+cd ${TOPDIR}/files/overlay
+find . | cpio -p ${BUILDOBJ}/_.mounted_ufs
 
 # Copy source onto card as well.
 if [ -n "$INSTALL_USR_SRC" ]; then
