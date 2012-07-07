@@ -23,12 +23,11 @@ very much under active development.  Expect bumps.
 Errata
 ----------------------------------------
 
-June 23, 2012: You need r237506 or later of the armv6 tree.
-This script now builds ubldr directly from source, and this
-is the first revision that has all the necessary changes.
-
-June 23, 2012: I'm having some issues with the cpsw Ethernet
-driver.  Hope to work on this next.
+July 7, 2012: This script now works with r238211 (July 7, 2012)
+or later of the armv6 tree.  This has the new TARGET_ARCH=armv6
+build support.  With this, 'make buildworld' and friends almost
+work straight out-of-the-box.  I hope to get the remaining
+issues resolved in another week or so.
 
 ============================================================
 
@@ -177,6 +176,9 @@ NATIVE SOURCE REBUILDS
 One of my goals is for the usual "make buildworld",
 "make installworld", "make buildkernel", and
 "make installkernel" to all work natively on the BeagleBone.
+As of r238211, the armv6 tree now correctly sets the
+system type, so it should no longer be necessary
+to set any machine type options when building.
 
 If you want to try this:
  * You probably want at least a 6G image.
@@ -192,26 +194,28 @@ Here are the commands you can try.  Patches appreciated
 if you figure out how to deal with any of the issues here:
 
 Buildworld:
- $ make TARGET_CPUTYPE=armv6 buildworld
-Status:  this works for me today.
-Issue: the TARGET_CPUTYPE shouldn't be necessary here.
-Issue: This takes about 30 hours right now; I suspect
-that's mostly due to the slow speed of the SD driver.
+ $ make buildworld
+
+Issue:  The new TARGET_ARCH support miscompiles
+rtld (something to do with ARM_TP_ADDRESS
+being used in the new rtld when it shouldn't?).
+
+Issue: Buildworld takes about 30 hours.
+I have not yet tried this with /usr/src and /usr/obj
+mounted over NFS; that would help identify whether
+the slow SD interface is the primary issue.
 
 Installworld:
- $ make TARGET_CPUTYPE=armv6 installworld
-Status: This seems fine.
-Issue:  as above
+ $ make installworld
+Status: The install per se is okay, but as soon
+as the broken rtld (see above) gets installed,
+the system crashes.
 
-Buildkernel (this is broken right now):
- $ make TARGET_CPUTYPE=armv6 KERNCONF=BEAGLEBONE buildkernel
-Status:  Breakage seems to be due to mismatches with how
-various parts of the source handle CPU-specific issues.
-We should probably be using TARGET_ARCH (which is inferred
-from the system) instead of TARGET_CPUTYPE, but a lot of the
-code relies on TARGET_CPUTYPE right now.  There's some
-discussion on arm@freebsd.org about how to fix this.  Ask
-if you're interested in helping.
+Buildkernel/installkernel:
+ $ make KERNCONF=BEAGLEBONE buildkernel
+ $ make KERNCONF=BEAGLEBONE installkernel
+Status:  This seems to work since the
+TARGET_ARCH support went in.
 
 ============================================================
 
@@ -232,6 +236,11 @@ be done:
    allowing for faster native buildworlds/buildkernel.)
  * Modular kernel.  The kernel can load modules, I've successfully
    built and loaded cpsw as a module.
+ * Refining the BEAGLEBONE kernel configuration:  For example,
+   adding bpf allows dhclient to work.
+ * Refining the system configuration:  A machine with only
+   256MB RAM probably should have sendmail, syslog, and
+   other daemons started by default.
  * Memory.  Some recent change reduced available memory quite
    a bit.  Easy fix is to turn off things in rc.conf.
    There are probably also kernel tweaks possible.
