@@ -14,8 +14,8 @@
 #
 #INSTALL_USR_PORTS=yes
 
-# Uncomment to avoid installworld (useful when debugging
-# boot issues)
+# Uncomment to avoid installworld (speeds up image-building
+# when you're testing boot and kernel initialization issues)
 #
 # NO_WORLD=yes
 
@@ -45,7 +45,7 @@ SD_SIZE=$((350 * MB)) # Smallest size that works.
 
 # The script assumes you're running a pretty recent
 # copy of FreeBSD-CURRENT and have FreeBSD-CURRENT
-# source code available.
+# source code available in /usr/src.
 
 # Directory that will hold FreeBSD source for the ARMv6 version of
 # FreeBSD (about 1.5GB).  These sources are not yet merged into

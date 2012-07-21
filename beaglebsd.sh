@@ -18,7 +18,7 @@ if [ -f $TOPDIR/beaglebsd-config-local.sh ]; then
 fi
 
 # Round down to sector multiple.
-SD_SIZE=$(( (SD_SIZE / 512) * 512))
+SD_SIZE=$(( (SD_SIZE / 512) * 512 ))
 
 mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
@@ -33,6 +33,8 @@ rm -f ${BUILDOBJ}/*.log
 # We need TIs modified U-Boot sources
 if [ ! -f "$UBOOT_SRC/board/ti/am335x/Makefile" ]; then
     # Use TIs U-Boot sources that know about am33x processors
+    # XXX TODO: Test with the master U-Boot sources from
+    # denx.de; they claim to have merged the TI AM335X support.
     echo "Expected to see U-Boot sources in $UBOOT_SRC"
     echo "Use the following command to get the U-Boot sources"
     echo
@@ -45,6 +47,7 @@ fi
 echo "Found U-Boot sources in $UBOOT_SRC"
 
 # We need the cross-tools for arm, if they're not already built.
+# This should work with arm.arm or arm.armv6 equally well.
 if [ -z `which armv6-freebsd-cc` ]; then
     echo "Can't find FreeBSD xdev tools for ARM."
     echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
@@ -115,7 +118,7 @@ cd $TOPDIR
 if [ ! -f ${BUILDOBJ}/_.built-world ]; then
     echo "Building FreeBSD-armv6 world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=armv6 buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
+    make TARGET_ARCH=armv6 DEBUG_FLAGS=-g buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-world
 else
@@ -157,6 +160,11 @@ fi
 #
 # Create and partition the disk image
 #
+# TODO: Figure out how to include a swap partition here.
+# Swapping to SD is painful, but not as bad as panicing
+# the kernel when you run out of memory.
+# TODO: Fix the kernel panics on out-of-memroy.
+#
 echo "Creating the raw disk image in ${IMG}"
 [ -f ${IMG} ] && rm -f ${IMG}
 dd if=/dev/zero of=${IMG} bs=1 seek=${SD_SIZE} count=0 >/dev/null 2>&1
@@ -187,6 +195,9 @@ tunefs -N enable /dev/${MD}s2
 # SUJ journal to 4M (minimum size)
 # A slow SDHC reads about 1MB/s, so the default 30M journal
 # can introduce a 30s delay into the boot.
+# XXX This doesn't seem to actually work.  After
+# a bad reboot, fsck still claims to be
+# reading a 30MB journal. XXX
 tunefs -S 4194304 /dev/${MD}s2
 
 echo "Mounting the virtual disk partitions"
@@ -225,18 +236,18 @@ make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} in
 
 if [ -z "$NO_WORLD" ]; then
     echo "Installing FreeBSD world onto the UFS partition at "`date`
-    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
+    make TARGET_ARCH=armv6 DEBUG_FLAGS=-g DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
     make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
     make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
 fi
 
 # Copy configuration files
-# These could be generated dynamically if we needed.
+#
 echo "Configuring FreeBSD at "`date`
 cd ${TOPDIR}/files/overlay
 find . | cpio -p ${BUILDOBJ}/_.mounted_ufs
 
-# Copy source onto card as well.
+# If requested, copy source onto card as well.
 if [ -n "$INSTALL_USR_SRC" ]; then
     echo "Copying source to /usr/src on disk image at "`date`
     mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/src
@@ -245,6 +256,7 @@ if [ -n "$INSTALL_USR_SRC" ]; then
     (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
 fi
 
+# If requested, install a ports tree.
 if [ -n "$INSTALL_USR_PORTS" ]; then
     mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/ports
     echo "Updating ports snapshot at "`date`
