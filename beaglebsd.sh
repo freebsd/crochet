@@ -48,7 +48,7 @@ echo "Found U-Boot sources in $UBOOT_SRC"
 
 # We need the cross-tools for arm, if they're not already built.
 # This should work with arm.arm or arm.armv6 equally well.
-if [ -z `which armv6-freebsd-cc` ]; then
+if [ -z `which arm-freebsd-cc` ]; then
     echo "Can't find FreeBSD xdev tools for ARM."
     echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
     echo
@@ -96,7 +96,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
     cd "$UBOOT_SRC"
     echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
-    gmake CROSS_COMPILE=armv6-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
+    gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
     touch ${BUILDOBJ}/_.uboot.configured
     rm -f ${BUILDOBJ}/_.uboot.built
 fi
@@ -104,7 +104,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
     cd "$UBOOT_SRC"
     echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
-    gmake CROSS_COMPILE=armv6-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
+    gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
     touch ${BUILDOBJ}/_.uboot.built
 else
     echo "Using U-Boot from previous build."
