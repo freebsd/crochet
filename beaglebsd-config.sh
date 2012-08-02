@@ -20,6 +20,14 @@
 # NO_WORLD=yes
 
 #
+# Number of jobs to run in parallel when building
+# world and kernel, respectively.  On SMP systems,
+# you can probably make this much higher.
+#
+WORLDJOBS=4
+KERNJOBS=4
+
+#
 # Size of the disk image that will be built.
 # This is usually the same size as your card,
 # but it can be smaller.

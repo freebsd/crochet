@@ -118,7 +118,7 @@ cd $TOPDIR
 if [ ! -f ${BUILDOBJ}/_.built-world ]; then
     echo "Building FreeBSD-armv6 world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=armv6 DEBUG_FLAGS=-g buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
+    make TARGET_ARCH=armv6 DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-world
 else
@@ -128,7 +128,7 @@ fi
 if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
     echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=armv6 KERNCONF=$KERNCONF buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
+    make TARGET_ARCH=armv6 KERNCONF=$KERNCONF -j $KERNJOBS buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
     cd $TOPDIR
     touch ${BUILDOBJ}/_.built-kernel
 else
