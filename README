@@ -3,31 +3,11 @@ freebsd-beaglebone
 
 Script to build a bootable FreeBSD image for BeagleBone.
 
-This started from Damjan Marion's instructions at
-  http://people.freebsd.org/~dmarion/beaglebone/creating_bootable_sd_card/
-
-but has several improvements:
-
- * For speed, it builds an image file on disk rather than
-   directly on the MicroSDHC card.
-
- * Uses the standard FreeBSD boot loader (ubldr) to load the
-   kernel from UFS.  Among other benefits, this supports all
-   standard FreeBSD load-time configuration options.
-
-Note:  This relies on the armv6 FreeBSD tree that is still
-very much under active development.  Expect bumps.
-
-============================================================
-
-Errata
-----------------------------------------
-
-July 7, 2012: This script now works with r238211 (July 7, 2012)
-or later of the armv6 tree.  This has the new TARGET_ARCH=armv6
-build support.  With this, 'make buildworld' and friends almost
-work straight out-of-the-box.  I hope to get the remaining
-issues resolved in another week or so.
+Milestone reached: On 15 August, 2012, Oleksandr Tymoshenko (gonzo@)
+finished merging the experimental "projects/armv6" work into
+FreeBSD-CURRENT.  So all of the BeagleBone support (and related
+support for many other late-model ARM systems) will be part of FreeBSD
+10.0 when it ships.
 
 ============================================================
 
@@ -114,13 +94,9 @@ How to boot the BeagleBone
 IF SOMETHING GOES WRONG
 -----------------------
 
-If the image fails to boot, it's probably because FreeBSD failed to
-build correctly (the armv6 tree is under very active development).
-The script continues to run and builds the image, but it will
-have things missing.
-
-Look at the build and install logs under the 'work' directory, and ask
-on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
+If the image fails to boot:
+  * Look at the build and install logs under the 'work' directory.
+  * Ask on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
 help.
 
 ============================================================
@@ -176,9 +152,6 @@ NATIVE SOURCE REBUILDS
 One of my goals is for the usual "make buildworld",
 "make installworld", "make buildkernel", and
 "make installkernel" to all work natively on the BeagleBone.
-As of r238211, the armv6 tree now correctly sets the
-system type, so it should no longer be necessary
-to set any machine type options when building.
 
 If you want to try this:
  * You probably want at least a 6G image.
@@ -234,12 +207,17 @@ be done:
    tree, but I haven't had time to try to get it to actually
    work.  (Among other things, USB disk might be faster,
    allowing for faster native buildworlds/buildkernel.)
+ * GPIO.  Some initial GPIO work is done but there are
+   evolving ideas about how to make the GPIO framework
+   more robust.
+ * Other drivers.  The AM3358 SoC has a lot of hardware
+   components that are still unsupported.
  * Modular kernel.  The kernel can load modules, I've successfully
    built and loaded cpsw as a module.
  * Refining the BEAGLEBONE kernel configuration:  For example,
    adding bpf allows dhclient to work.
  * Refining the system configuration:  A machine with only
-   256MB RAM probably should have sendmail, syslog, and
+   256MB RAM probably should not have sendmail, syslog, and
    other daemons started by default.
  * Memory.  Some recent change reduced available memory quite
    a bit.  Easy fix is to turn off things in rc.conf.
