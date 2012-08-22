@@ -5,8 +5,17 @@
 # read into beaglebsd.sh when it runs.
 
 # Uncomment to populate /usr/src
-# Make sure you have at least a 2GB card
-# (4GB recommended).
+# Make sure you have at least a 4GB card
+#
+# Note: a real native build will require some
+# swap.  The script doesn't (yet) automatically
+# set up a swap area on the SD card.  Set SD_SIZE
+# a little small, then run the following commmands
+# on the BeagleBone to add a swap partition:
+#  $ gpart add -t freebsd -s 1g /dev/mmcsd0
+#  $ swapon /dev/mmcsd0s3
+# (of course, edit /etc/fstab if you wish to
+# make this durable)
 #
 #INSTALL_USR_SRC=yes
 
@@ -55,15 +64,24 @@ SD_SIZE=$((350 * MB)) # Smallest size that works.
 # copy of FreeBSD-CURRENT and have FreeBSD-CURRENT
 # source code available in /usr/src.
 
-# Directory that will hold FreeBSD source for the ARMv6 version of
-# FreeBSD (about 1.5GB).  These sources are not yet merged into
-# FreeBSD-CURRENT, so you cannot yet just set this to /usr/src.
+# FreeBSD source that will be used to compile
+# the BeagleBone image.  The necessary changes
+# were merged to FreeBSD-CURRENT in r239281
+# (15 August 2012).
+#
+# If you are already running on a sufficiently
+# recent FreeBSD-CURRENT, you can just use /usr/src here.
+#
+FREEBSD_SRC=/usr/src
+
+# If you aren't running FreeBSD-CURRENT or cannot
+# update /usr/src, then uncomment the following.
 #
 # This directory doesn't need to exist yet.
 # When you run the script, it will tell you how to get
 # appropriate sources into this directory.
 #
-FREEBSD_SRC=$TOPDIR/src-armv6
+# FREEBSD_SRC=$TOPDIR/freebsd-src
 
 # Directory to hold U-Boot source code.
 # The U-Boot source is about 120MB. U-Boot will also be compiled
@@ -79,7 +97,7 @@ UBOOT_SRC=$TOPDIR/u-boot
 # directory with enough space for the final disk image.
 #
 # XXX The freebsd-armv6 build doesn't go here; it goes
-# into /usr/obj/arm.arm instead.
+# into /usr/obj/arm.armv6 instead.
 #
 BUILDOBJ=$TOPDIR/work
 

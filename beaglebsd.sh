@@ -59,20 +59,23 @@ if [ -z `which arm-freebsd-cc` ]; then
 fi
 echo "Found FreeBSD xdev tools for ARM"
 
-# We need the FreeBSD-armv6 tree (we can tell it's the right
-# one by the presence of the BEAGLEBONE configuration file).
-# Someday, this will all be merged and we can just rely on FreeBSD-CURRENT.
+# We need a FreeBSD source tree with the armv6 changes.
+# FreeBSD-CURRENT after r239281
+# (We can tell it's the right one by the presence of the BEAGLEBONE configuration file).
 if [ \! -f "$FREEBSD_SRC/sys/arm/conf/BEAGLEBONE" ]; then
-    echo "Need FreeBSD-armv6 tree."
+    echo "Need FreeBSD tree with armv6 support."
     echo "You can obtain this with the folowing command:"
     echo
-    echo "mkdir -p $FREEBSD_SRC && svn co http://svn.freebsd.org/base/projects/armv6 $FREEBSD_SRC"
+    echo "mkdir -p $FREEBSD_SRC && svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
+    echo
+    echo "If you already have FreeBSD-CURRENT sources in $FREEBSD_SRC, then"
+    echo "please verify that it's at least r239281 (15 August 2012)."
     echo
     echo "Edit \$FREEBSD_SRC in beaglebsd-config.sh if you want the sources in a different directory."
     echo "Run this script again after you have the sources installed."
     exit 1
 fi
-echo "Found FreeBSD-armv6 source tree in $FREEBSD_SRC"
+echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
 
 #
 # Build and configure U-Boot
