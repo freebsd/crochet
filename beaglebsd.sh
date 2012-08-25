@@ -2,6 +2,8 @@
 
 # Directory containing this script.
 TOPDIR=`cd \`dirname $0\`; pwd`
+FILESDIR=${TOPDIR}/config/arm/BEAGLEBONE/files
+
 # Useful values
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
@@ -32,7 +34,7 @@ rm -f ${BUILDOBJ}/*.log
 
 # We need TIs modified U-Boot sources
 if [ ! -f "$UBOOT_SRC/board/ti/am335x/Makefile" ]; then
-    # Use TIs U-Boot sources that know about am33x processors
+    # Use TIs U-Boot sources that know about am335x processors
     # XXX TODO: Test with the master U-Boot sources from
     # denx.de; they claim to have merged the TI AM335X support.
     echo "Expected to see U-Boot sources in $UBOOT_SRC"
@@ -84,13 +86,13 @@ if [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
-    patch -N -p1 < ../files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${FILESDIR}/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn on some additional U-Boot features not ordinarily present in TIs build.
-    patch -N -p1 < ../files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${FILESDIR}/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
-    patch -N -p1 < ../files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${FILESDIR}/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn off some features that bloat the MLO so it can't link
-    patch -N -p1 < ../files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${FILESDIR}/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
     touch ${BUILDOBJ}/_.uboot.patched
     rm -f ${BUILDOBJ}/_.uboot.configured
@@ -145,9 +147,8 @@ if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
     echo "Building FreeBSD arm:arm ubldr"
     rm -rf ${BUILDOBJ}/ubldr
     mkdir -p ${BUILDOBJ}/ubldr
-    # Assumes commits have been merged!
+
     cd ${FREEBSD_SRC}
-    #cd /usr/src
     ubldr_makefiles=`pwd`/share/mk
     buildenv=`make TARGET_ARCH=armv6 buildenvvars`
     cd sys/boot
@@ -178,42 +179,28 @@ echo "Partitioning the raw disk image at "`date`
 gpart create -s MBR -f x ${MD}
 gpart add -a 63 -b 63 -s2m -t '!12' -f x ${MD}
 gpart set -a active -i 1 -f x ${MD}
+FAT_DEV=/dev/${MD}s1
 # XXX Would like "-a 4m" here, but gpart doesn't honor it?
 gpart add -t freebsd -f x ${MD}
+UFS_DEV=/dev/${MD}s2
 gpart commit ${MD}
 
 echo "Formatting the FAT partition at "`date`
-# Note: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
-newfs_msdos -L "boot" -F 12 ${MD}s1 >/dev/null
+# TODO: Select FAT12, FAT16, or FAT32 depending on the size of the partition.
+newfs_msdos -L "boot" -F 12 ${FAT_DEV} >/dev/null
 
-echo "Formatting the UFS partition at "`date`
-newfs ${MD}s2 >/dev/null
-# Turn on Softupdates
-tunefs -n enable /dev/${MD}s2
-# Turn on SUJ
-# This makes reboots tolerable if you just pull power on the BB
-tunefs -j enable /dev/${MD}s2
-# Turn on NFSv4 ACLs
-tunefs -N enable /dev/${MD}s2
-# SUJ journal to 4M (minimum size)
-# A slow SDHC reads about 1MB/s, so the default 30M journal
-# can introduce a 30s delay into the boot.
-# XXX This doesn't seem to actually work.  After
-# a bad reboot, fsck still claims to be
-# reading a 30MB journal. XXX
-tunefs -S 4194304 /dev/${MD}s2
-
-echo "Mounting the virtual disk partitions"
+#
+# Mount the FAT partition
+#
+echo "Mounting the virtual FAT partition"
 if [ -d ${BUILDOBJ}/_.mounted_fat ]; then
+    # Note:  _.mounted_fat should only exist if the partition
+    # is actually mounted.
+    umount ${BUILDOBJ}/_.mounted_fat || true
     rmdir ${BUILDOBJ}/_.mounted_fat
 fi
 mkdir ${BUILDOBJ}/_.mounted_fat
-mount_msdosfs /dev/${MD}s1 ${BUILDOBJ}/_.mounted_fat
-if [ -d ${BUILDOBJ}/_.mounted_ufs ]; then
-    rmdir ${BUILDOBJ}/_.mounted_ufs
-fi
-mkdir ${BUILDOBJ}/_.mounted_ufs
-mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
+mount_msdosfs ${FAT_DEV} ${BUILDOBJ}/_.mounted_fat
 
 #
 # Install U-Boot onto FAT partition.
@@ -221,7 +208,7 @@ mount /dev/${MD}s2 ${BUILDOBJ}/_.mounted_ufs
 echo "Installing U-Boot onto the FAT partition at "`date`
 cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
 cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
-cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
+cp ${FILESDIR}/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 
 #
 # Install ubldr onto FAT partition.
@@ -229,6 +216,37 @@ cp ${TOPDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 echo "Installing ubldr onto the FAT partition at "`date`
 cp ${BUILDOBJ}/ubldr/ubldr ${BUILDOBJ}/_.mounted_fat/
 cp ${BUILDOBJ}/ubldr/loader.help ${BUILDOBJ}/_.mounted_fat/
+
+#
+# Unmount FAT partition
+#
+echo "Unmounting FAT partition"
+umount ${BUILDOBJ}/_.mounted_fat
+rmdir ${BUILDOBJ}/_.mounted_fat
+
+#
+# Format and mount the UFS partition
+#
+
+echo "Formatting the UFS partition at "`date`
+newfs ${UFS_DEV} >/dev/null
+# Turn on Softupdates
+tunefs -n enable ${UFS_DEV}
+# Turn on SUJ with a minimally-sized journal.
+# This makes reboots tolerable if you just pull power on the BB
+# Note:  A slow SDHC reads about 1MB/s, so a 30MB
+# journal can delay boot by 30s.
+tunefs -j enable -S 4194304 ${UFS_DEV}
+# Turn on NFSv4 ACLs
+tunefs -N enable ${UFS_DEV}
+
+if [ -d ${BUILDOBJ}/_.mounted_ufs ]; then
+    umount ${BUILDOBJ}/_.mounted_ufs || true
+    rmdir ${BUILDOBJ}/_.mounted_ufs
+fi
+mkdir ${BUILDOBJ}/_.mounted_ufs
+mount ${UFS_DEV} ${BUILDOBJ}/_.mounted_ufs
+
 
 #
 # Install FreeBSD kernel and world onto UFS partition.
@@ -245,9 +263,8 @@ if [ -z "$NO_WORLD" ]; then
 fi
 
 # Copy configuration files
-#
 echo "Configuring FreeBSD at "`date`
-cd ${TOPDIR}/files/overlay
+cd ${FILESDIR}/overlay
 find . | cpio -p ${BUILDOBJ}/_.mounted_ufs
 
 # If requested, copy source onto card as well.
@@ -268,13 +285,12 @@ if [ -n "$INSTALL_USR_PORTS" ]; then
     portsnap -p ${BUILDOBJ}/_.mounted_ufs/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
 fi
 
-#
-# Unmount and clean up.
-#
-echo "Unmounting the disk image at "`date`
+# Done with UFS partition.
+echo "Unmounting the UFS partition at "`date`
 cd $TOPDIR
-umount ${BUILDOBJ}/_.mounted_fat
 umount ${BUILDOBJ}/_.mounted_ufs
+rmdir ${BUILDOBJ}/_.mounted_ufs
+
 mdconfig -d -u ${MD}
 
 #
