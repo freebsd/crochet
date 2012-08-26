@@ -82,7 +82,7 @@ echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
 #
 # Build and configure U-Boot
 #
-if [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
+if [ ! -f ${UBOOT_SRC}/_.uboot.patched ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
@@ -240,6 +240,8 @@ tunefs -j enable -S 4194304 ${UFS_DEV}
 # Turn on NFSv4 ACLs
 tunefs -N enable ${UFS_DEV}
 
+
+echo "Mounting UFS partition"
 if [ -d ${BUILDOBJ}/_.mounted_ufs ]; then
     umount ${BUILDOBJ}/_.mounted_ufs || true
     rmdir ${BUILDOBJ}/_.mounted_ufs
