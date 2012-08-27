@@ -82,7 +82,14 @@ echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
 #
 # Build and configure U-Boot
 #
-if [ ! -f ${UBOOT_SRC}/_.uboot.patched ]; then
+# Note: I used to put the _.uboot.patched flag file in BUILDOBJ, but
+# this causes a weird problem:  If you delete all of the BUILDOBJ directory,
+# you would lose the flag even though the sources are obviously still
+# patched.  So now I'm storing the patched marker in the U-Boot source
+# directory.  For now, honor the old marker file if it's there.
+# TODO: Remove support for ${BUILDOBJ}/_.uboot.patched in October 2012.
+#
+if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
@@ -94,8 +101,12 @@ if [ ! -f ${UBOOT_SRC}/_.uboot.patched ]; then
     # Turn off some features that bloat the MLO so it can't link
     patch -N -p1 < ${FILESDIR}/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
-    touch ${BUILDOBJ}/_.uboot.patched
+    touch ${UBOOT_SRC}/_.uboot.patched
     rm -f ${BUILDOBJ}/_.uboot.configured
+else
+    # Put in a new 'patched' marker in case the old one was still being used.
+    # TODO: Remove this in October 2012.
+    touch ${UBOOT_SRC}/_.uboot.patched
 fi
 
 if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
