@@ -1,5 +1,5 @@
 
-_uboot_download_instructions ( ) (
+_uboot_download_instructions ( ) {
     # Use TIs U-Boot sources that know about am335x processors
     # XXX TODO: Test with the master U-Boot sources from
     # denx.de; they claim to have merged the TI AM335X support.
@@ -11,27 +11,27 @@ _uboot_download_instructions ( ) (
     echo
     echo "Edit \$UBOOT_SRC in beaglebsd-config.sh if you want the sources in a different directory."
     echo "Run this script again after you have the U-Boot sources installed."
-)
+}
 
-_uboot_test ( ) (
+_uboot_test ( ) {
     if [ ! -f "$1" ]; then
 	_uboot_download_instructions "$2"
 	exit 1
     fi
     echo "Found suitable U-Boot sources in $UBOOT_SRC"
-)
+}
 
 #
 # Test whether TI U-Boot sources are visible.
 # If not, prompt the user to download them.
 #
-uboot_ti_test ( ) (
+uboot_ti_test ( ) {
     _uboot_test \
 	"$UBOOT_SRC/board/ti/am335x/Makefile" \
-	"git://arago-project.org/git/projects/u-boot-am33x.git" || exit 1
-)
+	"git://arago-project.org/git/projects/u-boot-am33x.git"
+}
 
-uboot_patch ( ) (
+uboot_patch ( ) {
     if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
 	cd "$UBOOT_SRC"
 	echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
@@ -43,9 +43,9 @@ uboot_patch ( ) (
 	rm -f ${BUILDOBJ}/_.uboot.configured
     fi
     touch ${UBOOT_SRC}/_.uboot.patched
-)
+}
 
-uboot_configure ( ) (
+uboot_configure ( ) {
     if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
 	cd "$UBOOT_SRC"
 	echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
@@ -53,9 +53,9 @@ uboot_configure ( ) (
 	touch ${BUILDOBJ}/_.uboot.configured
 	rm -f ${BUILDOBJ}/_.uboot.built
     fi
-)
+}
 
-uboot_build ( ) (
+uboot_build ( ) {
     if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
 	cd "$UBOOT_SRC"
 	echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
@@ -64,4 +64,4 @@ uboot_build ( ) (
     else
 	echo "Using U-Boot from previous build."
     fi
-)
+}

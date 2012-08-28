@@ -1,6 +1,6 @@
 TARGET_ARCH=armv6
 
-freebsd_buildworld ( ) (
+freebsd_buildworld ( ) {
     if [ ! -f ${BUILDOBJ}/_.built-world ]; then
 	echo "Building FreeBSD-$TARGET_ARCH world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
 	cd $FREEBSD_SRC
@@ -10,9 +10,9 @@ freebsd_buildworld ( ) (
     else
 	echo "Using FreeBSD world from previous build"
     fi
-)
+}
 
-freebsd_buildkernel ( ) (
+freebsd_buildkernel ( ) {
     if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
 	echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
 	cd $FREEBSD_SRC
@@ -22,24 +22,23 @@ freebsd_buildkernel ( ) (
     else
 	echo "Using FreeBSD kernel from previous build"
     fi
-)
+}
 
-freebsd_installworld ( ) (
+freebsd_installworld ( ) {
     cd $FREEBSD_SRC
     echo "Installing FreeBSD world onto the UFS partition at "`date`
     make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${BUILDOBJ}/_.installworld.log 2>&1
     make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
     make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${BUILDOBJ}/_.distribution.log 2>&1
-)
+}
 
-freebsd_installkernel ( ) (
+freebsd_installkernel ( ) {
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel onto the UFS partition at "`date`
     make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+}
 
-)
-
-freebsd_ubldr_build ( ) (
+freebsd_ubldr_build ( ) {
     if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
 	echo "Building FreeBSD $TARGET_ARCH ubldr"
 	rm -rf ${BUILDOBJ}/ubldr
@@ -57,26 +56,26 @@ freebsd_ubldr_build ( ) (
     else
 	echo "Using FreeBSD ubldr from previous build"
     fi
-)
+}
 
-freebsd_ubldr_copy ( ) (
+freebsd_ubldr_copy ( ) {
     echo "Installing ubldr onto the FAT partition at "`date`
     cp ${BUILDOBJ}/ubldr/ubldr $1
     cp ${BUILDOBJ}/ubldr/loader.help $1
-)
+}
 
-freebsd_install_usr_src ( ) (
+freebsd_install_usr_src ( ) {
     echo "Copying source to /usr/src on disk image at "`date`
     mkdir -p $1/usr/src
     cd $1/usr/src
     # Note: Includes the .svn directory.
     (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
-)
+}
 
-freebsd_install_usr_ports ( ) (
+freebsd_install_usr_ports ( ) {
     mkdir -p $1/usr/ports
     echo "Updating ports snapshot at "`date`
     portsnap fetch > ${BUILDOBJ}/_.portsnap.fetch.log
     echo "Installing ports tree at "`date`
     portsnap -p $1/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
-)
+}

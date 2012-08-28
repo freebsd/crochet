@@ -1,4 +1,4 @@
-freebsd_xdev_test ( ) (
+freebsd_xdev_test ( ) {
     # We need the cross-tools for arm, if they're not already built.
     # This should work with arm.arm or arm.armv6 equally well.
     if [ -z `which arm-freebsd-cc` ]; then
@@ -11,4 +11,4 @@ freebsd_xdev_test ( ) (
 	exit 1
     fi
     echo "Found FreeBSD xdev tools for ARM"
-)
+}

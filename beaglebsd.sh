@@ -18,7 +18,6 @@ GB=$((1000 * $MB))
 #
 load_config
 
-
 mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
 MAKEOBJDIRPREFIX=${BUILDOBJ}/_freebsd_build

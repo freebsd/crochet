@@ -1,4 +1,4 @@
-load_config ( ) (
+load_config ( ) {
     if [ -f $CONFIGDIR/config.sh ]; then
 	echo "Loading configuration values"
 	. $CONFIGDIR/config.sh
@@ -14,4 +14,4 @@ load_config ( ) (
 
     # Round down to sector multiple.
     SD_SIZE=$(( (SD_SIZE / 512) * 512 ))
-)
+}
