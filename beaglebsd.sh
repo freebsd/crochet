@@ -1,32 +1,23 @@
 #!/bin/sh -e
 
-# Directory containing this script.
+# General configuration and useful definitions
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
 CONFIGDIR=${TOPDIR}/config/arm/BEAGLEBONE
-
-# Useful values
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
 
-# Load the builder support we need.
-. ${LIBDIR}/uboot.sh
-. ${LIBDIR}/freebsd_xdev.sh
+# Load builder libraries we need.
+. ${LIBDIR}/base.sh
 . ${LIBDIR}/freebsd.sh
+. ${LIBDIR}/freebsd_xdev.sh
+. ${LIBDIR}/uboot.sh
 
 #
 # Get the config values:
 #
-echo "Loading configuration values"
-. $TOPDIR/beaglebsd-config.sh
+load_config
 
-if [ -f $TOPDIR/beaglebsd-config-local.sh ]; then
-    echo "Loading local configuration overrides"
-    . $TOPDIR/beaglebsd-config-local.sh
-fi
-
-# Round down to sector multiple.
-SD_SIZE=$(( (SD_SIZE / 512) * 512 ))
 
 mkdir -p ${BUILDOBJ}
 # Why does this have no effect?
@@ -65,14 +56,14 @@ fi
 echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
 
 #
-# Build and configure U-Boot
+# Patch, configure, and build U-Boot
 #
 uboot_patch ${CONFIGDIR}/files/uboot_*.patch
 uboot_configure am335x_evm_config
 uboot_build
 
 #
-# Build FreeBSD for BeagleBone
+# Build FreeBSD
 #
 freebsd_buildworld
 freebsd_buildkernel $KERNCONF
@@ -165,16 +156,8 @@ mount ${UFS_DEV} ${BUILDOBJ}/_.mounted_ufs
 #
 # Install FreeBSD kernel and world onto UFS partition.
 #
-cd $FREEBSD_SRC
-echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
-
-if [ -z "$NO_WORLD" ]; then
-    echo "Installing FreeBSD world onto the UFS partition at "`date`
-    make TARGET_ARCH=armv6 DEBUG_FLAGS=-g DESTDIR=${BUILDOBJ}/_.mounted_ufs installworld > ${BUILDOBJ}/_.installworld.log 2>&1
-    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
-    make TARGET_ARCH=armv6 DESTDIR=${BUILDOBJ}/_.mounted_ufs distribution > ${BUILDOBJ}/_.distribution.log 2>&1
-fi
+freebsd_installkernel ${BUILDOBJ}/_.mounted_ufs
+freebsd_installworld ${BUILDOBJ}/_.mounted_ufs
 
 # Copy configuration files
 echo "Configuring FreeBSD at "`date`
@@ -183,20 +166,12 @@ find . | cpio -p ${BUILDOBJ}/_.mounted_ufs
 
 # If requested, copy source onto card as well.
 if [ -n "$INSTALL_USR_SRC" ]; then
-    echo "Copying source to /usr/src on disk image at "`date`
-    mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/src
-    cd ${BUILDOBJ}/_.mounted_ufs/usr/src
-    # Note: Includes the .svn directory.
-    (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
+    freebsd_install_usr_src ${BUILDOBJ}/_.mounted_ufs
 fi
 
 # If requested, install a ports tree.
 if [ -n "$INSTALL_USR_PORTS" ]; then
-    mkdir -p ${BUILDOBJ}/_.mounted_ufs/usr/ports
-    echo "Updating ports snapshot at "`date`
-    portsnap fetch > ${BUILDOBJ}/_.portsnap.fetch.log
-    echo "Installing ports tree at "`date`
-    portsnap -p ${BUILDOBJ}/_.mounted_ufs/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
+    freebsd_install_usr_ports ${BUILDOBJ}/_.mounted_ufs
 fi
 
 # Done with UFS partition.

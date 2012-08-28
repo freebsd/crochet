@@ -23,11 +23,6 @@
 #
 #INSTALL_USR_PORTS=yes
 
-# Uncomment to avoid installworld (speeds up image-building
-# when you're testing boot and kernel initialization issues)
-#
-# NO_WORLD=yes
-
 #
 # Number of jobs to run in parallel when building
 # world and kernel, respectively.  On SMP systems,

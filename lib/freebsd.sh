@@ -24,6 +24,21 @@ freebsd_buildkernel ( ) (
     fi
 )
 
+freebsd_installworld ( ) (
+    cd $FREEBSD_SRC
+    echo "Installing FreeBSD world onto the UFS partition at "`date`
+    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${BUILDOBJ}/_.installworld.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+)
+
+freebsd_installkernel ( ) (
+    cd $FREEBSD_SRC
+    echo "Installing FreeBSD kernel onto the UFS partition at "`date`
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+
+)
+
 freebsd_ubldr_build ( ) (
     if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
 	echo "Building FreeBSD $TARGET_ARCH ubldr"
@@ -48,4 +63,20 @@ freebsd_ubldr_copy ( ) (
     echo "Installing ubldr onto the FAT partition at "`date`
     cp ${BUILDOBJ}/ubldr/ubldr $1
     cp ${BUILDOBJ}/ubldr/loader.help $1
+)
+
+freebsd_install_usr_src ( ) (
+    echo "Copying source to /usr/src on disk image at "`date`
+    mkdir -p $1/usr/src
+    cd $1/usr/src
+    # Note: Includes the .svn directory.
+    (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
+)
+
+freebsd_install_usr_ports ( ) (
+    mkdir -p $1/usr/ports
+    echo "Updating ports snapshot at "`date`
+    portsnap fetch > ${BUILDOBJ}/_.portsnap.fetch.log
+    echo "Installing ports tree at "`date`
+    portsnap -p $1/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
 )
