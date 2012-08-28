@@ -33,31 +33,34 @@ freebsd_src_test ( ) {
 # freebsd_buildworld: Build FreeBSD world.
 #
 freebsd_buildworld ( ) {
-    if [ ! -f ${BUILDOBJ}/_.built-world ]; then
-	echo "Building FreeBSD-$TARGET_ARCH world at "`date`" (Logging to ${BUILDOBJ}/_.buildworld.log)"
-	cd $FREEBSD_SRC
-	make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${BUILDOBJ}/_.buildworld.log 2>&1
-	cd $TOPDIR
-	touch ${BUILDOBJ}/_.built-world
-    else
+    if [ -f ${WORKDIR}/_.built-world ]; then
 	echo "Using FreeBSD world from previous build"
+	return 0
     fi
+
+    echo "Building FreeBSD-$TARGET_ARCH world at "`date`" (Logging to ${WORKDIR}/_.buildworld.log)"
+    cd $FREEBSD_SRC
+    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${WORKDIR}/_.buildworld.log 2>&1 && touch ${WORKDIR}/_.built-world
 }
 
-# freebsd_buildkernel: Build FreeBSD kernel
+# freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
+# Note: Assumes world is already built.
 #
-# $1: Name of kernel configuration
+# $@: arguments to make.  KERNCONF=FOO is required
+#
+# TODO: save "$@" in _.built-kernel so we can verify that
+# the kernel we last built is the same as the one we're being
+# asked to build.
 #
 freebsd_buildkernel ( ) {
-    if [ ! -f ${BUILDOBJ}/_.built-kernel ]; then
-	echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${BUILDOBJ}/_.buildkernel.log)"
-	cd $FREEBSD_SRC
-	make TARGET_ARCH=$TARGET_ARCH KERNCONF=$1 -j $KERNJOBS buildkernel > ${BUILDOBJ}/_.buildkernel.log 2>&1
-	cd $TOPDIR
-	touch ${BUILDOBJ}/_.built-kernel
-    else
+    if [ -f ${WORKDIR}/_.built-kernel ]; then
 	echo "Using FreeBSD kernel from previous build"
+	return 0
     fi
+
+    echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${WORKDIR}/_.buildkernel.log)"
+    cd $FREEBSD_SRC
+    make TARGET_ARCH=$TARGET_ARCH "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.log 2>&1 && touch ${WORKDIR}/_.built-kernel
 }
 
 # freebsd_installworld: Install FreeBSD world to image
@@ -65,11 +68,12 @@ freebsd_buildkernel ( ) {
 # $1: Root directory of UFS partition
 #
 freebsd_installworld ( ) {
+    # TODO: check and warn if world isn't built.
     cd $FREEBSD_SRC
     echo "Installing FreeBSD world onto the UFS partition at "`date`
-    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${BUILDOBJ}/_.installworld.log 2>&1
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${BUILDOBJ}/_.distrib-dirs.log 2>&1
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${BUILDOBJ}/_.distribution.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.log 2>&1
 }
 
 # freebsd_installkernel: Install FreeBSD kernel to image
@@ -77,33 +81,36 @@ freebsd_installworld ( ) {
 # $1: Root directory of UFS partition
 #
 freebsd_installkernel ( ) {
+    # TODO: check and warn if kernel isn't built.
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${BUILDOBJ}/_.installkernel.log 2>&1
+    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${WORKDIR}/_.installkernel.log 2>&1
 }
 
 # freebsd_ubldr_build:  Build the ubldr loader program.
+# Note: Assumes world is already built.
 #
-# $1: base address of compiled loader
+# $@: make arguments for building
 #
 freebsd_ubldr_build ( ) {
-    if [ ! -f ${BUILDOBJ}/ubldr/ubldr ]; then
-	echo "Building FreeBSD $TARGET_ARCH ubldr"
-	rm -rf ${BUILDOBJ}/ubldr
-	mkdir -p ${BUILDOBJ}/ubldr
-
-	cd ${FREEBSD_SRC}
-	ubldr_makefiles=`pwd`/share/mk
-	buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
-	cd sys/boot
-	eval $buildenv make -m $ubldr_makefiles obj > ${BUILDOBJ}/_.ubldr.build.log
-	eval $buildenv make -m $ubldr_makefiles depend >> ${BUILDOBJ}/_.ubldr.build.log
-	eval $buildenv make UBLDR_LOADADDR=$1 -m $ubldr_makefiles all >> ${BUILDOBJ}/_.ubldr.build.log
-	cd arm/uboot
-	eval $buildenv make DESTDIR=${BUILDOBJ}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${BUILDOBJ}/_.ubldr.build.log
-    else
+    if [ -f ${WORKDIR}/ubldr/ubldr ]; then
 	echo "Using FreeBSD ubldr from previous build"
+	return 0
     fi
+
+    echo "Building FreeBSD $TARGET_ARCH ubldr"
+    rm -rf ${WORKDIR}/ubldr
+    mkdir -p ${WORKDIR}/ubldr
+
+    cd ${FREEBSD_SRC}
+    ubldr_makefiles=`pwd`/share/mk
+    buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
+    cd sys/boot
+    eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make "$@" -m $ubldr_makefiles all >> ${WORKDIR}/_.ubldr.build.log
+    cd arm/uboot
+    eval $buildenv make DESTDIR=${WORKDIR}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${WORKDIR}/_.ubldr.build.log
 }
 
 # freebsd_ubldr_copy:  Copy the compiled ubldr files
@@ -113,8 +120,8 @@ freebsd_ubldr_build ( ) {
 #
 freebsd_ubldr_copy ( ) {
     echo "Installing ubldr"
-    cp ${BUILDOBJ}/ubldr/ubldr $1
-    cp ${BUILDOBJ}/ubldr/loader.help $1
+    cp ${WORKDIR}/ubldr/ubldr $1
+    cp ${WORKDIR}/ubldr/loader.help $1
 }
 
 # freebsd_install_usr_src:  Copy FREEBSD_SRC tree
@@ -138,7 +145,7 @@ freebsd_install_usr_src ( ) {
 freebsd_install_usr_ports ( ) {
     mkdir -p $1/usr/ports
     echo "Updating ports snapshot at "`date`
-    portsnap fetch > ${BUILDOBJ}/_.portsnap.fetch.log
+    portsnap fetch > ${WORKDIR}/_.portsnap.fetch.log
     echo "Installing ports tree at "`date`
-    portsnap -p $1/usr/ports extract > ${BUILDOBJ}/_.portsnap.extract.log
+    portsnap -p $1/usr/ports extract > ${WORKDIR}/_.portsnap.extract.log
 }

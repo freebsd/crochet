@@ -91,10 +91,7 @@ UBOOT_SRC=$TOPDIR/u-boot
 # XXX Directory where build artifacts will go; this should be a
 # directory with enough space for the final disk image.
 #
-# XXX The freebsd-armv6 build doesn't go here; it goes
-# into /usr/obj/arm.armv6 instead.
-#
-BUILDOBJ=$TOPDIR/work
+WORKDIR=$TOPDIR/work
 
 # Kernel configuration to use.
 # The BEAGLEBONE configuration is in the armv6 sources.
@@ -105,4 +102,4 @@ KERNCONF=BEAGLEBONE
 # The name of the final disk image.
 # This file will be as large as SD_SIZE above, so make sure it's located
 # somewhere with enough space.
-IMG=${BUILDOBJ}/FreeBSD-${KERNCONF}.img
+IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img

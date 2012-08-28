@@ -38,35 +38,35 @@ uboot_ti_test ( ) {
 }
 
 uboot_patch ( ) {
-    if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
+    if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${WORKDIR}/_.uboot.patched ]; then
 	cd "$UBOOT_SRC"
-	echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
+	echo "Patching U-Boot. (Logging to ${WORKDIR}/_.uboot.patch.log)"
 	for p in "$@"; do
 	    echo "   Applying patch $p"
-	    patch -N -p1 < $p >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+	    patch -N -p1 < $p >> ${WORKDIR}/_.uboot.patch.log 2>&1
 	done
 
-	rm -f ${BUILDOBJ}/_.uboot.configured
+	rm -f ${WORKDIR}/_.uboot.configured
     fi
     touch ${UBOOT_SRC}/_.uboot.patched
 }
 
 uboot_configure ( ) {
-    if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
+    if [ ! -f ${WORKDIR}/_.uboot.configured ]; then
 	cd "$UBOOT_SRC"
-	echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
-	gmake CROSS_COMPILE=arm-freebsd- $1 > ${BUILDOBJ}/_.uboot.configure.log 2>&1
-	touch ${BUILDOBJ}/_.uboot.configured
-	rm -f ${BUILDOBJ}/_.uboot.built
+	echo "Configuring U-Boot. (Logging to ${WORKDIR}/_.uboot.configure.log)"
+	gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1
+	touch ${WORKDIR}/_.uboot.configured
+	rm -f ${WORKDIR}/_.uboot.built
     fi
 }
 
 uboot_build ( ) {
-    if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
+    if [ ! -f ${WORKDIR}/_.uboot.built ]; then
 	cd "$UBOOT_SRC"
-	echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
-	gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
-	touch ${BUILDOBJ}/_.uboot.built
+	echo "Building U-Boot. (Logging to ${WORKDIR}/_.uboot.build.log)"
+	gmake CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1
+	touch ${WORKDIR}/_.uboot.built
     else
 	echo "Using U-Boot from previous build."
     fi
