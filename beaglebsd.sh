@@ -2,6 +2,7 @@
 
 # Directory containing this script.
 TOPDIR=`cd \`dirname $0\`; pwd`
+LIBDIR=${TOPDIR}/lib
 CONFIGDIR=${TOPDIR}/config/arm/BEAGLEBONE
 
 # Useful values
@@ -29,37 +30,22 @@ MAKEOBJDIRPREFIX=${BUILDOBJ}/_freebsd_build
 rm -f ${BUILDOBJ}/*.log
 
 #
+# Load the builder support we need.
+#
+. ${LIBDIR}/uboot.sh
+. ${LIBDIR}/freebsd_xdev.sh
+
+#
 # Check various prerequisites
+# Do this all up front so the poor schmuck running this script
+# can go get lunch during the lengthy builds that follow.
 #
 
 # We need TIs modified U-Boot sources
-if [ ! -f "$UBOOT_SRC/board/ti/am335x/Makefile" ]; then
-    # Use TIs U-Boot sources that know about am335x processors
-    # XXX TODO: Test with the master U-Boot sources from
-    # denx.de; they claim to have merged the TI AM335X support.
-    echo "Expected to see U-Boot sources in $UBOOT_SRC"
-    echo "Use the following command to get the U-Boot sources"
-    echo
-    echo "git clone git://arago-project.org/git/projects/u-boot-am33x.git $UBOOT_SRC"
-    echo
-    echo "Edit \$UBOOT_SRC in beaglebsd-config.sh if you want the sources in a different directory."
-    echo "Run this script again after you have the U-Boot sources installed."
-    exit 1
-fi
-echo "Found U-Boot sources in $UBOOT_SRC"
+uboot_ti_test || exit 1
 
-# We need the cross-tools for arm, if they're not already built.
-# This should work with arm.arm or arm.armv6 equally well.
-if [ -z `which arm-freebsd-cc` ]; then
-    echo "Can't find FreeBSD xdev tools for ARM."
-    echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
-    echo
-    echo "cd /usr/src && sudo make xdev XDEV=arm XDEV_ARCH=arm"
-    echo
-    echo "Run this script again after you have the xdev tools installed."
-    exit 1
-fi
-echo "Found FreeBSD xdev tools for ARM"
+# We need FreeBSD cross-tools for arm
+freebsd_xdev_test || exit 1
 
 # We need a FreeBSD source tree with the armv6 changes.
 # FreeBSD-CURRENT after r239281
@@ -82,51 +68,9 @@ echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
 #
 # Build and configure U-Boot
 #
-# Note: I used to put the _.uboot.patched flag file in BUILDOBJ, but
-# this causes a weird problem:  If you delete all of the BUILDOBJ directory,
-# you would lose the flag even though the sources are obviously still
-# patched.  So now I'm storing the patched marker in the U-Boot source
-# directory.  For now, honor the old marker file if it's there.
-# TODO: Remove support for ${BUILDOBJ}/_.uboot.patched in October 2012.
-#
-if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${BUILDOBJ}/_.uboot.patched ]; then
-    cd "$UBOOT_SRC"
-    echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
-    # Works around a FreeBSD bug (freestanding builds require libc).
-    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
-    # Turn on some additional U-Boot features not ordinarily present in TIs build.
-    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
-    # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
-    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
-    # Turn off some features that bloat the MLO so it can't link
-    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
-
-    touch ${UBOOT_SRC}/_.uboot.patched
-    rm -f ${BUILDOBJ}/_.uboot.configured
-else
-    # Put in a new 'patched' marker in case the old one was still being used.
-    # TODO: Remove this in October 2012.
-    touch ${UBOOT_SRC}/_.uboot.patched
-fi
-
-if [ ! -f ${BUILDOBJ}/_.uboot.configured ]; then
-    cd "$UBOOT_SRC"
-    echo "Configuring U-Boot. (Logging to ${BUILDOBJ}/_.uboot.configure.log)"
-    gmake CROSS_COMPILE=arm-freebsd- am335x_evm_config > ${BUILDOBJ}/_.uboot.configure.log 2>&1
-    touch ${BUILDOBJ}/_.uboot.configured
-    rm -f ${BUILDOBJ}/_.uboot.built
-fi
-
-if [ ! -f ${BUILDOBJ}/_.uboot.built ]; then
-    cd "$UBOOT_SRC"
-    echo "Building U-Boot. (Logging to ${BUILDOBJ}/_.uboot.build.log)"
-    gmake CROSS_COMPILE=arm-freebsd- > ${BUILDOBJ}/_.uboot.build.log 2>&1
-    touch ${BUILDOBJ}/_.uboot.built
-else
-    echo "Using U-Boot from previous build."
-fi
-
-cd $TOPDIR
+uboot_patch ${CONFIGDIR}/files/uboot_*.patch
+uboot_configure am335x_evm_config
+uboot_build
 
 #
 # Build FreeBSD for BeagleBone
@@ -190,10 +134,11 @@ echo "Partitioning the raw disk image at "`date`
 gpart create -s MBR -f x ${MD}
 gpart add -a 63 -b 63 -s2m -t '!12' -f x ${MD}
 gpart set -a active -i 1 -f x ${MD}
-FAT_DEV=/dev/${MD}s1
-# XXX Would like "-a 4m" here, but gpart doesn't honor it?
+FAT_PART=s1
+FAT_DEV=/dev/${MD}${FAT_PART}
 gpart add -t freebsd -f x ${MD}
-UFS_DEV=/dev/${MD}s2
+UFS_PART=s2
+UFS_DEV=/dev/${MD}${UFS_PART}
 gpart commit ${MD}
 
 echo "Formatting the FAT partition at "`date`
