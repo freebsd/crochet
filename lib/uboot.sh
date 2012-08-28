@@ -1,4 +1,7 @@
 
+. ${LIBDIR}/freebsd_xdev.sh
+
+
 _uboot_download_instructions ( ) {
     # Use TIs U-Boot sources that know about am335x processors
     # XXX TODO: Test with the master U-Boot sources from
@@ -14,6 +17,9 @@ _uboot_download_instructions ( ) {
 }
 
 _uboot_test ( ) {
+    # We use FreeBSD xdev tools to build U-Boot
+    freebsd_xdev_test
+
     if [ ! -f "$1" ]; then
 	_uboot_download_instructions "$2"
 	exit 1
