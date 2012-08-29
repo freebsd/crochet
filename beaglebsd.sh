@@ -75,7 +75,7 @@ disk_ufs_format
 disk_ufs_mount ${UFS_MOUNT}
 
 freebsd_installkernel ${UFS_MOUNT}
-freebsd_installworld ${UFS_MOUNT}
+[ -n "$NO_WORLD" ] || freebsd_installworld ${UFS_MOUNT}
 
 echo "Configuring FreeBSD at "`date`
 cd ${CONFIGDIR}/overlay
