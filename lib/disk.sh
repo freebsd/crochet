@@ -44,12 +44,12 @@ disk_fat_format ( ) {
 # $1: Directory where FAT partition will be mounted
 disk_fat_mount ( ) {
     echo "Mounting the virtual FAT partition"
-    if [ -d $1 ]; then
-	umount $1
-	rmdir $1
+    if [ -d "$1" ]; then
+	umount "$1"
+	rmdir "$1"
     fi
-    mkdir $1
-    mount_msdosfs ${_DISK_FAT_DEV} $1
+    mkdir "$1"
+    mount_msdosfs ${_DISK_FAT_DEV} "$1"
 }
 
 # $1: Mount point
