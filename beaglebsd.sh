@@ -2,7 +2,7 @@
 
 # Directory containing this script.
 TOPDIR=`cd \`dirname $0\`; pwd`
-FILESDIR=${TOPDIR}/config/arm/BEAGLEBONE/files
+CONFIGDIR=${TOPDIR}/config/arm/BEAGLEBONE
 
 # Useful values
 MB=$((1000 * 1000))
@@ -93,13 +93,13 @@ if [ ! -f ${UBOOT_SRC}/_.uboot.patched ] && [ ! -f ${BUILDOBJ}/_.uboot.patched ]
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${BUILDOBJ}/_.uboot.patch.log)"
     # Works around a FreeBSD bug (freestanding builds require libc).
-    patch -N -p1 < ${FILESDIR}/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch1_add_libc_to_link_on_FreeBSD.patch > ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn on some additional U-Boot features not ordinarily present in TIs build.
-    patch -N -p1 < ${FILESDIR}/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch2_add_options_to_am335x_config.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Fix a U-Boot bug that has been fixed in the master sources but not yet in TIs sources.
-    patch -N -p1 < ${FILESDIR}/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch3_fix_api_disk_enumeration.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
     # Turn off some features that bloat the MLO so it can't link
-    patch -N -p1 < ${FILESDIR}/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
+    patch -N -p1 < ${CONFIGDIR}/files/uboot_patch4_shrink_spl.patch >> ${BUILDOBJ}/_.uboot.patch.log 2>&1
 
     touch ${UBOOT_SRC}/_.uboot.patched
     rm -f ${BUILDOBJ}/_.uboot.configured
@@ -219,7 +219,7 @@ mount_msdosfs ${FAT_DEV} ${BUILDOBJ}/_.mounted_fat
 echo "Installing U-Boot onto the FAT partition at "`date`
 cp ${UBOOT_SRC}/MLO ${BUILDOBJ}/_.mounted_fat/
 cp ${UBOOT_SRC}/u-boot.img ${BUILDOBJ}/_.mounted_fat/
-cp ${FILESDIR}/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
+cp ${CONFIGDIR}/files/uEnv.txt ${BUILDOBJ}/_.mounted_fat/
 
 #
 # Install ubldr onto FAT partition.
@@ -277,7 +277,7 @@ fi
 
 # Copy configuration files
 echo "Configuring FreeBSD at "`date`
-cd ${FILESDIR}/overlay
+cd ${CONFIGDIR}/overlay
 find . | cpio -p ${BUILDOBJ}/_.mounted_ufs
 
 # If requested, copy source onto card as well.
