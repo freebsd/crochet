@@ -10,7 +10,7 @@ disk_create_image ( ) {
 }
 
 disk_release_image ( ) {
-    mdcondif -d -u ${_DISK_MD}
+    mdconfig -d -u ${_DISK_MD}
     unset _DISK_MD
 }
 
