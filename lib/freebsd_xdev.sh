@@ -1,3 +1,7 @@
+
+# freebsd_xdev_test: Verify that xdev tools exist.
+#
+# TODO: support armv6 here as well.
 freebsd_xdev_test ( ) {
     # We need the cross-tools for arm, if they're not already built.
     # This should work with arm.arm or arm.armv6 equally well.
