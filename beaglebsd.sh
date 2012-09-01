@@ -1,5 +1,7 @@
 #!/bin/sh -e
 
+echo 'Starting at '`date`
+
 # General configuration and useful definitions
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
