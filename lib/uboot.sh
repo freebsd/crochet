@@ -72,13 +72,15 @@ uboot_patch ( ) {
 #
 # $1: Name of U-Boot configuration to use.
 uboot_configure ( ) {
-    if [ ! -f ${WORKDIR}/_.uboot.configured ]; then
-	cd "$UBOOT_SRC"
-	echo "Configuring U-Boot. (Logging to ${WORKDIR}/_.uboot.configure.log)"
-	gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1
-	echo "$1" > ${WORKDIR}/_.uboot.configured
-	rm -f ${WORKDIR}/_.uboot.built
+    if [ -f ${WORKDIR}/_.uboot.configured ]; then
+	return 0
     fi
+
+    cd "$UBOOT_SRC"
+    echo "Configuring U-Boot. (Logging to ${WORKDIR}/_.uboot.configure.log)"
+    gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1
+    echo "$1" > ${WORKDIR}/_.uboot.configured
+    rm -f ${WORKDIR}/_.uboot.built
 }
 
 # uboot_build
@@ -86,6 +88,7 @@ uboot_configure ( ) {
 uboot_build ( ) {
     if [ -f ${WORKDIR}/_.uboot.built ]; then
 	echo "Using U-Boot from previous build."
+	return 0
     fi
 
     cd "$UBOOT_SRC"

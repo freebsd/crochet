@@ -11,6 +11,7 @@ GB=$((1000 * $MB))
 
 # Load builder libraries we need.
 . ${LIBDIR}/base.sh
+. ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
 
