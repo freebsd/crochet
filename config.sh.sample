@@ -1,8 +1,9 @@
 #
 # CONFIGURATION
 #
-# This fragment of shell script will be
-# read into beaglebsd.sh when it runs.
+
+# Set up the default configuration for your board
+board_init BeagleBone
 
 # Uncomment to populate /usr/src
 # Make sure you have at least a 4GB card

@@ -5,7 +5,7 @@ echo 'Starting at '`date`
 # General configuration and useful definitions
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
-CONFIGDIR=${TOPDIR}/config/arm/BEAGLEBONE
+
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
 
@@ -33,7 +33,7 @@ freebsd_src_test $KERNCONF
 #
 # Patch, configure, and build U-Boot
 #
-uboot_patch ${CONFIGDIR}/files/uboot_*.patch
+uboot_patch ${BOARDDIR}/files/uboot_*.patch
 uboot_configure am335x_evm_config
 uboot_build
 
@@ -60,7 +60,7 @@ disk_fat_mount ${FAT_MOUNT}
 echo "Installing U-Boot onto the FAT partition"
 cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
 cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
-cp ${CONFIGDIR}/files/uEnv.txt ${FAT_MOUNT}
+cp ${BOARDDIR}/files/uEnv.txt ${FAT_MOUNT}
 
 freebsd_ubldr_copy ${FAT_MOUNT}
 
@@ -78,7 +78,7 @@ freebsd_installkernel ${UFS_MOUNT}
 [ -n "$NO_WORLD" ] || freebsd_installworld ${UFS_MOUNT}
 
 echo "Configuring FreeBSD at "`date`
-cd ${CONFIGDIR}/overlay
+cd ${BOARDDIR}/overlay
 find . | cpio -p ${UFS_MOUNT}
 
 [ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src ${UFS_MOUNT}

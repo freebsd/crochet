@@ -1,4 +1,4 @@
-beaglebsd-config-local.sh
+config.sh
 src-armv6
 u-boot
 work
