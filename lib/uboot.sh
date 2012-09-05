@@ -49,11 +49,11 @@ uboot_ti_test ( ) {
 uboot_patch ( ) {
     # TODO: Verify that _.uboot.patched lists the patch files
     # we expect.  If not, complain and exit.
-    if [ ! -f ${UBOOT_SRC}/_.uboot.patched ]; then
+    if [ -f ${UBOOT_SRC}/_.uboot.patched ]; then
 	return 0
     fi
 
-    if [ ! -f ${WORKDIR}/_.uboot.patched ]; then
+    if [ -f ${WORKDIR}/_.uboot.patched ]; then
 	touch ${UBOOT_SRC}/_.uboot.patched
 	return 0
     fi
