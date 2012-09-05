@@ -62,7 +62,13 @@ uboot_patch ( ) {
     echo "Patching U-Boot. (Logging to ${WORKDIR}/_.uboot.patch.log)"
     for p in "$@"; do
 	echo "   Applying patch $p"
-	patch -N -p1 < $p >> ${WORKDIR}/_.uboot.patch.log 2>&1
+	if patch -N -p1 < $p >> ${WORKDIR}/_.uboot.patch.log 2>&1; then
+	    # success
+	else
+	    echo "Patch didn't apply: $p"
+	    echo "  Log in ${WORKDIR}/_.uboot.patch.log"
+	    exit 1
+	fi
     done
     echo "$@" > ${UBOOT_SRC}/_.uboot.patched
     rm -f ${WORKDIR}/_.uboot.configured
@@ -78,7 +84,13 @@ uboot_configure ( ) {
 
     cd "$UBOOT_SRC"
     echo "Configuring U-Boot. (Logging to ${WORKDIR}/_.uboot.configure.log)"
-    gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1
+    if gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1; then
+	# success
+    else
+	echo "  Failed to configure U-Boot."
+	echo "  Log in ${WORKDIR}/_.uboot.configure.log"
+	exit 1
+    fi
     echo "$1" > ${WORKDIR}/_.uboot.configured
     rm -f ${WORKDIR}/_.uboot.built
 }
@@ -93,6 +105,13 @@ uboot_build ( ) {
 
     cd "$UBOOT_SRC"
     echo "Building U-Boot. (Logging to ${WORKDIR}/_.uboot.build.log)"
-    gmake CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1
+    if gmake CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1; then
+	# success
+    else
+	echo "  Failed to build U-Boot."
+	echo "  Log in ${WORKDIR}/_.uboot.build.log"
+	exit 1
+    fi
+
     touch ${WORKDIR}/_.uboot.built
 }
