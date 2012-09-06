@@ -5,16 +5,13 @@
 # Set up the default configuration for your board
 board_config BeagleBone
 
-# Uncomment to populate /usr/src with a copy
-# of the sources the image was built with.
-# Make sure you have at least a 4GB card.
 #
-# INSTALL_USR_SRC=yes
-
-# Uncomment to fetch a fresh /usr/ports tree and put
-# it on the image.
+# Read board/<board-name>/README for more details
+# about configuring for your particular board.
 #
-# INSTALL_USR_PORTS=yes
+# The variables documented below are just
+# a few of the most common ones.
+#
 
 #
 # Size of the disk image that will be built.
@@ -63,27 +60,35 @@ board_config BeagleBone
 # FREEBSD_SRC=$TOPDIR/freebsd-src
 
 # Directory to hold U-Boot source code.
+# U-Boot is a popular bootloader used on many different
+# boards.
+#
 # The U-Boot source is about 120MB. U-Boot will also be compiled
 # in this directory, so you'll need about 150MB total space here.
 #
 # This directory doesn't need to exist yet.
 # When you run the script, it will tell you how to get
-# appropriate sources into this directory.
+# appropriate sources into this directory if you need them.
 #
 # UBOOT_SRC=$TOPDIR/u-boot
 
-# XXX Directory where build artifacts will go; this should be a
+# Directory where build artifacts will go; this should be a
 # directory with enough space for the final disk image.
 #
 # WORKDIR=$TOPDIR/work
-
-# Kernel configuration to use.
-# The BEAGLEBONE configuration is in the armv6 sources.
-# Otherwise, you might need to create the configuration file yourself.
-#
-# KERNCONF=BEAGLEBONE
 
 # The name of the final disk image.
 # This file will be as large as SD_SIZE above, so make sure it's located
 # somewhere with enough space.
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
+
+# Uncomment to populate /usr/src with a copy
+# of the sources the image was built with.
+# Make sure you have at least a 4GB card.
+#
+# INSTALL_USR_SRC=yes
+
+# Uncomment to fetch a fresh /usr/ports tree and put
+# it on the image.
+#
+# INSTALL_USR_PORTS=yes
