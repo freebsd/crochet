@@ -12,7 +12,10 @@ load_config ( ) {
 
 # $1: name of board directory
 #
-board_init ( ) {
+board_config ( ) {
     BOARDDIR=${TOPDIR}/board/$1
-    . $BOARDDIR/init.sh
+    . $BOARDDIR/config.sh
+
+    WORKDIR=$TOPDIR/work
+    IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 }
