@@ -22,6 +22,7 @@ freebsd_download_instructions ( ) {
 freebsd_src_test ( ) {
     # TODO: check that it's a FreeBSD source tree first
     if [ \! -f "$FREEBSD_SRC/sys/arm/conf/$1" ]; then
+	echo "Didn't find $FREEBSD_SRC/sys/arm/conf/$1"
 	# TODO: Change the message here to indicate that
 	# the kernel config wasn't found.
 	freebsd_download_instructions
