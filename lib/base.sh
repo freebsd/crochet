@@ -7,9 +7,6 @@ load_config ( ) {
 	echo "Please copy config.sh.sample to config.sh and customize for your application"
 	exit 1
     fi
-
-    # Round down to sector multiple.
-    SD_SIZE=$(( (SD_SIZE / 512) * 512 ))
 }
 
 

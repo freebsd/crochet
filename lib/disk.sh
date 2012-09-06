@@ -5,7 +5,7 @@
 disk_create_image ( ) {
     echo "Creating the raw disk image in $1"
     [ -f $1 ] && rm -f $1
-    dd if=/dev/zero of=$1 bs=1 seek=$2 count=0 >/dev/null 2>&1
+    dd if=/dev/zero of=$1 bs=512 seek=$(($2 / 512)) count=0 >/dev/null 2>&1
     _DISK_MD=`mdconfig -a -t vnode -f $1`
 }
 
