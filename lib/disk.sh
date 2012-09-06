@@ -19,22 +19,35 @@ disk_release_image ( ) {
 # (ROM code for TI AM335X and Raspberry PI both require MBR
 # partitioning.)
 #
+# TODO: Instead of trying to do all the partitioning
+# here, have this just create the MBR.
+#
+# Move the partition creation logic into disk_fat_format, etc.
+#
 disk_partition_mbr ( ) {
-    # TODO: Figure out how to include a swap partition here.
-    # Swapping to SD is painful, but not as bad as panicing
-    # the kernel when you run out of memory.
     echo "Partitioning the raw disk image at "`date`
     gpart create -s MBR -f x ${_DISK_MD}
+
     gpart add -a 63 -b 63 -s2m -t '!12' -f x ${_DISK_MD}
-    gpart set -a active -i 1 -f x ${_DISK_MD}
+    # TODO: we should get _DISK_FAT_PARTITION from gpart
+    # (similar to how mdconfig tells us the MD device we used.)
     _DISK_FAT_PARTITION=s1
     _DISK_FAT_DEV=/dev/${_DISK_MD}${_DISK_FAT_PARTITION}
+    gpart set -a active -i 1 -f x ${_DISK_MD}
+
+    #gpart add -s790m -t freebsd -i 3 -f x ${_DISK_MD}
+    #_DISK_SWAP_PARTITION=s3
+
     gpart add -t freebsd -f x ${_DISK_MD}
     _DISK_UFS_PARTITION=s2
     _DISK_UFS_DEV=/dev/${_DISK_MD}${_DISK_UFS_PARTITION}
+
     gpart commit ${_DISK_MD}
 }
 
+#
+# TODO: This should be disk_fat_add_partition_and_format
+#
 disk_fat_format ( ) {
     echo "Formatting the FAT partition at "`date`
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
