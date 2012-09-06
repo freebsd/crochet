@@ -1,0 +1,51 @@
+This is a set of scripts and configuration files that
+can build a bootable FreeBSD image for some popular ARM-based
+development boards.
+
+============================================================
+
+How to Build a Disk Image
+-------------------------
+
+The beaglebsd.sh script can build a complete bootable FreeBSD image
+ready to be copied to a MicroSDHC card.  The script runs on
+FreeBSD-CURRENT (March 2012 or later).
+
+Using the script to build an image consists of a few steps:
+
+1. READ board/<board-name>/README
+
+   The board-specific directories each have a README
+   with various details about running FreeBSD on a particular
+   system.
+
+2. EDIT config.sh
+
+   Start by copying config.sh.sample.
+
+   The first line specifies the board configuration you
+   want to use.  The name here should exactly match a
+   directory under "board/".
+
+3. RUN beaglebsd.sh as root
+
+   $ sudo /bin/sh beaglebsd.sh
+
+   The script will first check that you have any needed sources.
+   If you don't, the script will tell you exactly how to obtain the
+   missing pieces.  Follow the instructions and re-run the script
+   until you have everything.
+
+   As soon as it finds all the required pieces, the script will then
+   compile everything and build the disk image.  This part of the
+   process can take several hours.
+
+4. COPY the image to a MicroSDHC card.
+
+   The script will suggest a 'dd' command to do this.
+
+5. BOOT the image on your board.
+
+   Again, read board/<board-name>/README for details.
+
+============================================================
