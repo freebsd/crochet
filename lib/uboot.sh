@@ -1,6 +1,6 @@
+UBOOT_SRC=$TOPDIR/u-boot
 
 . ${LIBDIR}/freebsd_xdev.sh
-
 
 _uboot_download_instructions ( ) {
     # Use TIs U-Boot sources that know about am335x processors
