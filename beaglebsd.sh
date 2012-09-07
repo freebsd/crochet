@@ -5,6 +5,7 @@ echo 'Starting at '`date`
 # General configuration and useful definitions
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
+WORKDIR=${TOPDIR}/work
 
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
@@ -28,7 +29,7 @@ rm -f ${WORKDIR}/*.log
 # Check prerequisites
 #
 uboot_ti_test   # TIs modified U-Boot sources
-freebsd_src_test $KERNCONF
+freebsd_src_test ${KERNCONF}
 
 #
 # Patch, configure, and build U-Boot
@@ -41,7 +42,7 @@ uboot_build
 # Build FreeBSD and ubldr
 #
 freebsd_buildworld
-freebsd_buildkernel KERNCONF=$KERNCONF
+freebsd_buildkernel KERNCONF=${KERNCONF}
 freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 
 #
