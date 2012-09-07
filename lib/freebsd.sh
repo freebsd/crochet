@@ -3,16 +3,17 @@ TARGET_ARCH=armv6
 WORLDJOBS=4
 
 freebsd_download_instructions ( ) {
-    echo "Need FreeBSD tree with armv6 support."
-    echo "You can obtain this with the folowing command:"
     echo
-    echo "mkdir -p $FREEBSD_SRC && svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
+    echo "You can obtain a suitable FreeBSD source tree with the folowing commands:"
     echo
-    echo "If you already have FreeBSD-CURRENT sources in $FREEBSD_SRC, then"
-    echo "please verify that it's at least r239281 (15 August 2012)."
+    echo " $ mkdir -p $FREEBSD_SRC"
+    for l in "$@"; do
+        echo "$l"
+    done
     echo
-    echo "Edit \$FREEBSD_SRC in beaglebsd-config.sh if you want the sources in a different directory."
+    echo "Set \$FREEBSD_SRC in config.sh if you have the sources in a different directory."
     echo "Run this script again after you have the sources installed."
+    exit 1
 }
 
 # freebsd_src_test: Check FreeBSD src tree
@@ -25,7 +26,8 @@ freebsd_src_test ( ) {
 	echo "Didn't find $FREEBSD_SRC/sys/arm/conf/$1"
 	# TODO: Change the message here to indicate that
 	# the kernel config wasn't found.
-	freebsd_download_instructions
+	freebsd_download_instructions \
+	     " $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
 	exit 1
     fi
     echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
@@ -41,7 +43,13 @@ freebsd_buildworld ( ) {
 
     echo "Building FreeBSD-$TARGET_ARCH world at "`date`" (Logging to ${WORKDIR}/_.buildworld.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${WORKDIR}/_.buildworld.log 2>&1 && touch ${WORKDIR}/_.built-world
+    if make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${WORKDIR}/_.buildworld.log 2>&1 && touch ${WORKDIR}/_.built-world; then
+	# success
+    else
+	echo "Failed to build FreeBSD world."
+	echo "Log in ${WORKDIR}/_.buildworld.log"
+	exit 1
+    fi
 }
 
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
@@ -61,7 +69,14 @@ freebsd_buildkernel ( ) {
 
     echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${WORKDIR}/_.buildkernel.log)"
     cd $FREEBSD_SRC
-    make TARGET_ARCH=$TARGET_ARCH "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.log 2>&1 && touch ${WORKDIR}/_.built-kernel
+    if make TARGET_ARCH=$TARGET_ARCH "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.log 2>&1 && touch ${WORKDIR}/_.built-kernel; then
+	# success
+    else
+	echo "Failed to build FreeBSD kernel"
+	echo "Log: ${WORKDIR}/_.buildkernel.log"
+	exit 1
+    fi
+
 }
 
 # freebsd_installworld: Install FreeBSD world to image
@@ -72,9 +87,32 @@ freebsd_installworld ( ) {
     # TODO: check and warn if world isn't built.
     cd $FREEBSD_SRC
     echo "Installing FreeBSD world onto the UFS partition at "`date`
-    make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.log 2>&1
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.log 2>&1
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.log 2>&1
+    if make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.log 2>&1
+    then
+	# success
+    else
+	echo "Installworld failed."
+	echo "Log: ${WORKDIR}/_.installworld.log"
+	exit 1
+    fi
+
+    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.log 2>&1
+    then
+	# success
+    else
+	echo "distrib-dirs failed"
+	echo "Log: ${WORKDIR}/_.distrib-dirs.log"
+	exit 1
+    fi
+
+    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.log 2>&1
+    then
+	# success
+    else
+	echo "distribution failed"
+	echo "Log: ${WORKDIR}/_.distribution.log"
+	exit 1
+    fi
 }
 
 # freebsd_installkernel: Install FreeBSD kernel to image
@@ -85,7 +123,15 @@ freebsd_installkernel ( ) {
     # TODO: check and warn if kernel isn't built.
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-    make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${WORKDIR}/_.installkernel.log 2>&1
+    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 KERNCONF=${KERNCONF} installkernel > ${WORKDIR}/_.installkernel.log 2>&1
+    then
+	# success
+    else
+	echo "installkernel failed"
+	echo "Log: ${WORKDIR}/_.installkernel.log"
+	exit 1
+    fi
+
 }
 
 # freebsd_ubldr_build:  Build the ubldr loader program.
