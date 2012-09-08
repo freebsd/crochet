@@ -1,4 +1,3 @@
-/config.sh
-src-armv6
-u-boot
+config.sh
+u-boot*
 work
