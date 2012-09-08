@@ -7,7 +7,6 @@ freebsd_download_instructions ( ) {
     echo
     echo "You can obtain a suitable FreeBSD source tree with the folowing commands:"
     echo
-    echo " $ mkdir -p $FREEBSD_SRC"
     for l in "$@"; do
         echo "$l"
     done
