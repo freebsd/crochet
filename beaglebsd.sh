@@ -10,15 +10,22 @@ WORKDIR=${TOPDIR}/work
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
 
-# Load builder libraries we need.
+# Load builder libraries.
 . ${LIBDIR}/base.sh
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
 
-# TODO: Parameter parsing?
+# Placeholder definitions of overridable functions.
+check_prerequisites ( ) {
+    freebsd_current_test
+}
+build_bootloader ( ) { }
+construct_boot_partition ( ) { }
 
+#
 # Load user configuration
+#
 load_config
 
 # Initialize the work directory, clean out old logs.
@@ -26,50 +33,22 @@ mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
 #
-# Check prerequisites
+# Now we can build the system.
 #
-uboot_ti_test   # TIs modified U-Boot sources
-freebsd_src_test ${KERNCONF}
-
-#
-# Patch, configure, and build U-Boot
-#
-uboot_patch ${BOARDDIR}/files/uboot_*.patch
-uboot_configure am335x_evm_config
-uboot_build
-
-#
-# Build FreeBSD and ubldr
-#
+check_prerequisites
 freebsd_buildworld
 freebsd_buildkernel KERNCONF=${KERNCONF}
-freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-
-#
-# Create and partition the disk image
-#
+build_bootloader
 disk_create_image ${IMG} ${SD_SIZE}
 disk_partition_mbr
+construct_boot_partition
 
 #
-# Format, mount, and populate the FAT partition
+# TODO: create the swap partition
 #
-FAT_MOUNT=${WORKDIR}/_.mounted_fat
-disk_fat_format
-disk_fat_mount ${FAT_MOUNT}
-
-echo "Installing U-Boot onto the FAT partition"
-cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
-cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
-cp ${BOARDDIR}/files/uEnv.txt ${FAT_MOUNT}
-
-freebsd_ubldr_copy ${FAT_MOUNT}
-
-disk_fat_unmount ${FAT_MOUNT}
-unset FAT_MOUNT
 
 #
-# Format, mount, and populate the UFS partition
+# Format, mount, and populate the UFS partition.
 #
 UFS_MOUNT=${WORKDIR}/_.mounted_ufs
 disk_ufs_format
@@ -81,6 +60,10 @@ freebsd_installkernel ${UFS_MOUNT}
 echo "Configuring FreeBSD at "`date`
 cd ${BOARDDIR}/overlay
 find . | cpio -p ${UFS_MOUNT}
+if [ -d ${WORKDIR}/overlay ]; then
+    cd ${WORKDIR}/overlay
+    find . | cpio -p ${UFS_MOUNT}
+fi
 
 [ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src ${UFS_MOUNT}
 [ -z "$INSTALL_USR_PORTS" ] || freebsd_install_usr_ports ${UFS_MOUNT}

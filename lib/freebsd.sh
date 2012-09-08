@@ -1,6 +1,7 @@
 FREEBSD_SRC=/usr/src
 TARGET_ARCH=armv6
 WORLDJOBS=4
+KERNJOBS=4
 
 freebsd_download_instructions ( ) {
     echo
@@ -24,13 +25,21 @@ freebsd_src_test ( ) {
     # TODO: check that it's a FreeBSD source tree first
     if [ \! -f "$FREEBSD_SRC/sys/arm/conf/$1" ]; then
 	echo "Didn't find $FREEBSD_SRC/sys/arm/conf/$1"
+	shift
 	# TODO: Change the message here to indicate that
 	# the kernel config wasn't found.
-	freebsd_download_instructions \
-	     " $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
+	freebsd_download_instructions "$@"
 	exit 1
     fi
     echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
+}
+
+# freebsd_current_test:  Check that FreeBSD-CURRENT sources are available
+# (Specialized version of freebsd_src_test for the common case.)
+freebsd_current_test ( ) {
+    freebsd_src_test \
+	${KERNCONF} \
+ 	" $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
 }
 
 # freebsd_buildworld: Build FreeBSD world.
