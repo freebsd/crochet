@@ -26,30 +26,26 @@ disk_release_image ( ) {
 #
 disk_partition_mbr ( ) {
     echo "Partitioning the raw disk image at "`date`
-    gpart create -s MBR -f x ${_DISK_MD}
-
-    gpart add -a 63 -b 63 -s2m -t '!12' -f x ${_DISK_MD}
-    # TODO: we should get _DISK_FAT_PARTITION from gpart
-    # (similar to how mdconfig tells us the MD device we used.)
-    _DISK_FAT_PARTITION=s1
-    _DISK_FAT_DEV=/dev/${_DISK_MD}${_DISK_FAT_PARTITION}
-    gpart set -a active -i 1 -f x ${_DISK_MD}
-
-    #gpart add -s790m -t freebsd -i 3 -f x ${_DISK_MD}
-    #_DISK_SWAP_PARTITION=s3
-
-    gpart add -t freebsd -f x ${_DISK_MD}
-    _DISK_UFS_PARTITION=s2
-    _DISK_UFS_DEV=/dev/${_DISK_MD}${_DISK_UFS_PARTITION}
+    gpart create -s MBR ${_DISK_MD}
 
     gpart commit ${_DISK_MD}
 }
 
+# Add a FAT partition and format it.
 #
-# TODO: This should be disk_fat_add_partition_and_format
+# $1: size of parition, can use 'k', 'm', 'g' suffixes
+# TODO: If $1 is empty, use whole disk.
 #
-disk_fat_format ( ) {
-    echo "Formatting the FAT partition at "`date`
+disk_fat_create ( ) {
+    echo "Creating the FAT partition at "`date`
+    gpart add -a 63 -b 63 -s$1 -t '!12' ${_DISK_MD}
+    # TODO: we should get _DISK_FAT_PARTITION from gpart
+    # (similar to how mdconfig tells us the MD device we used.)
+    _DISK_FAT_PARTITION_NUMBER=1
+    _DISK_FAT_PARTITION=s${_DISK_FAT_PARTITION_NUMBER}
+    _DISK_FAT_DEV=/dev/${_DISK_MD}${_DISK_FAT_PARTITION}
+    gpart set -a active -i ${_DISK_FAT_PARTITION_NUMBER} ${_DISK_MD}
+
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     newfs_msdos -L "boot" -F 12 ${_DISK_FAT_DEV} >/dev/null
 }
@@ -72,8 +68,22 @@ disk_fat_unmount ( ) {
     rmdir $1
 }
 
-disk_ufs_format ( ) {
-    echo "Formatting the UFS partition at "`date`
+# TODO: Make this work.
+disk_swap_create ( ) {
+    #gpart add -s790m -t freebsd -i 3 -f x ${_DISK_MD}
+    #_DISK_SWAP_PARTITION=s3
+}
+
+# TODO: Support $1 size argument
+# TODO: If $1 is empty, use whole disk.
+disk_ufs_create ( ) {
+    echo "Creating the UFS partition at "`date`
+
+    gpart add -t freebsd -f x ${_DISK_MD}
+    _DISK_UFS_PARTITION_NUMBER=2
+    _DISK_UFS_PARTITION=s${_DISK_UFS_PARTITION_NUMBER}
+    _DISK_UFS_DEV=/dev/${_DISK_MD}${_DISK_UFS_PARTITION}
+
     newfs ${_DISK_UFS_DEV} >/dev/null
     # Turn on Softupdates
     tunefs -n enable ${_DISK_UFS_DEV}

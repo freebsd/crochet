@@ -18,7 +18,7 @@ build_bootloader ( ) {
 
 construct_boot_partition ( ) {
     FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    disk_fat_format
+    disk_fat_create 2m
     disk_fat_mount ${FAT_MOUNT}
 
     echo "Installing U-Boot onto the FAT partition"

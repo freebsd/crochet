@@ -46,12 +46,13 @@ construct_boot_partition
 #
 # TODO: create the swap partition
 #
+# disk_swap_create <size>
 
 #
-# Format, mount, and populate the UFS partition.
+# Create, mount, and populate the UFS partition.
 #
 UFS_MOUNT=${WORKDIR}/_.mounted_ufs
-disk_ufs_format
+disk_ufs_create
 disk_ufs_mount ${UFS_MOUNT}
 
 freebsd_installkernel ${UFS_MOUNT}
