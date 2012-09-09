@@ -19,16 +19,9 @@ disk_release_image ( ) {
 # (ROM code for TI AM335X and Raspberry PI both require MBR
 # partitioning.)
 #
-# TODO: Instead of trying to do all the partitioning
-# here, have this just create the MBR.
-#
-# Move the partition creation logic into disk_fat_format, etc.
-#
 disk_partition_mbr ( ) {
     echo "Partitioning the raw disk image at "`date`
     gpart create -s MBR ${_DISK_MD}
-
-    gpart commit ${_DISK_MD}
 }
 
 # Add a FAT partition and format it.
