@@ -18,6 +18,10 @@ _uboot_download_instructions ( ) {
     echo "Run this script again after you have the U-Boot sources installed."
 }
 
+#
+# $1: path to a file that should be in this U-Boot tree
+# $2...: list of commands to fetch appropriate U-Boot sources
+#
 uboot_test ( ) {
     # We use FreeBSD xdev tools to build U-Boot
     freebsd_xdev_test
@@ -33,7 +37,7 @@ uboot_test ( ) {
 	exit 1
     fi
 
-    echo "Found suitable U-Boot sources in $UBOOT_SRC"
+    echo "Found U-Boot sources in $UBOOT_SRC"
 }
 
 # uboot_patch: Apply patches to the U-Boot sources.
