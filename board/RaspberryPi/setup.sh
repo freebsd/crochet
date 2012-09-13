@@ -3,7 +3,7 @@ FREEBSD_SRC=${TOPDIR}/freebsd-rpi
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
 RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
 
-check_prerequisites ( ) {
+board_check_prerequisites ( ) {
     freebsd_src_test \
 	${KERNCONF} \
  	" $ git clone git://github.com/gonzoua/freebsd-pi.git $FREEBSD_SRC"
@@ -23,7 +23,7 @@ check_prerequisites ( ) {
     fi
 }
 
-build_bootloader ( ) {
+board_build_bootloader ( ) {
     # Closed-source firmware is already built.
 
     # Build U-Boot
@@ -37,7 +37,7 @@ build_bootloader ( ) {
     freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 }
 
-construct_boot_partition ( ) {
+board_construct_boot_partition ( ) {
     echo "Setting up boot partition"
     FAT_MOUNT=${WORKDIR}/_.mounted_fat
     disk_fat_create 8m

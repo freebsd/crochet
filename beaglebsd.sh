@@ -16,12 +16,12 @@ GB=$((1000 * $MB))
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
 
-# Placeholder definitions of overridable functions.
-check_prerequisites ( ) {
+# Placeholder definitions of functions overridden by board setup.
+board_check_prerequisites ( ) {
     freebsd_current_test
 }
-build_bootloader ( ) { }
-construct_boot_partition ( ) { }
+board_build_bootloader ( ) { }
+board_construct_boot_partition ( ) { }
 
 #
 # Load user configuration
@@ -35,13 +35,13 @@ rm -f ${WORKDIR}/*.log
 #
 # Now we can build the system.
 #
-check_prerequisites
+board_check_prerequisites
 freebsd_buildworld
 freebsd_buildkernel KERNCONF=${KERNCONF}
-build_bootloader
+board_build_bootloader
 disk_create_image ${IMG} ${SD_SIZE}
 disk_partition_mbr
-construct_boot_partition
+board_construct_boot_partition
 
 #
 # TODO: create the swap partition
