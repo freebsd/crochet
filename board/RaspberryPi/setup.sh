@@ -1,12 +1,9 @@
 KERNCONF=RPI-B
-FREEBSD_SRC=${TOPDIR}/freebsd-rpi
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
 RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
 
 board_check_prerequisites ( ) {
-    freebsd_src_test \
-	${KERNCONF} \
- 	" $ git clone git://github.com/gonzoua/freebsd-pi.git $FREEBSD_SRC"
+    freebsd_current_test
 
     uboot_test \
 	"$UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
