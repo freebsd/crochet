@@ -57,6 +57,7 @@ disk_fat_mount ( ) {
 # $1: Mount point
 disk_fat_unmount ( ) {
     echo "Unmounting FAT partition"
+    cd ${TOPDIR}
     umount $1
     rmdir $1
 }
@@ -72,12 +73,12 @@ disk_swap_create ( ) {
 disk_ufs_create ( ) {
     echo "Creating the UFS partition at "`date`
 
-    gpart add -t freebsd -f x ${_DISK_MD}
+    gpart add -t freebsd ${_DISK_MD}
     _DISK_UFS_PARTITION_NUMBER=2
     _DISK_UFS_PARTITION=s${_DISK_UFS_PARTITION_NUMBER}
     _DISK_UFS_DEV=/dev/${_DISK_MD}${_DISK_UFS_PARTITION}
 
-    newfs ${_DISK_UFS_DEV} >/dev/null
+    newfs ${_DISK_UFS_DEV}
     # Turn on Softupdates
     tunefs -n enable ${_DISK_UFS_DEV}
     # Turn on SUJ with a minimally-sized journal.
@@ -100,10 +101,10 @@ disk_ufs_mount ( ) {
     mount ${_DISK_UFS_DEV} $1
 }
 
+# $1: directory where UFS partition was mounted
 disk_ufs_unmount ( ) {
     echo "Unmounting the UFS partition at "`date`
-    cd $TOPDIR
-    umount ${UFS_MOUNT}
-    rmdir ${UFS_MOUNT}
-    unset UFS_MOUNT
+    cd ${TOPDIR}
+    umount $1
+    rmdir $1
 }
