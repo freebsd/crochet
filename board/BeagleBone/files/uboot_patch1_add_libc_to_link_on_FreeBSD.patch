@@ -11,16 +11,3 @@ index 99b9278..8395284 100644
  export PLATFORM_LIBS
  
  # Special flags for CPP when processing the linker script.
-diff --git a/examples/api/Makefile b/examples/api/Makefile
-index 5b5f7a6..60f7b43 100644
---- a/examples/api/Makefile
-+++ b/examples/api/Makefile
-@@ -71,7 +71,7 @@ all:	$(obj).depend $(OUTPUT)
- #########################################################################
- 
- $(OUTPUT):	$(OBJS)
--		$(LD) -Ttext $(LOAD_ADDR) -o $@ $^ -L$(gcclibdir) -lgcc
-+		$(LD) -static -Ttext $(LOAD_ADDR) -o $@ $^ -L$(gcclibdir) -lgcc -lc
- 		$(OBJCOPY) -O binary $@ $(OUTPUT).bin 2>/dev/null
- 
- # Rule to build generic library C files
