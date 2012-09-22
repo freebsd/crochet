@@ -74,8 +74,12 @@ disk_ufs_create ( ) {
     echo "Creating the UFS partition at "`date`
 
     gpart add -t freebsd ${_DISK_MD}
-    _DISK_UFS_PARTITION_NUMBER=2
-    _DISK_UFS_PARTITION=s${_DISK_UFS_PARTITION_NUMBER}
+    _DISK_UFS_SLICE_NUMBER=2
+    _DISK_UFS_SLICE=s${_DISK_UFS_SLICE_NUMBER}
+
+    gpart create -s BSD ${_DISK_MD}${_DISK_UFS_SLICE}
+    gpart add -t freebsd-ufs ${_DISK_MD}${_DISK_UFS_SLICE}
+    _DISK_UFS_PARTITION=${_DISK_UFS_SLICE}a
     _DISK_UFS_DEV=/dev/${_DISK_MD}${_DISK_UFS_PARTITION}
 
     newfs ${_DISK_UFS_DEV}
