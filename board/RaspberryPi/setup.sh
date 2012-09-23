@@ -40,12 +40,15 @@ board_construct_boot_partition ( ) {
     disk_fat_create 8m
     disk_fat_mount ${FAT_MOUNT}
 
+    # Copy Phase One boot files to FAT partition
     cd ${RPI_FIRMWARE_SRC}/boot
-    cp bootcode.bin loader.bin start.elf ${FAT_MOUNT}
+    cp bootcode.bin ${FAT_MOUNT}
+    cp loader.bin ${FAT_MOUNT}
+    cp arm192_start.elf ${FAT_MOUNT}/start.elf
 
+    # Copy U-Boot and ubldr to FAT partition
     cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
     cp ${BOARDDIR}/files/uEnv.txt ${FAT_MOUNT}
-
     freebsd_ubldr_copy ${FAT_MOUNT}
 
     disk_fat_unmount ${FAT_MOUNT}
