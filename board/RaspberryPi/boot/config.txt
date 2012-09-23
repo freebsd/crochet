@@ -1,3 +1,6 @@
+cmdline=
+kernel=u-boot.bin
+
 # uncomment if you get no picture on HDMI for a default "safe" mode
 #hdmi_safe=1
 
