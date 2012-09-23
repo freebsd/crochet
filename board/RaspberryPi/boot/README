@@ -1,0 +1,70 @@
+Overview of Raspberry PI boot Sequence for FreeBSD
+
+The first phase is common to any use of RaspberryPi,
+whether you're booting Linux, FreeBSD, or any other OS.
+It loads a series of proprietary closed-source boot
+loader files that initialize the hardware and ultimately
+load and run a file called "kernel.img" from SD.
+
+For a Linux boot, kernel.img is the Linux kernel.  For
+FreeBSD, there are a few more steps to get to the FreeBSD
+bootloader and kernel.
+
+
+PHASE ONE: Initialize the hardware
+==================================
+
+General Raspberry Pi boot sequence:
+
+* At power on, the ARM core is off and the GPU is on.  SDRAM is disabled.
+
+* GPU ROM code reads bootcode.bin from SD card and executes it on the GPU.
+
+* bootcode.bin enables SDRAM and loads loader.bin into RAM
+
+* bootcode.bin executes loader.bin on the GPU
+
+* loader.bin loads start.elf and executes it on the GPU (start.elf is
+  the "GPU firmware" that remains resident)
+
+  Note: There are several versions of start.elf that partition memory
+  differently between ARM and the GPU.  To configure this, you copy
+  the appropriate version to the name start.elf.
+
+* start.elf reads config.txt and uses it to configure the hardware.
+
+* start.elf reads cmdline.txt which holds arguments for kernel.img
+
+* start.elf loads kernel.img at 0x8000
+
+* start.elf starts the ARM core executing kernel.img
+
+Note:  The most recent boot files are available from
+github.com/raspberrypi/firmware  (Warning:  git clone
+of this project is very time-consuming!)
+
+There are some examples of bare-metal RaspberryPi programming
+at github.com/dwelch67/raspberrypi.  These use the same boot
+process as above, but replace kernel.img with simple freestanding
+executables.
+
+
+
+PHASE TWO: Load and boot FreeBSD
+================================
+
+For FreeBSD boot, the kernel.img file is a version of U-Boot
+with the "API" feature.
+
+* u-boot loads and initializes
+
+* u-boot loads ubldr from the FAT partition.
+  ubldr is a version of the FreeBSD standard loader(8) which
+  uses the u-boot API to access the hardware.
+
+* ubldr locates a UFS partition on the SD card.
+
+* ubldr loads the FreeBSD kernel from UFS
+
+* The FreeBSD kernel initializes and runs.
+
