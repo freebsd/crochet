@@ -37,7 +37,7 @@ rm -f ${WORKDIR}/*.log
 #
 board_check_prerequisites
 freebsd_buildworld
-freebsd_buildkernel KERNCONF=${KERNCONF}
+freebsd_buildkernel
 board_build_bootloader
 disk_create_image ${IMG} ${SD_SIZE}
 disk_partition_mbr

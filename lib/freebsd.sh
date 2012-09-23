@@ -41,50 +41,58 @@ freebsd_current_test ( ) {
  	" $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
 }
 
-# freebsd_buildworld: Build FreeBSD world.
+# Common code for buildworld and buildkernel.
+# In particular, this compares the command we're about to
+# run to the previous run and rebuilds if anything is different.
 #
-freebsd_buildworld ( ) {
-    if [ -f ${WORKDIR}/_.built-world ]; then
-	echo "Using FreeBSD world from previous build"
+_freebsd_build ( ) {
+    if diff ${WORKDIR}/_.build$1.sh ${WORKDIR}/_.built-$1 >/dev/null 2>&1
+    then
+	echo "Using FreeBSD $1 from previous build"
 	return 0
     fi
 
-    echo "Building FreeBSD-$TARGET_ARCH world at "`date`" (Logging to ${WORKDIR}/_.buildworld.log)"
+    echo "Building FreeBSD ${TARGET_ARCH} ${KERNCONF} $1 at "`date`" (Logging to ${WORKDIR}/_.build$1.log)"
+
+    if [ -f ${WORKDIR}/_.built-$1 ]
+    then
+	echo " Previous build$1 used different flags:"
+	echo " Old: "`cat ${WORKDIR}/_.built-$1`
+	echo " new: "`cat ${WORKDIR}/_.build$1.sh`
+	rm ${WORKDIR}/_.built-$1
+    fi
+
     cd $FREEBSD_SRC
-    if make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $WORLDJOBS buildworld > ${WORKDIR}/_.buildworld.log 2>&1 && touch ${WORKDIR}/_.built-world; then
-	# success
+    if /bin/sh -e ${WORKDIR}/_.build$1.sh > ${WORKDIR}/_.build$1.log 2>&1
+    then
+	mv ${WORKDIR}/_.build$1.sh ${WORKDIR}/_.built-$1
     else
-	echo "Failed to build FreeBSD world."
-	echo "Log in ${WORKDIR}/_.buildworld.log"
+	echo "Failed to build FreeBSD $1."
+	echo "Log in ${WORKDIR}/_.build$1.log"
 	exit 1
     fi
 }
 
+# freebsd_buildworld: Build FreeBSD world.
+#
+# $@: additional make arguments
+#
+# TODO: freebsd_buildworld and freebsd_buildkernel are almost
+# identical.  Factor out the common pieces.
+#
+freebsd_buildworld ( ) {
+    echo make TARGET_ARCH=$TARGET_ARCH DEBUG_FLAGS=-g -j $@ $WORLDJOBS buildworld > ${WORKDIR}/_.buildworld.sh
+    _freebsd_build world
+}
+
+
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
-# Note: Assumes world is already built.
 #
-# $@: arguments to make.  KERNCONF=FOO is required
-#
-# TODO: save "$@" in _.built-kernel so we can verify that
-# the kernel we last built is the same as the one we're being
-# asked to build.
+# $@: arguments to make.
 #
 freebsd_buildkernel ( ) {
-    if [ -f ${WORKDIR}/_.built-kernel ]; then
-	echo "Using FreeBSD kernel from previous build"
-	return 0
-    fi
-
-    echo "Building FreeBSD-armv6 kernel at "`date`" (Logging to ${WORKDIR}/_.buildkernel.log)"
-    cd $FREEBSD_SRC
-    if make TARGET_ARCH=$TARGET_ARCH "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.log 2>&1 && touch ${WORKDIR}/_.built-kernel; then
-	# success
-    else
-	echo "Failed to build FreeBSD kernel"
-	echo "Log: ${WORKDIR}/_.buildkernel.log"
-	exit 1
-    fi
-
+    echo make TARGET_ARCH=${TARGET_ARCH} KERNCONF=${KERNCONF} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.sh
+    _freebsd_build kernel
 }
 
 # freebsd_installworld: Install FreeBSD world to image
