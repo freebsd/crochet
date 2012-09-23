@@ -54,8 +54,7 @@ board_construct_boot_partition ( ) {
     cp arm192_start.elf ${FAT_MOUNT}/start.elf
 
     # Copy U-Boot and ubldr to FAT partition
-    cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
-    cp ${BOARDDIR}/files/uEnv.txt ${FAT_MOUNT}
+    cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/kernel.img
     freebsd_ubldr_copy ${FAT_MOUNT}
 
     disk_fat_unmount ${FAT_MOUNT}
