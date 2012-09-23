@@ -1,15 +1,12 @@
 KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
-RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
+# Use boot files checked into this project;
+# avoid a 400MB+ download.
+#RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
+RPI_FIRMWARE_SRC=${BOARDDIR}
 
-board_check_prerequisites ( ) {
-    freebsd_current_test
-
-    uboot_test \
-	"$UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
-	"git clone -b rpi_b git://github.com/gonzoua/u-boot-pi.git ${UBOOT_SRC}"
-
-    if [ ! -f "${RPI_FIRMWARE_SRC}/boot/start.elf" ]; then
+raspberry_pi_firmware_check ( ) {
+    if [ ! -f "${RPI_FIRMWARE_SRC}/boot/bootcode.bin" ]; then
 	echo "Need Rasberry Pi closed-source boot files."
 	echo "Use the following command to fetch them:"
 	echo
@@ -18,6 +15,16 @@ board_check_prerequisites ( ) {
 	echo "Run this script again after you have the files."
 	exit 1
     fi
+}
+
+board_check_prerequisites ( ) {
+    freebsd_current_test
+
+    uboot_test \
+	"$UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
+	"git clone git://github.com/gonzoua/u-boot-pi.git ${UBOOT_SRC}"
+
+    raspberry_pi_firmware_check
 }
 
 board_build_bootloader ( ) {
