@@ -51,10 +51,12 @@ board_construct_boot_partition ( ) {
     cd ${RPI_FIRMWARE_SRC}/boot
     cp bootcode.bin ${FAT_MOUNT}
     cp loader.bin ${FAT_MOUNT}
+    cp config.txt ${FAT_MOUNT}
     cp arm192_start.elf ${FAT_MOUNT}/start.elf
 
     # Copy U-Boot and ubldr to FAT partition
     cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
+    cp ${BOARDDIR}/files/boot.scr ${FAT_MOUNT}
     freebsd_ubldr_copy ${FAT_MOUNT}
 
     disk_fat_unmount ${FAT_MOUNT}
