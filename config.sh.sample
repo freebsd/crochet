@@ -3,7 +3,7 @@
 #
 
 # Set up the default configuration for your board
-board_config BeagleBone
+board_setup BeagleBone
 
 #
 # Read board/<board-name>/README for more details
@@ -28,6 +28,13 @@ board_config BeagleBone
 # SD_SIZE=$((7900 * MB)) # for 8 Gigabyte card
 # SD_SIZE=$((15900 * MB)) # for 16 Gigabyte card
 # SD_SIZE=$((31900 * MB)) # for 32 Gigabyte card
+
+# The board_setup picks a suitable default KERNCONF
+# but you can override it here.  (Overriding here
+# won't impact the default IMG filename; you may
+# want to change that below as well.)
+#
+# KERNCONF=MYCONF
 
 #
 # TOPDIR is the directory containing this script.
@@ -80,6 +87,7 @@ board_config BeagleBone
 # The name of the final disk image.
 # This file will be as large as SD_SIZE above, so make sure it's located
 # somewhere with enough space.
+#
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 
 # Uncomment to populate /usr/src with a copy
