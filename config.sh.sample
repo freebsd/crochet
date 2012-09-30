@@ -2,8 +2,16 @@
 # CONFIGURATION
 #
 
-# Set up the default configuration for your board
-board_setup BeagleBone
+# Note: Only board_setup and SD_SIZE should
+# be required for building a standard image,
+# assuming /usr/src has suitable FreeBSD
+# sources.  Everything else below is optional.
+
+# Uncomment one to choose the default configuration for your board
+#
+# board_setup BeagleBone
+# board_setup RaspberryPi
+# board_setup PandaBoard
 
 #
 # Read board/<board-name>/README for more details
@@ -23,34 +31,26 @@ board_setup BeagleBone
 # The sizes here are rounded down some to make
 # sure they fit on a matching card.
 #
+# SD_SIZE=$((100 * MB)) # for kernel-only images
 # SD_SIZE=$((1950 * MB)) # for 2 Gigabyte card
 # SD_SIZE=$((3900 * MB)) # for 4 Gigabyte card
 # SD_SIZE=$((7900 * MB)) # for 8 Gigabyte card
 # SD_SIZE=$((15900 * MB)) # for 16 Gigabyte card
 # SD_SIZE=$((31900 * MB)) # for 32 Gigabyte card
 
-# The board_setup picks a suitable default KERNCONF
+# The board_setup above picks a default KERNCONF
 # but you can override it here.  (Overriding here
 # won't impact the default IMG filename; you may
 # want to change that below as well.)
 #
 # KERNCONF=MYCONF
 
-#
-# TOPDIR is the directory containing this script.
-# As long as TOPDIR is on a disk with at least
-# 5G or so of free space, you can probably
-# use the settings below unchanged.
-#
-
 # The script assumes you're running a pretty recent
 # copy of FreeBSD-CURRENT and have FreeBSD-CURRENT
 # source code available in /usr/src.
 
-# FreeBSD source that will be used to compile
-# the BeagleBone image.  The necessary changes
-# were merged to FreeBSD-CURRENT in r239281
-# (15 August 2012).
+# FreeBSD source that will be used for kernel,
+# world, and ubldr.
 #
 # If you are already running on a sufficiently
 # recent FreeBSD-CURRENT, you can just use /usr/src here.
@@ -85,14 +85,14 @@ board_setup BeagleBone
 # WORKDIR=$TOPDIR/work
 
 # The name of the final disk image.
-# This file will be as large as SD_SIZE above, so make sure it's located
-# somewhere with enough space.
+# This file will be as large as SD_SIZE above, so make
+# sure it's located somewhere with enough space.
 #
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 
 # Uncomment to populate /usr/src with a copy
 # of the sources the image was built with.
-# Make sure you have at least a 4GB card.
+# You probably want at least a 4GB card.
 #
 # INSTALL_USR_SRC=yes
 
@@ -100,3 +100,24 @@ board_setup BeagleBone
 # it on the image.
 #
 # INSTALL_USR_PORTS=yes
+
+# Uncomment to suppress installworld.  This is
+# useful when experimenting with boot and kernel
+# startup, since it greatly speeds up the image
+# generation.  Set SD_SIZE to 80 * MB or even smaller if
+# you can:
+#
+# unset FREEBSD_INSTALL_WORLD
+
+# Other configuration:
+#   * ${BOARDDIR}/overlay will be copied over the
+#      installed world.
+#   * ${WORKDIR}/overlay will be copied over that.
+# So you can create, e.g., ${WORKDIR}/overlay/etc/fstab
+# to override the default /etc/fstab.
+
+# TODO: Package installation.
+# I would like to be able to just drop some packages
+# in ${BOARDDIR}/packages and have the script install
+# them.  The old pkg_add tool couldn't really do this;
+# maybe pkgng can?
