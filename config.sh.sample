@@ -109,6 +109,16 @@
 #
 # unset FREEBSD_INSTALL_WORLD
 
+# Extra arguments when building world.
+# These are also passed to installworld.
+#
+# FREEBSD_BUILDWORLD_EXTRA_ARGS="DEBUG_FLAGS=-g"
+
+# Extra arguments when building kernel.
+# These are also passed to installkernel.
+#
+# FREEBSD_BUILDKERNEL_EXTRA_ARGS="-DNOCLEAN"
+
 # Other configuration:
 #   * ${BOARDDIR}/overlay will be copied over the
 #      installed world.
@@ -121,3 +131,4 @@
 # in ${BOARDDIR}/packages and have the script install
 # them.  The old pkg_add tool couldn't really do this;
 # maybe pkgng can?
+
