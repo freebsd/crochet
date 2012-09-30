@@ -56,18 +56,22 @@ disk_ufs_create
 disk_ufs_mount ${UFS_MOUNT}
 
 freebsd_installkernel ${UFS_MOUNT}
-[ -n "$NO_WORLD" ] || freebsd_installworld ${UFS_MOUNT}
 
-echo "Configuring FreeBSD at "`date`
-cd ${BOARDDIR}/overlay
-find . | cpio -p ${UFS_MOUNT}
-if [ -d ${WORKDIR}/overlay ]; then
-    cd ${WORKDIR}/overlay
+if [ -n "$FREEBSD_INSTALL_WORLD" ]
+then
+    freebsd_installworld ${UFS_MOUNT}
+
+    echo "Configuring FreeBSD at "`date`
+    cd ${BOARDDIR}/overlay
     find . | cpio -p ${UFS_MOUNT}
-fi
+    if [ -d ${WORKDIR}/overlay ]; then
+	cd ${WORKDIR}/overlay
+	find . | cpio -p ${UFS_MOUNT}
+    fi
 
-[ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src ${UFS_MOUNT}
-[ -z "$INSTALL_USR_PORTS" ] || freebsd_install_usr_ports ${UFS_MOUNT}
+    [ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src ${UFS_MOUNT}
+    [ -z "$INSTALL_USR_PORTS" ] || freebsd_install_usr_ports ${UFS_MOUNT}
+fi
 
 disk_ufs_unmount ${UFS_MOUNT}
 unset UFS_MOUNT
