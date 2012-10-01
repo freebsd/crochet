@@ -1,8 +1,15 @@
-FREEBSD_SRC=/usr/src
+# This should be overridden by the board setup
 TARGET_ARCH=armv6
-FREEBSD_BUILDWORLD_EXTRA_ARGS=""
-FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
+
+# Board setup should not touch these, so users can
+FREEBSD_SRC=/usr/src
 FREEBSD_INSTALL_WORLD=y
+FREEBSD_WORLD_EXTRA_ARGS=""
+FREEBSD_BUILDWORLD_EXTRA_ARGS=""
+FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
+FREEBSD_KERNEL_EXTRA_ARGS=""
+FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
+FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
 WORLDJOBS=4
 KERNJOBS=4
 
@@ -59,7 +66,7 @@ _freebsd_build ( ) {
 
     if [ -f ${WORKDIR}/_.built-$1 ]
     then
-	echo " Previous build$1 used different flags:"
+	echo " Rebuilding because previous build$1 used different flags:"
 	echo " Old: "`cat ${WORKDIR}/_.built-$1`
 	echo " new: "`cat ${WORKDIR}/_.build$1.sh`
 	rm ${WORKDIR}/_.built-$1
@@ -84,8 +91,8 @@ _freebsd_build ( ) {
 # identical.  Factor out the common pieces.
 #
 freebsd_buildworld ( ) {
-    _FREEBSD_BUILDWORLD_ARGS="TARGET_ARCH=$TARGET_ARCH ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ""$@"
-    echo make ${_FREEBSD_BUILDWORLD_ARGS} -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.sh
+    _FREEBSD_WORLD_ARGS="TARGET_ARCH=$TARGET_ARCH ${FREEBSD_WORLD_EXTRA_ARGS} ""$@"
+    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.sh
     _freebsd_build world
 }
 
@@ -95,8 +102,8 @@ freebsd_buildworld ( ) {
 # $@: arguments to make.
 #
 freebsd_buildkernel ( ) {
-    _FREEBSD_BUILDKERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} KERNCONF=${KERNCONF} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ""$@"
-    echo make  ${_FREEBSD_BUILDKERNEL_ARGS} -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.sh
+    _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} KERNCONF=${KERNCONF} ${FREEBSD_KERNEL_EXTRA_ARGS} ""$@"
+    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.sh
     _freebsd_build kernel
 }
 
@@ -107,7 +114,7 @@ freebsd_buildkernel ( ) {
 freebsd_installworld ( ) {
     cd $FREEBSD_SRC
     echo "Installing FreeBSD world onto the UFS partition at "`date`
-    if make ${_FREEBSD_BUILDWORLD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.log 2>&1
+    if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.log 2>&1
     then
 	# success
     else
@@ -143,7 +150,7 @@ freebsd_installkernel ( ) {
     # TODO: check and warn if kernel isn't built.
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-    if make ${_FREEBSD_BUILDKERNEL_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.log 2>&1
+    if make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.log 2>&1
     then
 	# success
     else

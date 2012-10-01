@@ -109,15 +109,21 @@
 #
 # unset FREEBSD_INSTALL_WORLD
 
-# Extra arguments when building world.
-# These are also passed to installworld.
+# Extra arguments for world.
 #
-# FREEBSD_BUILDWORLD_EXTRA_ARGS="DEBUG_FLAGS=-g"
+# Passed to both buildworld and installworld.
+# FREEBSD_WORLD_EXTRA_ARGS="DEBUG_FLAGS=-g"
+# Passed to only one:
+# FREEBSD_BUILDWORLD_EXTRA_ARGS="-DNOCLEAN"
+# FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
 
-# Extra arguments when building kernel.
-# These are also passed to installkernel.
+# Extra arguments for kernel.
 #
+# Passed to both buildkernel and installkernel.
+# FREEBSD_KERNEL_EXTRA_ARGS=""
+# Passed to only one:
 # FREEBSD_BUILDKERNEL_EXTRA_ARGS="-DNOCLEAN"
+# FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
 
 # Other configuration:
 #   * ${BOARDDIR}/overlay will be copied over the

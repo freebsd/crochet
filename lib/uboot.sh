@@ -1,3 +1,4 @@
+# Board setup will often overwrite this.
 UBOOT_SRC=$TOPDIR/u-boot
 
 . ${LIBDIR}/freebsd_xdev.sh
