@@ -26,8 +26,9 @@ disk_partition_mbr ( ) {
 
 # Add a FAT partition and format it.
 #
-# $1: size of parition, can use 'k', 'm', 'g' suffixes
+# $1: size of partition, can use 'k', 'm', 'g' suffixes
 # TODO: If $1 is empty, use whole disk.
+# $2: '12', '16', or '32' for FAT type (default depends on $1)
 #
 disk_fat_create ( ) {
     echo "Creating the FAT partition at "`date`
@@ -40,7 +41,20 @@ disk_fat_create ( ) {
     gpart set -a active -i ${_DISK_FAT_PARTITION_NUMBER} ${_DISK_MD}
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
-    newfs_msdos -L "boot" -F 12 ${_DISK_FAT_DEV} >/dev/null
+    _FAT_TYPE=$2
+    if [ -z ${_FAT_TYPE} ]; then
+	case $1 in
+	    *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
+		;;
+	    *m) _FAT_TYPE=16
+		;;
+	    *g) _FAT_TYPE=32
+		;;
+	esac
+	echo "Default to FAT${_FAT_TYPE} for partition size $1"
+    fi
+	
+    newfs_msdos -L "boot" -F ${_FAT_TYPE} ${_DISK_FAT_DEV} >/dev/null
 }
 
 # $1: Directory where FAT partition will be mounted
