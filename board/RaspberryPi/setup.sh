@@ -38,26 +38,44 @@ board_build_bootloader ( ) {
 
     # Build ubldr.
     # TODO: the loadaddr here is probably wrong.
-    freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
+    #freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 }
 
 board_construct_boot_partition ( ) {
     echo "Setting up boot partition"
     FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    disk_fat_create 8m
+    # Raspberry Pi boot loaders require FAT16
+    disk_fat_create 17m 16
     disk_fat_mount ${FAT_MOUNT}
 
     # Copy Phase One boot files to FAT partition
     cd ${RPI_FIRMWARE_SRC}/boot
     cp bootcode.bin ${FAT_MOUNT}
-    cp loader.bin ${FAT_MOUNT}
-    cp config.txt ${FAT_MOUNT}
     cp arm192_start.elf ${FAT_MOUNT}/start.elf
 
-    # Copy U-Boot and ubldr to FAT partition
-    cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
-    cp ${BOARDDIR}/files/boot.scr ${FAT_MOUNT}
-    freebsd_ubldr_copy ${FAT_MOUNT}
+    # Temporary test: put a Linux kernel so we can verify that above works.
+    cp kernel.img ${FAT_MOUNT}
+
+    # Copy U-Boot to FAT partition
+    #cp uEnv.txt ${FAT_MOUNT}
+    #cp u-boot.bin ${FAT_MOUNT}
+    #cp boot.scr ${FAT_MOUNT}
+
+    # TODO: Modify U-Boot to chain-boot ubldr
+    #freebsd_ubldr_copy ${FAT_MOUNT}
+
+    # Copy kernel.bin to FAT partition
+    FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
+    mkdir ${WORKDIR}/boot
+    #freebsd_installkernel ${WORKDIR}
+    #cp ${WORKDIR}/boot/kernel/kernel.bin ${FAT_MOUNT}/kernel.img
+
+    # DEBUG: list contents of FAT partition
+    cd ${FAT_MOUNT}
+    echo "FAT Partition contents:"
+    ls -l
+
+    cd ${TOPDIR}
 
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
