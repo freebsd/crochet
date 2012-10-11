@@ -55,7 +55,10 @@ UFS_MOUNT=${WORKDIR}/_.mounted_ufs
 disk_ufs_create
 disk_ufs_mount ${UFS_MOUNT}
 
-freebsd_installkernel ${UFS_MOUNT}
+if [ -n "$FREEBSD_INSTALL_KERNEL" ]
+then
+    freebsd_installkernel ${UFS_MOUNT}
+fi
 
 if [ -n "$FREEBSD_INSTALL_WORLD" ]
 then
