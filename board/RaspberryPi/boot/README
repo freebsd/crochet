@@ -20,11 +20,11 @@ General Raspberry Pi boot sequence:
 
 * GPU ROM code reads bootcode.bin from SD card and executes it on the GPU.
 
-* bootcode.bin enables SDRAM and loads loader.bin into RAM
+* bootcode.bin enables SDRAM and loads start.elf
 
-* bootcode.bin executes loader.bin on the GPU
+* [Old version: bootcode.bin executes loader.bin on the GPU, then loader.bin loads start.elf; this is no longer needed since Oct 2012]
 
-* loader.bin loads start.elf and executes it on the GPU (start.elf is
+* bootcode.bin executes start.elf on the GPU (start.elf is
   the "GPU firmware" that remains resident)
 
   Note: There are several versions of start.elf that partition memory
