@@ -1,8 +1,11 @@
 KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
-# Use boot files checked into this project;
-# avoid a 400MB+ download.
+
+# You can use the most up-to-date boot files from the RaspberryPi project:
 #RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
+
+# Or save yourself a 400MB+ download and just use the files checked
+# into this project:
 RPI_FIRMWARE_SRC=${BOARDDIR}
 
 raspberry_pi_firmware_check ( ) {
@@ -31,8 +34,7 @@ board_build_bootloader ( ) {
     # Closed-source firmware is already built.
 
     # Build U-Boot
-    # TODO: Figure out any needed patches
-    # uboot_patch ${BOARDDIR}/files/uboot_*.patch
+    uboot_patch ${BOARDDIR}/files/uboot_*.patch
     uboot_configure rpi_b_config
     uboot_build
 
@@ -43,11 +45,11 @@ board_build_bootloader ( ) {
 board_construct_boot_partition ( ) {
     echo "Setting up boot partition"
     FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    # Raspberry Pi boot loaders require FAT16
+    # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
     disk_fat_create 17m 16
     disk_fat_mount ${FAT_MOUNT}
 
-    # Copy Phase One boot files to FAT partition
+    # Copy RaspberryPi boot files to FAT partition
     cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${FAT_MOUNT}
     cp ${RPI_FIRMWARE_SRC}/boot/arm192_start.elf ${FAT_MOUNT}/start.elf
     # Configure to chain-load U-Boot
