@@ -160,8 +160,9 @@ freebsd_installworld ( ) {
 freebsd_installkernel ( ) {
     # TODO: check and warn if kernel isn't built.
     cd $FREEBSD_SRC
-    echo "Installing FreeBSD kernel onto the UFS partition at "`date`
-    if make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.log 2>&1
+    echo "Installing FreeBSD kernel to $1 at "`date`
+    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.sh
+    if /bin/sh -e ${WORKDIR}/_.installkernel.sh > ${WORKDIR}/_.installkernel.log 2>&1
     then
 	# success
     else
