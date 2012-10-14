@@ -54,6 +54,7 @@ board_construct_boot_partition ( ) {
     cp ${RPI_FIRMWARE_SRC}/boot/arm192_start.elf ${FAT_MOUNT}/start.elf
     # Configure to chain-load U-Boot
     echo "kernel=u-boot.bin" > ${FAT_MOUNT}/config.txt
+    #echo "kernel=freebsd.bin" > ${FAT_MOUNT}/config.txt
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
     cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
@@ -64,6 +65,16 @@ EOF
 
     # Install ubldr to FAT partition
     freebsd_ubldr_copy ${FAT_MOUNT}
+
+    # Copy kernel.bin to FAT partition
+    #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
+    #mkdir ${WORKDIR}/boot
+    #freebsd_installkernel ${WORKDIR}
+    #cat ${RPI_FIRMWARE_SRC}/boot/kernel.prefix.img ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
+
+    # DEBUG: list contents of FAT partition
+    echo "FAT Partition contents:"
+    ls -l ${FAT_MOUNT}
 
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
