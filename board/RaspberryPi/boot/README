@@ -1,20 +1,20 @@
 Overview of Raspberry PI boot Sequence for FreeBSD
 
-The first phase is common to any use of RaspberryPi,
-whether you're booting Linux, FreeBSD, or any other OS.
-It loads a series of proprietary closed-source boot
-loader files that initialize the hardware and ultimately
-load and run a file called "kernel.img" from SD.
-
-For a Linux boot, kernel.img is the Linux kernel.  For
-FreeBSD, there are a few more steps to get to the FreeBSD
-bootloader and kernel.
+There is an initial "Phase One" that is the same regardless
+of what OS you are booting.  The following "Phase Two" varies
+considerably.
 
 
 PHASE ONE: Initialize the hardware
 ==================================
 
-General Raspberry Pi boot sequence:
+This first phase is common to any use of RaspberryPi, whether you're
+booting Linux, FreeBSD, or any other software.  It loads a series of
+proprietary closed-source boot loader files that initialize the
+hardware and ultimately load and run some executable.
+
+These initial bits are loaded from the first partition on the SD card.
+That partition must be formatted as FAT16 or FAT32.
 
 * At power on, the ARM core is off and the GPU is on.  SDRAM is disabled.
 
@@ -22,7 +22,9 @@ General Raspberry Pi boot sequence:
 
 * bootcode.bin enables SDRAM and loads start.elf
 
-* [Old version: bootcode.bin executes loader.bin on the GPU, then loader.bin loads start.elf; this is no longer needed since Oct 2012]
+  (Note:  bootcode.bin used to execute loader.bin and loader.bin then
+  loaded start.elf.  This is no longer true since Oct 2012; loader.bin
+  is gone and bootcode.bin now loads start.elf directly.)
 
 * bootcode.bin executes start.elf on the GPU (start.elf is
   the "GPU firmware" that remains resident)
@@ -33,28 +35,40 @@ General Raspberry Pi boot sequence:
 
 * start.elf reads config.txt and uses it to configure the hardware.
 
-* start.elf reads cmdline.txt which holds arguments for kernel.img
+* Optional: start.elf reads cmdline.txt with arguments for kernel.img
 
-* start.elf loads kernel.img at 0x8000
-
-* start.elf starts the ARM core executing kernel.img
+The next part depends on what OS you are loading.  In any
+case, start.elf remains in place on the GPU.  Video drivers
+in the OS talk to start.elf (they don't communicate directly
+with the GPU).
 
 Note:  The most recent boot files are available from
 github.com/raspberrypi/firmware  (Warning:  git clone
 of this project is very time-consuming!)
 
+
+PHASE TWO for LINUX:
+====================
+
+If you're booting Linux, start.elf loads a file called
+kernel.img containing the Linux kernel.
+
+
+PHASE TWO for "bare-metal" programming:
+=======================================
+
 There are some examples of bare-metal RaspberryPi programming
-at github.com/dwelch67/raspberrypi.  These use the same boot
-process as above, but replace kernel.img with simple freestanding
-executables.
+at github.com/dwelch67/raspberrypi.
+
+These use the same boot process as for Linux, but replace
+kernel.img with simple freestanding executables.
 
 
+PHASE TWO for FreeBSD with U-Boot and ubldr:
+============================================
 
-PHASE TWO: Load and boot FreeBSD
-================================
-
-For FreeBSD boot, the kernel.img file is a version of U-Boot
-with the "API" feature.
+The config.txt file specifies "kernel=u-boot.bin", so
+start.elf loads the u-boot.bin file:
 
 * u-boot loads and initializes
 
@@ -68,3 +82,16 @@ with the "API" feature.
 
 * The FreeBSD kernel initializes and runs.
 
+
+
+PHASE TWO for FreeBSD without ubldr:
+====================================
+
+It is possible to load the FreeBSD kernel directly from U-Boot or even
+directly from start.elf.
+
+Booting via U-Boot and ubldr provides support for debugging the early
+kernel initialization, so seems to be preferred right now.
+
+Once FreeBSD is more stable on RaspberryPi,
+expect some changes here.
