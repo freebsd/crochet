@@ -66,16 +66,23 @@ uboot_patch ( ) {
 
     cd "$UBOOT_SRC"
     echo "Patching U-Boot. (Logging to ${WORKDIR}/_.uboot.patch.log)"
-    for p in "$@"; do
-	echo "   Applying patch $p"
-	if patch -N -p1 < $p >> ${WORKDIR}/_.uboot.patch.log 2>&1; then
-	    # success
-	else
-	    echo "Patch didn't apply: $p"
-	    echo "  Log in ${WORKDIR}/_.uboot.patch.log"
-	    exit 1
-	fi
-    done
+    # This function is usually called with an argument like
+    # 'patches/*.patch'; if there are no patch files, then $@ will have 
+    # "patches/*.patch" and we want to just skip the rest.
+    if ls "$@" 2>/dev/null; then
+	for p in "$@"; do
+	    echo "   Applying patch $p"
+	    if patch -N -p1 < $p >> ${WORKDIR}/_.uboot.patch.log 2>&1; then
+		# success
+	    else
+		echo "Patch didn't apply: $p"
+		echo "  Log in ${WORKDIR}/_.uboot.patch.log"
+		exit 1
+	    fi
+	done
+    else
+	echo "   No patches found; skipping"
+    fi
     mv ${UBOOT_SRC}/_.uboot.to.be.patched ${UBOOT_SRC}/_.uboot.patched
     echo "$@" > ${UBOOT_SRC}/_.uboot.patched
     rm -f ${UBOOT_SRC}/_.uboot.configured
