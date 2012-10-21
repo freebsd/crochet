@@ -23,7 +23,9 @@ board_check_prerequisites ( ) {
 board_build_bootloader ( ) { }
 board_construct_boot_partition ( ) { }
 
-customize_freebsd ( ) { }
+# Empty definitions of functions to be overridden by user.
+customize_boot_partition ( ) { }
+customize_freebsd_partition ( ) { }
 
 #
 # Load user configuration
