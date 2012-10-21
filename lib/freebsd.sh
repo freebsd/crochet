@@ -215,12 +215,15 @@ freebsd_ubldr_copy ( ) {
 #
 # $1: root of image
 #
-freebsd_install_usr_src ( ) {
+_freebsd_install_usr_src ( ) {
     echo "Copying source to /usr/src on disk image at "`date`
     mkdir -p $1/usr/src
-    cd $1/usr/src
     # Note: Includes the .svn directory.
-    (cd $FREEBSD_SRC ; tar cf - .) | tar xpf -
+    (cd $FREEBSD_SRC ; tar cf - .) | (cd $1/usr/src; tar xpf -)
+}
+
+freebsd_install_usr_src ( ) {
+    _freebsd_install_usr_src ${UFS_MOUNT}
 }
 
 # freebsd_install_usr_ports:  Download and install
@@ -228,10 +231,14 @@ freebsd_install_usr_src ( ) {
 #
 # $1:  root of image
 #
-freebsd_install_usr_ports ( ) {
+_freebsd_install_usr_ports ( ) {
     mkdir -p $1/usr/ports
     echo "Updating ports snapshot at "`date`
     portsnap fetch > ${WORKDIR}/_.portsnap.fetch.log
     echo "Installing ports tree at "`date`
     portsnap -p $1/usr/ports extract > ${WORKDIR}/_.portsnap.extract.log
+}
+
+freebsd_install_usr_ports ( ) {
+    _freebsd_install_usr_ports ${UFS_MOUNT}
 }

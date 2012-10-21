@@ -23,6 +23,8 @@ board_check_prerequisites ( ) {
 board_build_bootloader ( ) { }
 board_construct_boot_partition ( ) { }
 
+customize_freebsd ( ) { }
+
 #
 # Load user configuration
 #
@@ -55,27 +57,31 @@ UFS_MOUNT=${WORKDIR}/_.mounted_ufs
 disk_ufs_create
 disk_ufs_mount ${UFS_MOUNT}
 
-if [ -n "$FREEBSD_INSTALL_KERNEL" ]
-then
-    freebsd_installkernel ${UFS_MOUNT}
-fi
+[ -z "$FREEBSD_INSTALL_KERNEL" ] || freebsd_installkernel ${UFS_MOUNT}
+
 
 if [ -n "$FREEBSD_INSTALL_WORLD" ]
 then
     freebsd_installworld ${UFS_MOUNT}
 
-    echo "Configuring FreeBSD at "`date`
-    cd ${BOARDDIR}/overlay
-    find . | cpio -p ${UFS_MOUNT}
-    if [ -d ${WORKDIR}/overlay ]; then
-	cd ${WORKDIR}/overlay
-	find . | cpio -p ${UFS_MOUNT}
+    [ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src
+    [ -z "$INSTALL_USR_PORTS" ] || freebsd_install_usr_ports
+
+    if [ -d ${BOARDDIR}/overlay ]
+    then
+	echo "Overlaying board-specific files from ${BOARDDIR}/overlay"
+	(cd ${BOARDDIR}/overlay; find . | cpio -p ${UFS_MOUNT})
+    fi
+    if [ -d ${WORKDIR}/overlay ]
+    then
+	echo "Overlaying files from ${WORKDIR}/overlay"
+	(cd ${WORKDIR}/overlay; find . | cpio -p ${UFS_MOUNT})
     fi
 
-    [ -z "$INSTALL_USR_SRC" ] || freebsd_install_usr_src ${UFS_MOUNT}
-    [ -z "$INSTALL_USR_PORTS" ] || freebsd_install_usr_ports ${UFS_MOUNT}
 fi
 
+cd ${UFS_MOUNT}
+customize_freebsd_partition ${UFS_MOUNT}
 disk_ufs_unmount ${UFS_MOUNT}
 unset UFS_MOUNT
 

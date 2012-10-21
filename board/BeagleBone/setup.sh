@@ -38,12 +38,12 @@ board_construct_boot_partition ( ) {
     echo "Installing U-Boot onto the FAT partition"
     cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
     cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
-    #cp ${BOARDDIR}/bootfiles/MLO ${FAT_MOUNT}
-    #cp ${BOARDDIR}/bootfiles/u-boot.img ${FAT_MOUNT}
     cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}
 
     freebsd_ubldr_copy ${FAT_MOUNT}
 
+    cd ${FAT_MOUNT}
+    customize_boot_partition ${FAT_MOUNT}
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
 }

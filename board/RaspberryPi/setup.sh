@@ -66,6 +66,7 @@ EOF
     # Install ubldr to FAT partition
     freebsd_ubldr_copy ${FAT_MOUNT}
 
+    # Experimental.
     # Copy kernel.bin to FAT partition
     #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
     #mkdir ${WORKDIR}/boot
@@ -76,6 +77,8 @@ EOF
     echo "FAT Partition contents:"
     ls -l ${FAT_MOUNT}
 
+    cd ${FAT_MOUNT}
+    customize_boot_partition ${FAT_MOUNT}
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
 }

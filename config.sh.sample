@@ -7,6 +7,7 @@
 # assuming /usr/src has suitable FreeBSD
 # sources.  Everything else below is optional.
 
+# REQUIRED:
 # Uncomment one to choose the default configuration for your board
 #
 # board_setup BeagleBone
@@ -21,6 +22,7 @@
 # a few of the most common ones.
 #
 
+# REQUIRED: SD_SIZE
 #
 # Size of the disk image that will be built.
 # This is usually the same size as your card,
@@ -68,7 +70,8 @@
 
 # Directory to hold U-Boot source code.
 # U-Boot is a popular bootloader used on many different
-# boards.
+# boards.  This is ignored if the board configuration
+# you're using doesn't use U-Boot.
 #
 # The U-Boot source is about 120MB. U-Boot will also be compiled
 # in this directory, so you'll need about 150MB total space here.
@@ -90,17 +93,6 @@
 #
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 
-# Uncomment to populate /usr/src with a copy
-# of the sources the image was built with.
-# You probably want at least a 4GB card.
-#
-# INSTALL_USR_SRC=yes
-
-# Uncomment to fetch a fresh /usr/ports tree and put
-# it on the image.
-#
-# INSTALL_USR_PORTS=yes
-
 # Uncomment to suppress installworld.  This is
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
@@ -108,6 +100,23 @@
 # you can:
 #
 # unset FREEBSD_INSTALL_WORLD
+
+# Uncomment to suppress installkernel.  Not often useful.
+#
+# unset FREEBSD_INSTALL_KERNEL
+
+# Uncomment to populate /usr/src with a copy
+# of the sources the image was built with.
+# You probably want at least a 4GB card.
+# (Requires FREEBSD_INSTALL_WORLD.)
+#
+# INSTALL_USR_SRC=yes
+
+# Uncomment to fetch a fresh /usr/ports tree and put
+# it on the image.
+# (Requires FREEBSD_INSTALL_WORLD.)
+#
+# INSTALL_USR_PORTS=yes
 
 # Extra arguments for world.
 #
@@ -125,12 +134,69 @@
 # FREEBSD_BUILDKERNEL_EXTRA_ARGS="-DNOCLEAN"
 # FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
 
-# Other configuration:
-#   * ${BOARDDIR}/overlay will be copied over the
-#      installed world.
-#   * ${WORKDIR}/overlay will be copied over that.
-# So you can create, e.g., ${WORKDIR}/overlay/etc/fstab
-# to override the default /etc/fstab.
+
+# OVERLAY FILES
+#
+# Most customization simply consists of putting extra
+# files onto the image.
+#
+# The contents of ${BOARDDIR}/overlay and ${WORKDIR}/overlay
+# are copied over the image just before the generic
+# customization hooks are run.  For example, you can
+# put a custom passwd or fstab file into
+# ${WORKDIR}/overlay/etc.  If this file needs to be
+# built dynamically, you can build it here.
+
+
+# GENERIC CUSTOMIZATION HOOKS
+#
+# You can do arbitrary configuration by redefining
+# the following shell functions.
+#
+# Most boards set up two partitions:
+#  * A boot partition (often FAT formatted)
+#    holds the various boot loaders.  This
+#    varies significantly by board.
+#  * A FreeBSD partition holds the FreeBSD world
+#    (and usually kernel).
+#
+# These are constructed one at a time:  The
+# partition is created, mounted, files are copied
+# onto it, then the partition is unmounted.
+# The following shell functions are the very last
+# thing run before the partition is unmounted,
+# so you can effectively override or modify anything
+# done by earlier system-building phases.
+#
+# WARNING:  Unlike some other system-building scripts,
+# these do *not* run in a chroot or jail.  (It can't
+# because we're cross-building.)  For example, if you
+# want to add an account, be sure to refer
+# to etc/passwd and not /etc/passwd!
+#
+# Some useful shell variables:
+#   ${WORKDIR} is the full path to the 'work' directory
+#       which you can use for intermediate files
+#   ${BOARDDIR}
+#   ${TOPDIR}
+#
+# The lib/*.sh files also define a number of functions
+# that you may find useful here.
+#
+# # Runs after boot partition is built, just before it
+# # is unmounted.
+# # $1 is the full path to the mounted boot partition
+# customize_boot_partition ( ) {
+# }
+#
+# Note that the following runs even if FREEBSD_INSTALL_KERNEL
+# and FREEBSD_INSTALL_WORLD are not enabled.
+#
+# # Runs after FreeBSD partition is built and populated,
+# # just before it is unmounted.
+# # $1 is the full path to the mounted boot partition
+# customize_freebsd_partition ( ) {
+# }
 
 # TODO: Package installation.
 # I would like to be able to just drop some packages
