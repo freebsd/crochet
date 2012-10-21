@@ -22,6 +22,7 @@ board_check_prerequisites ( ) {
 }
 board_build_bootloader ( ) { }
 board_construct_boot_partition ( ) { }
+board_customize_freebsd_partition ( ) { }
 
 # Empty definitions of functions to be overridden by user.
 customize_boot_partition ( ) { }
@@ -83,6 +84,7 @@ then
 fi
 
 cd ${UFS_MOUNT}
+board_customize_freebsd_partition ${UFS_MOUNT}
 customize_freebsd_partition ${UFS_MOUNT}
 disk_ufs_unmount ${UFS_MOUNT}
 unset UFS_MOUNT
