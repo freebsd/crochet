@@ -1,0 +1,46 @@
+--- u-boot-2012.07-orig/include/configs/omap4_common.h	2012-07-31 02:24:37.000000000 +0800
++++ u-boot-2012.07/include/configs/omap4_common.h	2012-10-09 15:42:30.248845843 +0800
+@@ -124,11 +124,14 @@
+ #include <config_cmd_default.h>
+ 
+ /* Enabled commands */
+-#define CONFIG_CMD_EXT2		/* EXT2 Support                 */
+ #define CONFIG_CMD_FAT		/* FAT support                  */
+ #define CONFIG_CMD_I2C		/* I2C serial bus support	*/
+ #define CONFIG_CMD_MMC		/* MMC support                  */
+ 
++#define CONFIG_CMD_ELF
++#define CONFIG_API
++#define CONFIG_SYS_MMC_MAX_DEVICE 1
++
+ /* Disabled commands */
+ #undef CONFIG_CMD_NET
+ #undef CONFIG_CMD_NFS
+@@ -163,7 +166,7 @@
+ 	"mmcboot=echo Booting from mmc${mmcdev} ...; " \
+ 		"run mmcargs; " \
+ 		"bootm ${loadaddr}\0" \
+-
++/*
+ #define CONFIG_BOOTCOMMAND \
+ 	"if mmc rescan ${mmcdev}; then " \
+ 		"if run loadbootscript; then " \
+@@ -174,6 +177,11 @@
+ 			"fi; " \
+ 		"fi; " \
+ 	"fi"
++*/
++#define CONFIG_BOOTCOMMAND \
++       "mmc rescan;" \
++       "fatload mmc 0:1 88000000 ubldr;" \
++       "bootelf 88000000"
+ 
+ #define CONFIG_AUTO_COMPLETE		1
+ 
+@@ -280,6 +288,5 @@
+ #define CONFIG_SPL_SERIAL_SUPPORT
+ #define CONFIG_SPL_LDSCRIPT "$(CPUDIR)/omap-common/u-boot-spl.lds"
+ 
+-#define CONFIG_SYS_THUMB_BUILD
+ 
+ #endif /* __CONFIG_OMAP4_COMMON_H */
