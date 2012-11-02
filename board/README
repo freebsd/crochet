@@ -1,0 +1,7 @@
+The first line of the configuration specifies what "board setup"
+to use.  Mostly, the board setup defines how to build the
+boot partition for a particular board, though it can also
+override a number of other aspects.
+
+Look at the README inside a specific board directory for
+details.

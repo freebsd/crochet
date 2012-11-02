@@ -1,8 +1,3 @@
-freebsd-beaglebone
-==================
-
-Script to build a bootable FreeBSD image for BeagleBone.
-
 BeagleBone is supported by FreeBSD-CURRENT since
 August, 2012.
 
@@ -179,8 +174,6 @@ be done:
  * Memory.  Some recent change reduced available memory quite
    a bit.  Easy fix is to turn off things in rc.conf.
    There are probably also kernel tweaks possible.
- * Swap.  The script should allow you to specify a swap size
-   and automatically adjust the disk layout accordingly.
  * USB client.  The Linux distros have a virtual Ethernet
    client that allows true single-cable development.  I would
    like to do something similar for FreeBSD.

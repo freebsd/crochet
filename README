@@ -49,3 +49,24 @@ Using the script to build an image consists of a few steps:
    Again, read board/<board-name>/README for details.
 
 ============================================================
+
+PROJECTS
+------------
+
+There are still plenty of ways this script could
+be improved:
+
+ * More boards.  Currently, it supports Beaglebone,
+   RaspberryPi, and PandaBoard.  There are a lot of
+   other boards with similar concerns that could easily
+   be supported.
+
+ * Package Installation.  I would like to be able to
+   put a bunch of packages into board/NAME/packages and
+   have them installed onto the image.  The chroot technique
+   used by nanobsd won't work when cross-compiling, so we
+   need a different approach.  Maybe the new pkgng tool will
+   help?
+
+ * Swap.  The script should allow you to specify a swap size
+   and automatically adjust the disk layout accordingly.

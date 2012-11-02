@@ -1,0 +1,87 @@
+RaspberryPi is supported by FreeBSD-CURRENT as
+of November, 2012.
+
+========================================================================
+
+What is RaspberryPi?
+--------------------
+
+RaspberryPi launched in early 2012 as an inexpensive ($35) PC
+based on a Broadcom BCM2835 SoC.   It was developed by the
+UK-based RaspberryPi foundation as an inexpensive system for
+educational use.
+
+Having been designed as a PC (rather than as a development/experimenter
+board), it has a slightly different focus than some similar
+systems:
+ * Emphasis on low cost.
+ * Built-in video (HDMI and composite)
+ * Relies on standard consumer accessories:  can be powered from
+   a common micro-USB charger, uses USB keyboard, consumer television
+   display, etc.
+
+The RaspberryPi has been wildly successful (hundreds of thousands
+of units sold) and has attracted a large following.
+
+========================================================================
+
+How to Boot the RaspberryPi
+---------------------------
+
+As of 1 November 2012, FreeBSD-CURRENT does not fully support the
+native console, so you'll probably want a serial adapter cable.
+Adafruit.com sells one especially designed to work with RaspberryPi
+which can also provide power to the board.
+
+After connecting video, keyboard, and inserting the SDHC card,
+you connect power (either by attaching the last lead of the serial
+cable or connecting a micro-USB charger) to actually boot.
+
+============================================================
+
+IF SOMETHING GOES WRONG
+-----------------------
+
+If the image fails to boot:
+  * Look at the build and install logs under the 'work' directory.
+  * Ask on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
+help.
+
+============================================================
+
+Anatomy of a RaspberryPi Boot Image
+----------------------------------
+
+The FreeBSD bootable image for RaspberryPi has both FAT
+and UFS partitions containing the following files:
+
+  FAT Partition
+     bootcode.bin - First stage boot
+     start.elf - Second stage boot
+     config.txt - configuration for start.elf
+     ubldr - Third stage: FreeBSD bootloader
+
+  UFS Partition
+     /boot/kernel - dynamic kernel
+     ... rest of FreeBSD ...
+
+More details on RaspberryPi boot sequence can
+be found in the README file in the "boot"
+directory.
+
+(Note that the "Phase One" RaspberryPi boot
+process is still evolving.)
+
+Note:  I suspect there may be merit in having
+start.elf load the FreeBSD kernel directly, bypassing
+ubldr.  There are some issues still to be resolved
+before this is feasible.
+
+========================================================================
+
+PROJECTS
+----------------------------------------
+
+There is still a lot of work to be done.
+Ask on freebsd-arm@freebsd.org mailing list if you
+would like to help.
