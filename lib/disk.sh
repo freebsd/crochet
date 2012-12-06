@@ -119,6 +119,13 @@ disk_ufs_mount ( ) {
     mount ${_DISK_UFS_DEV} $1
 }
 
+disk_add_swap_file ( ) {
+    echo "Creating swap file"
+    dd if=/dev/zero of="usr/swap0" bs=1024k count=$2
+    chmod 0600 "usr/swap0"
+    echo 'swapfile="/usr/swap0"' > etc/rc.conf
+}
+
 # $1: directory where UFS partition was mounted
 disk_ufs_unmount ( ) {
     echo "Unmounting the UFS partition at "`date`

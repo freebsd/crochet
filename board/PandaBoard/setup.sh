@@ -23,7 +23,10 @@ board_construct_boot_partition ( ) {
     disk_fat_create 8m
     disk_fat_mount ${FAT_MOUNT}
     echo "Installing U-Boot onto the FAT partition"
-    cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
+    # For now, we use a copy of an MLO built by someone else.
+    cp ${BOARDDIR}/boot/MLO ${FAT_MOUNT}
+    # TODO: We should be able to use MLO built by U-Boot. <sigh>
+    #cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
     cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
 
     freebsd_ubldr_copy ${FAT_MOUNT}
