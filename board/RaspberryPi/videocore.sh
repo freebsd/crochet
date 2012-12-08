@@ -22,6 +22,8 @@ videocore_build ( ) (
     cd ${FREEBSD_SRC}
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     eval $buildenv SYSDIR=${FREEBSD_SRC}/sys MAKESYSPATH=${FREEBSD_SRC}/share/mk make -C ${VC_SRC}
+
+    touch ${WORKDIR}/_.built-videocore-module
 )
 
 # $1: Target directory for install
@@ -72,6 +74,8 @@ videocore_user_build ( ) (
     eval $buildenv $CMAKE -DCMAKE_TOOLCHAIN_FILE=${VC_USER_SRC}/makefiles/cmake/toolchains/arm-freebsd.cmake -DCMAKE_BUILD_TYPE=Release ${VC_USER_SRC}
     cd ${_VC_BUILDDIR}
     eval $buildenv make
+
+    touch ${WORKDIR}/_.built-videocore-library
 )
 
 # $1: DESTDIR
