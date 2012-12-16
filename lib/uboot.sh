@@ -34,7 +34,12 @@ uboot_test ( ) {
     fi
     if [ -z `which gmake` ]; then
 	echo "U-Boot build requires 'gmake'"
-	echo "Please install and re-run this script."
+	echo "Please install devel/gmake and re-run this script."
+	exit 1
+    fi
+    if [ -z `which gsed` ]; then
+	echo "U-Boot build requires 'gsed'"
+	echo "Please install textproc/gsed and re-run this script."
 	exit 1
     fi
 
@@ -120,7 +125,7 @@ uboot_build ( ) {
 
     cd "$UBOOT_SRC"
     echo "Building U-Boot. (Logging to ${WORKDIR}/_.uboot.build.log)"
-    if gmake CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1; then
+    if gmake SED=gsed CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1; then
 	# success
     else
 	echo "  Failed to build U-Boot."
