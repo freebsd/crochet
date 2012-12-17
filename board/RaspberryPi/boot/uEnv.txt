@@ -1,0 +1,2 @@
+loadbootscript=fatload mmc 0 0x2000000 ubldr                                        
+bootscript=bootelf 0x2000000                                                        
