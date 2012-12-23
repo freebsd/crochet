@@ -1,5 +1,7 @@
 KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
+VC_SRC=${TOPDIR}/vchiq-freebsd
+VC_USER_SRC=${TOPDIR}/vcuserland
 
 # You can use the most up-to-date boot files from the RaspberryPi project:
 #RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
@@ -7,6 +9,8 @@ UBOOT_SRC=${TOPDIR}/u-boot-rpi
 # Or save yourself a 400MB+ download and just use the files checked
 # into this project:
 RPI_FIRMWARE_SRC=${BOARDDIR}
+
+. ${BOARDDIR}/videocore.sh
 
 raspberry_pi_firmware_check ( ) {
     if [ ! -f "${RPI_FIRMWARE_SRC}/boot/bootcode.bin" ]; then
@@ -28,6 +32,8 @@ board_check_prerequisites ( ) {
 	"git clone git://github.com/gonzoua/u-boot-pi.git ${UBOOT_SRC}"
 
     raspberry_pi_firmware_check
+    videocore_src_check
+    videocore_user_check
 }
 
 board_build_bootloader ( ) {
@@ -40,6 +46,10 @@ board_build_bootloader ( ) {
 
     # Build ubldr.
     freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
+
+    # Build videocore driver and userland
+    videocore_build
+    videocore_user_build
 }
 
 board_construct_boot_partition ( ) {
@@ -51,17 +61,27 @@ board_construct_boot_partition ( ) {
 
     # Copy RaspberryPi boot files to FAT partition
     cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${FAT_MOUNT}
-    cp ${RPI_FIRMWARE_SRC}/boot/arm192_start.elf ${FAT_MOUNT}/start.elf
-    # Configure to chain-load U-Boot
-    echo "kernel=u-boot.bin" > ${FAT_MOUNT}/config.txt
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup.dat ${FAT_MOUNT}
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup_cd.dat ${FAT_MOUNT}
+    cp ${RPI_FIRMWARE_SRC}/boot/start.elf ${FAT_MOUNT}
+    cp ${RPI_FIRMWARE_SRC}/boot/start_cd.elf ${FAT_MOUNT}
+
+    # Configure Raspberry Pi boot files
+    cp ${RPI_FIRMWARE_SRC}/boot/config.txt ${FAT_MOUNT}
+    echo "gpu_mem=$RPI_GPU_MEM" >> ${FAT_MOUNT}/config.txt
     #echo "kernel=freebsd.bin" > ${FAT_MOUNT}/config.txt
 
+    # RPi boot loader loads initial device tree file
+    # Ubldr customizes this and passes it to the kernel.
+    # (See overlay/boot/loader.rc)
+    dtc -o ${FAT_MOUNT}/devtree.dat -O dtb -I dts ${RPI_FIRMWARE_SRC}/boot/raspberrypi.dts
+
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
-    cat > ${FAT_MOUNT}/uEnv.txt <<EOF
-loadbootscript=fatload mmc 0 0x2000000 ubldr
-bootscript=bootelf 0x2000000
-EOF
+    # TODO: Get the compiled U-Boot to actually work.
+    #cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
+    # For now, we're using Oleksandr's uboot.img file.
+    cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
+    cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${FAT_MOUNT}
 
     # Install ubldr to FAT partition
     freebsd_ubldr_copy ${FAT_MOUNT}
@@ -71,7 +91,7 @@ EOF
     #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
     #mkdir ${WORKDIR}/boot
     #freebsd_installkernel ${WORKDIR}
-    #cat ${RPI_FIRMWARE_SRC}/boot/kernel.prefix.img ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
+    #cp ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
 
     # DEBUG: list contents of FAT partition
     echo "FAT Partition contents:"
