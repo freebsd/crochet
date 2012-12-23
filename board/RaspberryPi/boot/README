@@ -10,7 +10,7 @@ PHASE ONE: Initialize the hardware
 
 This first phase is common to any use of RaspberryPi, whether you're
 booting Linux, FreeBSD, or any other software.  It loads a series of
-proprietary closed-source boot loader files that initialize the
+proprietary boot loader files that initialize the
 hardware and ultimately load and run some executable.
 
 These initial bits are loaded from the first partition on the SD card.
@@ -26,12 +26,16 @@ That partition must be formatted as FAT16 or FAT32.
   loaded start.elf.  This is no longer true since Oct 2012; loader.bin
   is gone and bootcode.bin now loads start.elf directly.)
 
-* bootcode.bin executes start.elf on the GPU (start.elf is
-  the "GPU firmware" that remains resident)
+  (If gpu_mem is set very low, then bootcode.bin reads start_cd.elf
+  instead.  This is a stripped-down version which lacks the
+  video support; suitable for systems that run purely with serial
+  console.)
 
-  Note: There are several versions of start.elf that partition memory
-  differently between ARM and the GPU.  To configure this, you copy
-  the appropriate version to the name start.elf.
+  (Q: Does bootcode.bin read config.txt?  Seems like it
+  must if it loads start_cd.elf depending on the memory config.)
+
+* bootcode.bin executes start.elf on the GPU (start.elf is
+  the "GPU firmware" that remains resident.)
 
 * start.elf reads config.txt and uses it to configure the hardware.
 
@@ -78,6 +82,9 @@ start.elf loads the u-boot.bin file:
 
 * ubldr locates a UFS partition on the SD card.
 
+* ubldr loads /boot/loader.rc and uses it to set up some
+  boot-time parameters.
+
 * ubldr loads the FreeBSD kernel from UFS
 
 * The FreeBSD kernel initializes and runs.
@@ -87,11 +94,20 @@ start.elf loads the u-boot.bin file:
 PHASE TWO for FreeBSD without ubldr:
 ====================================
 
-It is possible to load the FreeBSD kernel directly from U-Boot or even
-directly from start.elf.
+It should be possible to load the FreeBSD kernel directly from U-Boot
+or even directly from start.elf.
 
-Booting via U-Boot and ubldr provides support for debugging the early
-kernel initialization, so seems to be preferred right now.
+Pro: Potentially faster booting by eliminating the U-Boot and
+ubldr phases.
 
-Once FreeBSD is more stable on RaspberryPi,
-expect some changes here.
+Con: U-Boot and ubldr support debugging and configuring
+the early kernel initialization.  Booting without those would
+reduce some of the customizability.
+
+Con: Requires kernel to live on the MSDOS partition.  (There
+may be ways to make this less awkward; can /boot be mounted
+from a FAT partition?)
+
+For now, being able to debug and configure the early
+boot stages is very valuable, but as FreeBSD gets
+more stable this may change.
