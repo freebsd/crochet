@@ -2,6 +2,7 @@ KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
 VC_SRC=${TOPDIR}/vchiq-freebsd
 VC_USER_SRC=${TOPDIR}/vcuserland
+RPI_GPU_MEM=128
 
 # You can use the most up-to-date boot files from the RaspberryPi project:
 #RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
