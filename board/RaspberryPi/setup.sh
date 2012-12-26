@@ -2,7 +2,8 @@ KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
 VC_SRC=${TOPDIR}/vchiq-freebsd
 VC_USER_SRC=${TOPDIR}/vcuserland
-RPI_GPU_MEM=128
+# TODO: Figure out why kernel won't boot if this is set to 128.
+RPI_GPU_MEM=32
 
 # You can use the most up-to-date boot files from the RaspberryPi project:
 #RPI_FIRMWARE_SRC=${TOPDIR}/rpi-firmware
@@ -69,18 +70,18 @@ board_construct_boot_partition ( ) {
 
     # Configure Raspberry Pi boot files
     cp ${RPI_FIRMWARE_SRC}/boot/config.txt ${FAT_MOUNT}
-    echo "gpu_mem=$RPI_GPU_MEM" >> ${FAT_MOUNT}/config.txt
-    #echo "kernel=freebsd.bin" > ${FAT_MOUNT}/config.txt
+    echo "gpu_mem=${RPI_GPU_MEM}" >> ${FAT_MOUNT}/config.txt
 
     # RPi boot loader loads initial device tree file
     # Ubldr customizes this and passes it to the kernel.
     # (See overlay/boot/loader.rc)
-    dtc -o ${FAT_MOUNT}/devtree.dat -O dtb -I dts ${RPI_FIRMWARE_SRC}/boot/raspberrypi.dts
+    dtc -o ${FAT_MOUNT}/devtree.dat -O dtb -p 1024 -I dts ${RPI_FIRMWARE_SRC}/boot/raspberrypi.dts
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
     # TODO: Get the compiled U-Boot to actually work.
     #cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
     # For now, we're using Oleksandr's uboot.img file.
+    echo "kernel=uboot.img" >> ${FAT_MOUNT}/config.txt
     cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
     cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${FAT_MOUNT}
 
@@ -93,10 +94,7 @@ board_construct_boot_partition ( ) {
     #mkdir ${WORKDIR}/boot
     #freebsd_installkernel ${WORKDIR}
     #cp ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
-
-    # DEBUG: list contents of FAT partition
-    echo "FAT Partition contents:"
-    ls -l ${FAT_MOUNT}
+    #echo "kernel=freebsd.bin" >> ${FAT_MOUNT}/config.txt
 
     cd ${FAT_MOUNT}
     customize_boot_partition ${FAT_MOUNT}
