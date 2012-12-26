@@ -2,7 +2,6 @@ KERNCONF=RPI-B
 UBOOT_SRC=${TOPDIR}/u-boot-rpi
 VC_SRC=${TOPDIR}/vchiq-freebsd
 VC_USER_SRC=${TOPDIR}/vcuserland
-# TODO: Figure out why kernel won't boot if this is set to 128.
 RPI_GPU_MEM=32
 
 # You can use the most up-to-date boot files from the RaspberryPi project:
