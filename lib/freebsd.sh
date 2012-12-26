@@ -20,6 +20,10 @@ FREEBSD_KERNEL_BOARD_ARGS=""
 FREEBSD_BUILDKERNEL_BOARD_ARGS=""
 FREEBSD_INSTALLKERNEL_BOARD_ARGS=""
 
+# Since we're building with special flags, keep
+# the obj tree separate from /usr/obj.
+MAKEOBJDIRPREFIX=${WORKDIR}/obj
+export MAKEOBJDIRPREFIX
 
 WORLDJOBS=4
 KERNJOBS=4
@@ -97,9 +101,6 @@ _freebsd_build ( ) {
 # freebsd_buildworld: Build FreeBSD world.
 #
 # $@: additional make arguments
-#
-# TODO: freebsd_buildworld and freebsd_buildkernel are almost
-# identical.  Factor out the common pieces.
 #
 freebsd_buildworld ( ) {
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=$TARGET_ARCH ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
