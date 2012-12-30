@@ -11,6 +11,7 @@ RPI_GPU_MEM=32
 # into this project:
 RPI_FIRMWARE_SRC=${BOARDDIR}
 
+. ${BOARDDIR}/mkimage.sh
 . ${BOARDDIR}/videocore.sh
 
 raspberry_pi_firmware_check ( ) {
@@ -33,6 +34,7 @@ board_check_prerequisites ( ) {
 	"git clone git://github.com/gonzoua/u-boot-pi.git ${UBOOT_SRC}"
 
     raspberry_pi_firmware_check
+    mkimage_check
     videocore_src_check
     videocore_user_check
 }
@@ -76,12 +78,12 @@ board_construct_boot_partition ( ) {
     # (See overlay/boot/loader.rc)
     dtc -o ${FAT_MOUNT}/devtree.dat -O dtb -p 1024 -I dts ${RPI_FIRMWARE_SRC}/boot/raspberrypi.dts
 
+    # Use Oleksandr's uboot.img file.
+    #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
+
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    # TODO: Get the compiled U-Boot to actually work.
-    #cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
-    # For now, we're using Oleksandr's uboot.img file.
+    mkimage ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
     echo "kernel=uboot.img" >> ${FAT_MOUNT}/config.txt
-    cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
     cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${FAT_MOUNT}
 
     # Install ubldr to FAT partition
