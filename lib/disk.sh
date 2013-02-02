@@ -121,7 +121,7 @@ disk_ufs_mount ( ) {
 
 disk_add_swap_file ( ) {
     echo "Creating swap file"
-    dd if=/dev/zero of="usr/swap0" bs=1024k count=$2
+    dd if=/dev/zero of="usr/swap0" bs=1024k count=$1
     chmod 0600 "usr/swap0"
     echo 'swapfile="/usr/swap0"' >> etc/rc.conf
 }
