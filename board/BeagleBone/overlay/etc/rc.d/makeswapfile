@@ -38,13 +38,13 @@ makeswapfile_start ()
 	# Testing shows that 8G SD card is minimum for buildworld,
 	# and that 768M swap is needed for buildworld on BeagleBone.
 	makeswapfile_minfreeblocks=${makeswapfile_minfreeblocks:-14000000}
-	makeswapfile_swapsize=${makeswapfile_swapsize:-768}
+	makeswapfile_swapsize_mb=${makeswapfile_swapsize_mb:-768}
 
 	freeblocks=`df -b /usr | tail -n 1 | awk '{print $4}'`
 	if [ ! -e /usr/swap0 ]; then
 		if [ ${freeblocks} -gt ${makeswapfile_minfreeblocks} ]; then
-			echo Adding ${makeswapfile_swapsize}MB swap file
-			dd if=/dev/zero of=/usr/swap0 bs=1024k count=${makeswapfile_swapsize}
+			echo Adding ${makeswapfile_swapsize_mb}MB swap file
+			dd if=/dev/zero of=/usr/swap0 bs=1024k count=${makeswapfile_swapsize_mb}
 			chmod 0600 /usr/swap0
 			echo 'swapfile="/usr/swap0"' >> /etc/rc.conf
 		else
