@@ -1,11 +1,11 @@
 #!/bin/sh
 
-# Special for BeagleBone.
-
-# PROVIDE: growroot
-# REQUIRE: fsck
+# PROVIDE: growfs
 # BEFORE: root
+# REQUIRE: fsck
+# KEYWORD: firstbootonly
 
+# Special for BeagleBone.
 #
 # Automatically grow mmcsd0s2a to fill the
 # entire SD card.
@@ -18,6 +18,27 @@
 # disk since the root disk is still mounted read-only
 # at this point.)
 # 
-gpart resize -i 2 mmcsd0
-gpart resize -i 1 mmcsd0s2
-growfs -y /dev/mmcsd0s2a
+
+echo
+echo ===================
+echo
+echo GROWFS
+echo
+echo ===================
+
+. /etc/rc.subr
+
+name="growfs"
+start_cmd="growfs_start"
+stop_cmd=":"
+
+growfs_start ()
+{
+    echo Attempting to grow mmcsd0
+    gpart resize -i 2 mmcsd0
+    gpart resize -i 1 mmcsd0s2
+    growfs -y /dev/mmcsd0s2a
+}
+
+load_rc_config $name
+run_rc_command "$1"
