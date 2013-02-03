@@ -1,8 +1,7 @@
 #!/bin/sh
 
 # PROVIDE: growfs
-# BEFORE: root
-# REQUIRE: fsck
+# BEFORE: sysctl
 # KEYWORD: firstbootonly
 
 # Special for BeagleBone.
@@ -15,26 +14,26 @@
 #
 # TODO: Figure out a clean way to have this run
 # only on first boot.  (We can't write anything to
-# disk since the root disk is still mounted read-only
-# at this point.)
+# disk here since the root disk is still mounted
+# read-only at this point.)  Fortunately, it completes
+# very quickly if it can't actually grow the partition.
+#
+# TODO: Figure out where this should really be ordered.
+# Before sysctl seems like overkill, but I've tried
+# only requiring it to be before fsck and that's not
+# early enough.
 # 
-
-echo
-echo ===================
-echo
-echo GROWFS
-echo
-echo ===================
 
 . /etc/rc.subr
 
 name="growfs"
 start_cmd="growfs_start"
 stop_cmd=":"
+rcvar="growfs_enable"
 
 growfs_start ()
 {
-    echo Attempting to grow mmcsd0
+    echo "Growing root partition to fill SD card"
     gpart resize -i 2 mmcsd0
     gpart resize -i 1 mmcsd0s2
     growfs -y /dev/mmcsd0s2a

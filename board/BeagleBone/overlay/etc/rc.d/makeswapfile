@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# PROVIDE: makeswapfile
+# REQUIRE: FILESYSTEMS
+# KEYWORD: firstbootonly
+
+# Special for BeagleBone.
+#
+# If disk is big enough, create a swap file.
+#
+# Leaving out the swap file lets us build an
+# image small enough to boot and run on a 1GB SD
+# card.  But if we happen to find ourselves with
+# enough room, we can do better.
+#
+# This allows us to distribute a single image
+# and have it work on essentially any size SD card.
+#
+# TODO: Figure out a clean way to have this run
+# only on first boot.
+#
+# TODO: Make this configurable.
+#
+# TODO: Figure out where this should really be ordered.
+# 
+
+. /etc/rc.subr
+
+name="makeswapfile"
+start_cmd="makeswapfile_start"
+stop_cmd=":"
+rcvar="makeswapfile_enable"
+
+# Default: If there is more than 7G free, add a 768M swap file.
+# Testing shows that 8G SD card is minimum for buildworld,
+# and that 768M swap is needed for buildworld on BeagleBone.
+
+# TODO: support rc.d settings for
+#   Min free space in blocks
+makeswapfile_minfreeblocks=14000000
+#   size of swap file
+makeswapfile_swapsize=768
+
+makeswapfile_start ()
+(
+	rootfree=`df -b /usr | tail -n 1 | awk '{print $4}'`
+	if [ ! -e /usr/swap0 ]; then
+		if [ ${rootsize} -gt ${makeswapfile_minfreeblocks} ]; then
+			echo Creating swap file
+			dd if=/dev/zero of=/usr/swap0 bs=1024k count=${makeswapfile_swapsize}
+			chmod 0600 /usr/swap0
+			echo 'swapfile="/usr/swap0"' >> /etc/rc.conf
+			swapon /usr/swap0
+		else
+			touch /usr/swap0
+		fi
+	fi
+)
+
+load_rc_config ${name}
+run_rc_command "$1"
