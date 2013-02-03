@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Special for BeagleBone.
+
+# PROVIDE: growroot
+# REQUIRE: fsck
+# BEFORE: root
+
+#
+# Automatically grow mmcsd0s2a to fill the
+# entire SD card.
+#
+# This allows us to distribute a single image
+# and have it work on essentially any size SD card.
+#
+# TODO: Figure out a clean way to have this run
+# only on first boot.  (We can't write anything to
+# disk since the root disk is still mounted read-only
+# at this point.)
+# 
+gpart resize -i 2 mmcsd0
+gpart resize -i 1 mmcsd0s2
+growfs -y /dev/mmcsd0s2a
