@@ -104,43 +104,32 @@ NATIVE SOURCE REBUILDS
 One of my goals is for the usual "make buildworld",
 "make installworld", "make buildkernel", and
 "make installkernel" to all work natively on the BeagleBone.
+A few people have had success, though a buildworld
+seems to take more than 30 hours.
 
-If you want to try this:
- * You probably want at least a 6G image.
- * Uncomment INSTALL_USR_SRC in beaglebsd-config.sh
- * You may need to set up a swap partition; the script
-   doesn't do this automatically (see PROJECTS list below)
+ $ make buildworld
+ $ make installworld
+ $ make KERNCONF=BEAGLEBONE buildkernel
+ $ make KERNCONF=BEAGLEBONE installkernel
+
+If you want to try this, you'll want an 8G image.
+You can put the source tree into the image when
+you build it by including the following in your
+config.sh:
+
+  customize_freebsd_partition ( ) {
+     freebsd_install_usr_src
+     disk_add_swap_file 768
+  }
 
 After you boot the resulting image, you'll have a fully
 populated /usr/src and can try rebuilding the system
 natively.
 
-Here are the commands you can try.  Patches appreciated
-if you figure out how to deal with any of the issues here:
-
-Buildworld:
- $ make buildworld
-
-Issue:  The new TARGET_ARCH support miscompiles
-rtld (something to do with ARM_TP_ADDRESS
-being used in the new rtld when it shouldn't?).
-
-Issue: Buildworld takes about 30 hours.
-I have not yet tried this with /usr/src and /usr/obj
-mounted over NFS; that would help identify whether
-the slow SD interface is the primary issue.
-
-Installworld:
- $ make installworld
-Status: The install per se is okay, but as soon
-as the broken rtld (see above) gets installed,
-the system crashes.
-
-Buildkernel/installkernel:
- $ make KERNCONF=BEAGLEBONE buildkernel
- $ make KERNCONF=BEAGLEBONE installkernel
-Status:  This seems to work since the
-TARGET_ARCH support went in.
+Alternatively, of course, you can use "portsnap" to
+download and install a ports tree, build the subversion
+port, and checkout the FreeBSD source code using that.
+This works, I've done it.
 
 ============================================================
 
@@ -150,24 +139,20 @@ PROJECTS
 If you're interested, there are a lot of things still to
 be done:
 
+ * Use the system.  The stability has been generally improving
+   but the more people use and stress it, the more issues we'll
+   be able to shake out.  Report any problems on freebsd-arm
+   mailing list.
  * Test ports.  I've tried building a few ports natively with
    somewhat mixed success.  Try things and let us know what
    you find.
- * Improve cpsw Ethernet driver.  Damjan Marion's initial
-   driver works, but could certainly use more work.
- * USB.  Benjamin Gray has written a driver, it's in the
-   tree, but I haven't had time to try to get it to actually
-   work.  (Among other things, USB disk might be faster,
-   allowing for faster native buildworlds/buildkernel.)
+ * USB.  Oleksandr has a patchset floating around but it's
+   incomplete.  Ask if you're interested.
  * GPIO.  Some initial GPIO work is done but there are
    evolving ideas about how to make the GPIO framework
    more robust.
  * Other drivers.  The AM3358 SoC has a lot of hardware
    components that are still unsupported.
- * Modular kernel.  The kernel can load modules, I've successfully
-   built and loaded cpsw as a module.
- * Refining the BEAGLEBONE kernel configuration:  For example,
-   adding bpf allows dhclient to work.
  * Refining the system configuration:  A machine with only
    256MB RAM probably should not have sendmail, syslog, and
    other daemons started by default.
