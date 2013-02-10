@@ -206,8 +206,17 @@ freebsd_ubldr_build ( ) {
 # $1: Target directory to receive ubldr files
 #
 freebsd_ubldr_copy ( ) {
+    freebsd_ubldr_copy_ubldr
+    freebsd_ubldr_copy_ubldr_help
+}
+
+freebsd_ubldr_copy_ubldr ( ) {
     echo "Installing ubldr"
     cp ${WORKDIR}/ubldr/ubldr $1
+}
+
+freebsd_ubldr_copy_ubldr_help ( ) {
+    echo "Installing ubldr help file"
     cp ${WORKDIR}/ubldr/loader.help $1
 }
 
