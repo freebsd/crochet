@@ -1,5 +1,7 @@
-RaspberryPi is supported by FreeBSD-CURRENT as
-of November, 2012.
+RaspberryPi is supported by FreeBSD-CURRENT as of
+November, 2012.  Support is improving very rapidly
+and the system is now at a point where many people
+should be able to actually use the system.
 
 ========================================================================
 
@@ -20,22 +22,22 @@ systems:
    a common micro-USB charger, uses USB keyboard, consumer television
    display, etc.
 
-The RaspberryPi has been wildly successful (hundreds of thousands
-of units sold) and has attracted a large following.
+The RaspberryPi has been wildly successful (over a million
+units sold) and has attracted a large following.
 
 ========================================================================
 
 How to Boot the RaspberryPi
 ---------------------------
 
-As of 1 November 2012, FreeBSD-CURRENT does not fully support the
-native console, so you'll probably want a serial adapter cable.
-Adafruit.com sells one especially designed to work with RaspberryPi
-which can also provide power to the board.
+As of January 2013, FreeBSD-CURRENT fully supports either
+a video console (you'll need a USB keyboard and display
+connected) or it can be configured to use a serial console
+(you'll need a serial adapter cable such as the one sold by
+Adafruit.com).
 
 After connecting video, keyboard, and inserting the SDHC card,
-you connect power (either by attaching the last lead of the serial
-cable or connecting a micro-USB charger) to actually boot.
+you connect power to actually boot.
 
 ============================================================
 
@@ -78,10 +80,3 @@ ubldr.  There are some issues still to be resolved
 before this is feasible.
 
 ========================================================================
-
-PROJECTS
-----------------------------------------
-
-There is still a lot of work to be done.
-Ask on freebsd-arm@freebsd.org mailing list if you
-would like to help.
