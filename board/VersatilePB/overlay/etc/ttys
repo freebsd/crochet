@@ -1,0 +1,10 @@
+ttyv0 "/usr/libexec/getty Pc" xterm on secure
+ttyv1 "/usr/libexec/getty Pc" xterm on secure
+ttyv2 "/usr/libexec/getty Pc" xterm on secure
+ttyv3 "/usr/libexec/getty Pc" xterm on secure
+ttyv4 "/usr/libexec/getty Pc" xterm on secure
+ttyv5 "/usr/libexec/getty Pc" xterm on secure
+ttyv6 "/usr/libexec/getty Pc" xterm on secure
+ttyv7 "/usr/libexec/getty Pc" xterm on secure
+ttyu0 "/usr/libexec/getty 3wire.115200" vt102 on secure
+
