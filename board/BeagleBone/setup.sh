@@ -49,5 +49,6 @@ board_construct_boot_partition ( ) {
 }
 
 board_customize_freebsd_partition ( ) {
+    mkdir $1/boot/msdos
     freebsd_ubldr_copy_ubldr_help $1/boot
 }
