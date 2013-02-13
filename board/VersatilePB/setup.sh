@@ -2,10 +2,7 @@ FREEBSD_SRC=/usr/src
 KERNCONF=VERSATILEPB
 IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 FLASH=${WORKDIR}/FreeBSD-${KERNCONF}.flash
-
-# TODO: The following is brittle and will break
-# if anything changes in how the objdir is handled.
-KERNELBIN=${WORKDIR}/obj/arm.armv6`realpath ${FREEBSD_SRC}`/sys/${KERNCONF}/kernel.bin
+FREEBSD_INSTALLKERNEL_BOARD_ARGS=KERNEL_EXTRA_INSTALL=kernel.bin
 
 board_construct_boot_partition ( ) {
     # dummy partition.
@@ -20,19 +17,13 @@ board_construct_boot_partition ( ) {
     /usr/bin/printf "\0\060\240\343" >> ${WORKDIR}/first_commands
     # jump to kernel entry point
     /usr/bin/printf "\001\366\240\343" >> ${WORKDIR}/first_commands
+    # install kernel
+    [ ! -d ${WORKDIR}/_.kernel.bin ] && mkdir ${WORKDIR}/_.kernel.bin
+    freebsd_installkernel ${WORKDIR}/_.kernel.bin
 
     dd of=$FLASH bs=1M count=4 if=/dev/zero
     dd of=$FLASH bs=1 conv=notrunc if=${WORKDIR}/first_commands
-
-    # TODO: $KERNELBIN is a very brittle approach.
-    # Better to use something like the following:
-
-    # mkdir ${WORKDIR}/kernel
-    # freebsd_kernel_install ${WORKDIR}/kernel
-    # dd .... if=${WORKDIR}/kernel/...
-
-    dd of=$FLASH bs=64k oseek=15 conv=notrunc if=$KERNELBIN
-    
+    dd of=$FLASH bs=64k oseek=15 conv=notrunc if=${WORKDIR}/boot/kernel/kernel.bin
 }
 
 board_show_message ( ) {
