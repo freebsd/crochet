@@ -195,9 +195,9 @@ freebsd_ubldr_build ( ) {
     cd sys/boot
     eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log
     eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log
-    eval $buildenv make "$@" -m $ubldr_makefiles all >> ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make "$@" -m $ubldr_makefiles all >> ${WORKDIR}/_.ubldr.build.log || exit 1
     cd arm/uboot
-    eval $buildenv make DESTDIR=${WORKDIR}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make DESTDIR=${WORKDIR}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${WORKDIR}/_.ubldr.build.log || exit 1
 }
 
 # freebsd_ubldr_copy:  Copy the compiled ubldr files
@@ -212,12 +212,12 @@ freebsd_ubldr_copy ( ) {
 
 freebsd_ubldr_copy_ubldr ( ) {
     echo "Installing ubldr"
-    cp ${WORKDIR}/ubldr/ubldr $1
+    cp ${WORKDIR}/ubldr/ubldr $1 || exit 1
 }
 
 freebsd_ubldr_copy_ubldr_help ( ) {
     echo "Installing ubldr help file"
-    cp ${WORKDIR}/ubldr/loader.help $1
+    cp ${WORKDIR}/ubldr/loader.help $1 || exit 1
 }
 
 # freebsd_install_usr_src:  Copy FREEBSD_SRC tree
