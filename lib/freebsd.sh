@@ -252,3 +252,11 @@ _freebsd_install_usr_ports ( ) {
 freebsd_install_usr_ports ( ) {
     _freebsd_install_usr_ports ${UFS_MOUNT}
 }
+
+# $1: name of dts file
+# $2: destination directory
+freebsd_copy_dts ( ) (
+    cd $FREEBSD_SRC
+    cd sys/boot/fdt/dts
+    cp $1 $2
+)
