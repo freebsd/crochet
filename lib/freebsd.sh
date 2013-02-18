@@ -253,10 +253,53 @@ freebsd_install_usr_ports ( ) {
     _freebsd_install_usr_ports ${UFS_MOUNT}
 }
 
-# $1: name of dts file
-# $2: destination directory
-freebsd_copy_dts ( ) (
-    cd $FREEBSD_SRC
-    cd sys/boot/fdt/dts
-    cp $1 $2
+
+# $1: name of dts or dtb file
+# $2: destination dts or dtb file or dir
+#
+# If $1 and $2 have different extensions (".dts" vs. ".dtb"),
+# the dtc compiler will be used to translate formats.  If
+# $2 is a directory or the extensions are the same, this
+# devolves into a 'cp'.
+#
+freebsd_install_fdt ( ) (
+    cd $FREEBSD_SRC/sys/boot/fdt/dts
+    case $1 in
+	*.dtb)
+	    case $2 in
+		*.dtb)
+		    cp $1 $2
+		    ;;
+		*.dts)
+		    dtc -I dtb -O dts -p 8192 -o $2 $1
+		    ;;
+		*)
+		    if [ -d $2 ]; then
+			cp $1 $2
+		    else
+			echo "Can't compile $1 to $2"
+			exit 1
+		    fi
+		    ;;
+	    esac
+	    ;;
+	*.dts)
+	    case $2 in
+		*.dts)
+		    cp $1 $2
+		    ;;
+		*.dtb)
+		    dtc -I dts -O dtb -p 8192 -o $2 $1
+		    ;;
+		*)
+		    if [ -d $2 ]; then
+			cp $1 $2
+		    else
+			echo "Can't compile $1 to $2"
+			exit 1
+		    fi
+		    ;;
+	    esac
+	    ;;
+    esac
 )
