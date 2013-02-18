@@ -40,7 +40,8 @@ uboot_test ( ) {
 	exit 1
     fi
 
-    echo "Found U-Boot sources in $UBOOT_SRC"
+    echo "Found U-Boot sources in:"
+    echo "    $UBOOT_SRC"
 }
 
 # uboot_patch: Apply patches to the U-Boot sources.
