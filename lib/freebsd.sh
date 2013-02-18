@@ -185,7 +185,8 @@ freebsd_ubldr_build ( ) {
 	return 0
     fi
 
-    echo "Building FreeBSD $TARGET_ARCH ubldr"
+    echo "Building FreeBSD $TARGET_ARCH ubldr at "`date`
+    echo "    (Logging to ${WORKDIR}/_.ubldr.build.log)"
     rm -rf ${WORKDIR}/ubldr
     mkdir -p ${WORKDIR}/ubldr
 
