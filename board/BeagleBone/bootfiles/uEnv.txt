@@ -1,3 +1,4 @@
-bootfile=ubldr
+bootfile=bb-ubldr
 kloadaddr=0x88000000
-uenvcmd=fatload mmc \${mmc_dev} \${kloadaddr} \${bootfile};bootelf \${kloadaddr}"
+fdtaddr=0x80010000
+uenvcmd=fatload mmc \${mmc_dev} \${fdtaddr} BBONE.DTB;fdt addr \${fdtaddr};fatload mmc \${mmc_dev} \${kloadaddr} \${bootfile};bootelf \${kloadaddr}"
