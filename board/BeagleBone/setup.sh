@@ -35,14 +35,23 @@ board_construct_boot_partition ( ) {
     disk_fat_create 2m
     disk_fat_mount ${FAT_MOUNT}
 
+    # Note that all of the BeagleBone boot files
+    # start with 'BB' now (except for MLO, which can't
+    # be renamed because it's loaded by the ROM).
     echo "Installing U-Boot onto the FAT partition"
     cp ${UBOOT_SRC}/MLO ${FAT_MOUNT}
-    cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
-    cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}
+    cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}/bb-uboot.img
+    cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}/bb-uEnv.txt
 
-    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}
+    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/bb-ubldr
     freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dts
     freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dtb
+
+    # Temporary redundant copies for backwards compatibility.
+    cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}/u-boot.img
+    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/ubldr
+    cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}/uenv.txt
+
 
     cd ${FAT_MOUNT}
     customize_boot_partition ${FAT_MOUNT}
@@ -53,6 +62,4 @@ board_construct_boot_partition ( ) {
 board_customize_freebsd_partition ( ) {
     mkdir $1/boot/msdos
     freebsd_ubldr_copy_ubldr_help $1/boot
-    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dts
-    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dtb
 }
