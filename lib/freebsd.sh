@@ -77,7 +77,8 @@ _freebsd_build ( ) {
 	return 0
     fi
 
-    echo "Building FreeBSD ${TARGET_ARCH} ${KERNCONF} $1 at "`date`" (Logging to ${WORKDIR}/_.build$1.log)"
+    echo "Building FreeBSD ${TARGET_ARCH} ${KERNCONF} $1 at "`date`
+    echo "    (Logging to ${WORKDIR}/_.build$1.log)"
 
     if [ -f ${WORKDIR}/_.built-$1 ]
     then
