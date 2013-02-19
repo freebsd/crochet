@@ -13,6 +13,7 @@
 # board_setup BeagleBone
 # board_setup RaspberryPi
 # board_setup PandaBoard
+# board_setup VersatilePB
 
 #
 # Read board/<board-name>/README for more details

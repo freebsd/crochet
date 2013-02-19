@@ -23,6 +23,16 @@ board_check_prerequisites ( ) {
 board_build_bootloader ( ) { }
 board_construct_boot_partition ( ) { }
 board_customize_freebsd_partition ( ) { }
+board_show_message ( ) {
+    echo "DONE."
+    echo "Completed disk image is in: ${IMG}"
+    echo
+    echo "Copy to a MicroSDHC card using a command such as:"
+    echo "dd if=${IMG} of=/dev/da0 bs=1m"
+    echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
+    echo
+}
+
 
 # Empty definitions of functions to be overridden by user.
 customize_boot_partition ( ) { }
@@ -73,12 +83,12 @@ then
     if [ -d ${BOARDDIR}/overlay ]
     then
 	echo "Overlaying board-specific files from ${BOARDDIR}/overlay"
-	(cd ${BOARDDIR}/overlay; find . | cpio -p ${UFS_MOUNT})
+	(cd ${BOARDDIR}/overlay; find . | cpio -pmud ${UFS_MOUNT})
     fi
     if [ -d ${WORKDIR}/overlay ]
     then
 	echo "Overlaying files from ${WORKDIR}/overlay"
-	(cd ${WORKDIR}/overlay; find . | cpio -p ${UFS_MOUNT})
+	(cd ${WORKDIR}/overlay; find . | cpio -pmud ${UFS_MOUNT})
     fi
 
 fi
@@ -97,11 +107,5 @@ disk_release_image
 #
 # We have a finished image; explain what to do with it.
 #
-echo "DONE."
-echo "Completed disk image is in: ${IMG}"
-echo
-echo "Copy to a MicroSDHC card using a command such as:"
-echo "dd if=${IMG} of=/dev/da0 bs=1m"
-echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
-echo
+board_show_message
 date

@@ -1,0 +1,2 @@
+# Device	Mountpoint	FStype	Options	Dump	Pass#
+/dev/mmcsd0s2a / 		ufs rw,noatime 1 1

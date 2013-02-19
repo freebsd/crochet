@@ -4,9 +4,6 @@ UBOOT_SRC=$TOPDIR/u-boot
 . ${LIBDIR}/freebsd_xdev.sh
 
 _uboot_download_instructions ( ) {
-    # Use TIs U-Boot sources that know about am335x processors
-    # XXX TODO: Test with the master U-Boot sources from
-    # denx.de; they claim to have merged the TI AM335X support.
     echo
     echo "Expected to see U-Boot sources in $UBOOT_SRC"
     echo "Use the following command to get the U-Boot sources"
@@ -43,7 +40,8 @@ uboot_test ( ) {
 	exit 1
     fi
 
-    echo "Found U-Boot sources in $UBOOT_SRC"
+    echo "Found U-Boot sources in:"
+    echo "    $UBOOT_SRC"
 }
 
 # uboot_patch: Apply patches to the U-Boot sources.
@@ -103,7 +101,8 @@ uboot_configure ( ) {
     fi
 
     cd "$UBOOT_SRC"
-    echo "Configuring U-Boot. (Logging to ${WORKDIR}/_.uboot.configure.log)"
+    echo "Configuring U-Boot at "`date`
+    echo "    (Logging to ${WORKDIR}/_.uboot.configure.log)"
     if gmake CROSS_COMPILE=arm-freebsd- $1 > ${WORKDIR}/_.uboot.configure.log 2>&1; then
 	# success
     else
@@ -124,7 +123,8 @@ uboot_build ( ) {
     fi
 
     cd "$UBOOT_SRC"
-    echo "Building U-Boot. (Logging to ${WORKDIR}/_.uboot.build.log)"
+    echo "Building U-Boot at "`date`
+    echo "    (Logging to ${WORKDIR}/_.uboot.build.log)"
     if gmake SED=gsed CROSS_COMPILE=arm-freebsd- > ${WORKDIR}/_.uboot.build.log 2>&1; then
 	# success
     else

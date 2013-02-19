@@ -40,10 +40,19 @@ board_construct_boot_partition ( ) {
     cp ${UBOOT_SRC}/u-boot.img ${FAT_MOUNT}
     cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}
 
-    freebsd_ubldr_copy ${FAT_MOUNT}
+    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}
+    freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dts
+    freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dtb
 
     cd ${FAT_MOUNT}
     customize_boot_partition ${FAT_MOUNT}
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
+}
+
+board_customize_freebsd_partition ( ) {
+    mkdir $1/boot/msdos
+    freebsd_ubldr_copy_ubldr_help $1/boot
+    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dts
+    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dtb
 }
