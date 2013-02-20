@@ -208,8 +208,8 @@ freebsd_ubldr_build ( ) {
 # $1: Target directory to receive ubldr files
 #
 freebsd_ubldr_copy ( ) {
-    freebsd_ubldr_copy_ubldr
-    freebsd_ubldr_copy_ubldr_help
+    freebsd_ubldr_copy_ubldr $1
+    freebsd_ubldr_copy_ubldr_help $1
 }
 
 freebsd_ubldr_copy_ubldr ( ) {
