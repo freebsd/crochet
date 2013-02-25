@@ -1,5 +1,5 @@
 KERNCONF=RPI-B
-UBOOT_SRC=${TOPDIR}/u-boot-rpi
+RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
 VC_SRC=${TOPDIR}/vchiq-freebsd
 VC_USER_SRC=${TOPDIR}/vcuserland
 RPI_GPU_MEM=32
@@ -14,7 +14,12 @@ RPI_FIRMWARE_SRC=${BOARDDIR}
 . ${BOARDDIR}/mkimage.sh
 . ${BOARDDIR}/videocore.sh
 
-raspberry_pi_firmware_check ( ) {
+raspberry_pi_check_prerequisites ( ) {
+    uboot_test \
+	RPI_UBOOT_SRC \
+	"$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
+	"git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
+
     if [ ! -f "${RPI_FIRMWARE_SRC}/boot/bootcode.bin" ]; then
 	echo "Need Rasberry Pi closed-source boot files."
 	echo "Use the following command to fetch them:"
@@ -24,28 +29,23 @@ raspberry_pi_firmware_check ( ) {
 	echo "Run this script again after you have the files."
 	exit 1
     fi
-}
-
-board_check_prerequisites ( ) {
-    freebsd_current_test
-
-    uboot_test \
-	"$UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
-	"git clone git://github.com/gonzoua/u-boot-pi.git ${UBOOT_SRC}"
-
-    raspberry_pi_firmware_check
     mkimage_check
     videocore_src_check
     videocore_user_check
 }
 
-board_build_bootloader ( ) {
+board_check_prerequisites ( ) {
+    freebsd_current_test
+    raspberry_pi_check_prerequisites
+}
+
+raspberry_pi_build_bootloader ( ) {
     # Closed-source firmware is already built.
 
     # Build U-Boot
-    uboot_patch ${BOARDDIR}/files/uboot_*.patch
-    uboot_configure rpi_b_config
-    uboot_build
+    uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+    uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
+    uboot_build ${RPI_UBOOT_SRC}
 
     # Build ubldr.
     freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
@@ -55,12 +55,11 @@ board_build_bootloader ( ) {
     videocore_user_build
 }
 
-board_construct_boot_partition ( ) {
-    echo "Setting up boot partition"
-    FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
-    disk_fat_create 17m 16
-    disk_fat_mount ${FAT_MOUNT}
+board_build_bootloader ( ) {
+    raspberry_pi_build_bootloader
+}
+
+raspberry_pi_populate_boot_partition ( ) {
 
     # Copy RaspberryPi boot files to FAT partition
     cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${FAT_MOUNT}
@@ -82,7 +81,7 @@ board_construct_boot_partition ( ) {
     #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    mkimage ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
+    mkimage ${RPI_UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
     echo "kernel=uboot.img" >> ${FAT_MOUNT}/config.txt
     cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${FAT_MOUNT}
 
@@ -96,9 +95,24 @@ board_construct_boot_partition ( ) {
     #freebsd_installkernel ${WORKDIR}
     #cp ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
     #echo "kernel=freebsd.bin" >> ${FAT_MOUNT}/config.txt
+}
+
+board_construct_boot_partition ( ) {
+    echo "Setting up boot partition"
+    FAT_MOUNT=${WORKDIR}/_.mounted_fat
+    # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
+    disk_fat_create 17m 16
+    disk_fat_mount ${FAT_MOUNT}
+
+    raspberry_pi_populate_boot_partition ${FAT_MOUNT}
 
     cd ${FAT_MOUNT}
     customize_boot_partition ${FAT_MOUNT}
     disk_fat_unmount ${FAT_MOUNT}
     unset FAT_MOUNT
+}
+
+board_customize_freebsd_partition ( ) {
+    mkdir $1/boot/msdos
+    freebsd_ubldr_copy_ubldr_help $1/boot
 }
