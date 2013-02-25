@@ -196,6 +196,7 @@ freebsd_ubldr_build ( ) {
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     cd sys/boot
     eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make -m $ubldr_makefiles clean >> ${WORKDIR}/_.ubldr.build.log
     eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log
     eval $buildenv make "$@" -m $ubldr_makefiles all >> ${WORKDIR}/_.ubldr.build.log || exit 1
     cd arm/uboot
