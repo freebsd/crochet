@@ -75,7 +75,9 @@ raspberry_pi_populate_boot_partition ( ) {
     # RPi boot loader loads initial device tree file
     # Ubldr customizes this and passes it to the kernel.
     # (See overlay/boot/loader.rc)
-    dtc -o ${FAT_MOUNT}/devtree.dat -O dtb -p 1024 -I dts ${RPI_FIRMWARE_SRC}/boot/raspberrypi.dts
+    freebsd_install_fdt bcm2835-rpi-b.dts ${FAT_MOUNT}/rpi-b.dtb
+    echo "device_tree=rpi-b.dtb" >> ${FAT_MOUNT}/config.txt
+    echo "device_tree_address=0x100" >> ${FAT_MOUNT}/config.txt
 
     # Use Oleksandr's uboot.img file.
     #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
