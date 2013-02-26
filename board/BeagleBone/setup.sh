@@ -49,7 +49,7 @@ beaglebone_populate_boot_partition ( ) {
     cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img ${FAT_MOUNT}/bb-uboot.img
     cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}/bb-uEnv.txt
 
-    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/bb-ubldr
+    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/ubldr
     freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dts
     freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dtb
 
