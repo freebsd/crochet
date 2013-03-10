@@ -1,12 +1,26 @@
+#
+# Experimental configuration to test ideas for a true
+# "GENERIC" FreeBSD/arm kernel.
+#
+# This installs all the boot bits for both RaspberryPi
+# and BeagleBone.  The resulting image can load the kernel
+# (with the appropriate board-specific FDT) on either
+# platform.  Now we just need a kernel that can boot
+# on either platform.
+#
+
 MYBOARDDIR=${BOARDDIR}
 BEAGLEBONE_BOARDDIR=${BOARDDIR}/../BeagleBone
 RASPBERRY_PI_BOARDDIR=${BOARDDIR}/../RaspberryPi
 
-. ${BEAGLEBONE_BOARDDIR}/BeagleBone/setup.sh
-. ${RASPBERRY_PI_BOARDDIR}/RaspberryPi/setup.sh
+BOARDDIR=${BEAGLEBONE_BOARDDIR}
+. ${BEAGLEBONE_BOARDDIR}/setup.sh
+BOARDDIR=${RASPBERRY_PI_BOARDDIR}
+. ${RASPBERRY_PI_BOARDDIR}/setup.sh
+BOARDDIR=${MYBOARDDIR}
 
 # TODO: KERNCONF=GENERIC
-KERNCONF=BEAGLEBONE
+KERNCONF=RPI-B
 
 board_check_prerequisites ( ) (
     BOARDDIR=${BEAGLEBONE_BOARDDIR}
