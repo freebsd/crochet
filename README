@@ -1,17 +1,16 @@
-(This is the projet formerly known as freebsd-beaglebone aka beaglebsd.
-It has been significantly refactored and supports much more than
-just BeagleBone now, hence the name change.)
+Crochet is a tool for building bootable FreeBSD images for
+popular ARM-based development boards.
 
-This is a set of scripts and configuration files that
-can build a bootable FreeBSD image for some popular ARM-based
-development boards.
+It was formerly known as "freebsd-beaglebone" or "beaglebsd"
+as the original work was done for BeagleBone.  But it now supports
+a lot more boards (including non-ARM systems).
 
 ============================================================
 
 How to Build a Disk Image
 -------------------------
 
-The freebsdbuilder.sh script can build a complete bootable FreeBSD
+The crochet.sh script can build a complete bootable FreeBSD
 image ready to be copied to a suitable device (e.g., MicroSDHC card,
 Compact Flash card, disk drive, etc.).  The script runs on
 FreeBSD-CURRENT (March 2012 or later).
@@ -33,9 +32,9 @@ Using the script to build an image consists of a few steps:
    want to use.  The name here should exactly match a
    directory under "board/".
 
-3. RUN freebsdbuilder.sh as root
+3. RUN crochet.sh as root
 
-   $ sudo /bin/sh freebsdbuilder.sh
+   $ sudo /bin/sh crochet.sh
 
    The script will first check that you have any needed sources.
    If you don't, the script will tell you exactly how to obtain the
