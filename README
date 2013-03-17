@@ -7,8 +7,9 @@ development boards.
 How to Build a Disk Image
 -------------------------
 
-The beaglebsd.sh script can build a complete bootable FreeBSD image
-ready to be copied to a MicroSDHC card.  The script runs on
+The freebsdbuilder.sh script can build a complete bootable FreeBSD
+image ready to be copied to a suitable device (e.g., MicroSDHC card,
+Compact Flash card, disk drive, etc.).  The script runs on
 FreeBSD-CURRENT (March 2012 or later).
 
 Using the script to build an image consists of a few steps:
@@ -17,7 +18,8 @@ Using the script to build an image consists of a few steps:
 
    The board-specific directories each have a README
    with various details about running FreeBSD on a particular
-   system.
+   system.  (Some boards have several README files in
+   subdirectories with additional technical information.)
 
 2. EDIT config.sh
 
@@ -27,9 +29,9 @@ Using the script to build an image consists of a few steps:
    want to use.  The name here should exactly match a
    directory under "board/".
 
-3. RUN beaglebsd.sh as root
+3. RUN freebsdbuilder.sh as root
 
-   $ sudo /bin/sh beaglebsd.sh
+   $ sudo /bin/sh freebsdbuilder.sh
 
    The script will first check that you have any needed sources.
    If you don't, the script will tell you exactly how to obtain the
@@ -56,17 +58,37 @@ PROJECTS
 There are still plenty of ways this script could
 be improved:
 
- * More boards.  Currently, it supports Beaglebone,
-   RaspberryPi, and PandaBoard.  There are a lot of
-   other boards with similar concerns that could easily
-   be supported.
+ * More boards.  Currently, it supports Beaglebone, RaspberryPi, and
+   PandaBoard.  There are a lot of other boards with similar concerns
+   that could easily be supported.
 
- * Package Installation.  I would like to be able to
-   put a bunch of packages into board/NAME/packages and
-   have them installed onto the image.  The chroot technique
-   used by nanobsd won't work when cross-compiling, so we
-   need a different approach.  Maybe the new pkgng tool will
-   help?
+ * Non-ARM support.  I see no reason this script could not be used for
+   other architectures.  I just haven't done so yet.
 
- * Swap.  The script should allow you to specify a swap size
-   and automatically adjust the disk layout accordingly.
+ * Out-of-tree kernel configuration.  Right now, these scripts assume
+   kernel configuration files are in the FreeBSD source tree.  I don't
+   think config(8) requires this; it would be nice to be able to
+   include a tweaked kernel configuration as part of a board
+   definition.
+
+ * Package Installation.  I would like to be able to put a bunch of
+   packages into board/NAME/packages and have them installed onto the
+   image.  The nanobsd technique of using chroot won't work for
+   cross-compiling.  Fortunately, the new pkgng tools do (mostly)
+   support this; there are just a few minor bugs and small features
+   needed for this to work: Ask on one of the mailing lists if you'd
+   like to help extend pkgng to fully handle cross-architecture pkg
+   installs.
+
+ * Swap.  The script should allow you to specify a swap size and
+   automatically adjust the disk layout accordingly.  For now, board
+   definitions are mostly creating swap files in the FreeBSD
+   partition, which is easy and seems to work well enough.
+   (Complicating factor: For several reasons, I would prefer a swap
+   partition to precede the FreeBSD partition on the disk.)
+
+ * Support for read-only root and other more complex partitioning
+   approaches.
+
+ * NanoBSD-style split-partition support.  Ideally, this would be a
+   "mix in" capability that users could request with any board.

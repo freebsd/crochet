@@ -1,7 +1,5 @@
 KERNCONF=RPI-B
 RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
-VC_SRC=${TOPDIR}/vchiq-freebsd
-VC_USER_SRC=${TOPDIR}/vcuserland
 RPI_GPU_MEM=32
 
 # You can use the most up-to-date boot files from the RaspberryPi project:
@@ -13,6 +11,12 @@ RPI_FIRMWARE_SRC=${BOARDDIR}
 
 . ${BOARDDIR}/mkimage.sh
 . ${BOARDDIR}/videocore.sh
+
+# Note: A lot of the work here is done in "raspberry_pi_" functions.
+# The standard "board_" functions just delegate to the "raspberry_pi_"
+# versions.  This was done to simplify the (stil *very* experimental)
+# BeagleBonePlusRaspberryPi board that tries to install everything
+# for both boards onto a single image.
 
 raspberry_pi_check_prerequisites ( ) {
     uboot_test \
@@ -59,62 +63,63 @@ board_build_bootloader ( ) {
     raspberry_pi_build_bootloader
 }
 
-raspberry_pi_populate_boot_partition ( ) {
+board_partition_image ( ) {
+    disk_partition_mbr
+    # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
+    disk_fat_create 17m 16
+    disk_ufs_create
+}
 
+board_mount_partitions ( ) {
+    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
+    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+}
+
+raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi boot files to FAT partition
-    cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${FAT_MOUNT}
-    cp ${RPI_FIRMWARE_SRC}/boot/fixup.dat ${FAT_MOUNT}
-    cp ${RPI_FIRMWARE_SRC}/boot/fixup_cd.dat ${FAT_MOUNT}
-    cp ${RPI_FIRMWARE_SRC}/boot/start.elf ${FAT_MOUNT}
-    cp ${RPI_FIRMWARE_SRC}/boot/start_cd.elf ${FAT_MOUNT}
+    cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${BOARD_BOOT_MOUNTPOINT}
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup.dat ${BOARD_BOOT_MOUNTPOINT}
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup_cd.dat ${BOARD_BOOT_MOUNTPOINT}
+    cp ${RPI_FIRMWARE_SRC}/boot/start.elf ${BOARD_BOOT_MOUNTPOINT}
+    cp ${RPI_FIRMWARE_SRC}/boot/start_cd.elf ${BOARD_BOOT_MOUNTPOINT}
 
     # Configure Raspberry Pi boot files
-    cp ${RPI_FIRMWARE_SRC}/boot/config.txt ${FAT_MOUNT}
-    echo "gpu_mem=${RPI_GPU_MEM}" >> ${FAT_MOUNT}/config.txt
+    cp ${RPI_FIRMWARE_SRC}/boot/config.txt ${BOARD_BOOT_MOUNTPOINT}
+    echo "gpu_mem=${RPI_GPU_MEM}" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
 
     # RPi boot loader loads initial device tree file
     # Ubldr customizes this and passes it to the kernel.
     # (See overlay/boot/loader.rc)
-    freebsd_install_fdt bcm2835-rpi-b.dts ${FAT_MOUNT}/rpi-b.dtb
-    echo "device_tree=rpi-b.dtb" >> ${FAT_MOUNT}/config.txt
-    echo "device_tree_address=0x100" >> ${FAT_MOUNT}/config.txt
+    freebsd_install_fdt bcm2835-rpi-b.dts ${BOARD_BOOT_MOUNTPOINT}/rpi-b.dtb
+    echo "device_tree=rpi-b.dtb" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
+    echo "device_tree_address=0x100" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
 
     # Use Oleksandr's uboot.img file.
-    #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${FAT_MOUNT}
+    #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${BOARD_BOOT_MOUNTPOINT}
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    mkimage ${RPI_UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}/uboot.img
-    echo "kernel=uboot.img" >> ${FAT_MOUNT}/config.txt
-    cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${FAT_MOUNT}
+    mkimage ${RPI_UBOOT_SRC}/u-boot.bin ${BOARD_BOOT_MOUNTPOINT}/uboot.img
+    echo "kernel=uboot.img" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
+    cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${BOARD_BOOT_MOUNTPOINT}
 
     # Install ubldr to FAT partition
-    freebsd_ubldr_copy ${FAT_MOUNT}
+    freebsd_ubldr_copy ${BOARD_BOOT_MOUNTPOINT}
 
     # Experimental.
     # Copy kernel.bin to FAT partition
     #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
     #mkdir ${WORKDIR}/boot
     #freebsd_installkernel ${WORKDIR}
-    #cp ${WORKDIR}/boot/kernel/kernel.bin > ${FAT_MOUNT}/freebsd.bin
-    #echo "kernel=freebsd.bin" >> ${FAT_MOUNT}/config.txt
+    #cp ${WORKDIR}/boot/kernel/kernel.bin > ${BOARD_BOOT_MOUNTPOINT}/freebsd.bin
+    #echo "kernel=freebsd.bin" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
 }
 
-board_construct_boot_partition ( ) {
-    echo "Setting up boot partition"
-    FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
-    disk_fat_create 17m 16
-    disk_fat_mount ${FAT_MOUNT}
-
-    raspberry_pi_populate_boot_partition ${FAT_MOUNT}
-
-    cd ${FAT_MOUNT}
-    customize_boot_partition ${FAT_MOUNT}
-    disk_fat_unmount ${FAT_MOUNT}
-    unset FAT_MOUNT
+board_populate_boot_partition ( ) {
+    raspberry_pi_populate_boot_partition ${$BOARD_BOOT_MOUNTPOINT}
 }
 
-board_customize_freebsd_partition ( ) {
+board_populate_freebsd_partition ( ) {
+    generic_board_populate_freebsd_partition
     mkdir $1/boot/msdos
     freebsd_ubldr_copy_ubldr_help $1/boot
 }

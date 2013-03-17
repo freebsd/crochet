@@ -40,43 +40,35 @@ board_build_bootloader ( ) {
     beaglebone_build_bootloader
 }
 
+board_partition_image ( ) {
+    disk_partition_mbr
+    disk_fat_create 2m
+    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
+}
+
 beaglebone_populate_boot_partition ( ) {
     # Note that all of the BeagleBone boot files
     # start with 'BB' now (except for MLO, which can't
     # be renamed because it's loaded by the ROM).
     echo "Installing U-Boot onto the FAT partition"
-    cp ${BEAGLEBONE_UBOOT_SRC}/MLO ${FAT_MOUNT}
-    cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img ${FAT_MOUNT}/bb-uboot.img
-    cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}/bb-uEnv.txt
+    cp ${BEAGLEBONE_UBOOT_SRC}/MLO ${BOARD_BOOT_MOUNTPOINT}
+    cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img ${BOARD_BOOT_MOUNTPOINT}/bb-uboot.img
+    cp ${BOARDDIR}/bootfiles/uEnv.txt ${BOARD_BOOT_MOUNTPOINT}/bb-uEnv.txt
 
-    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/ubldr
-    freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dts
-    freebsd_install_fdt beaglebone.dts ${FAT_MOUNT}/bbone.dtb
-
-    # Temporary redundant copies for backwards compatibility.
-    cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img ${FAT_MOUNT}/u-boot.img
-    freebsd_ubldr_copy_ubldr ${FAT_MOUNT}/ubldr
-    cp ${BOARDDIR}/bootfiles/uEnv.txt ${FAT_MOUNT}/uenv.txt
+    # Issue: ubldr is actually board-specific right now, but only
+    # because of the link address.  Changing ubldr to a static binary
+    # (non-ELF) might address this.
+    freebsd_ubldr_copy_ubldr ${BOARD_BOOT_MOUNTPOINT}/bbubldr
+    freebsd_install_fdt beaglebone.dts ${BOARD_BOOT_MOUNTPOINT}/bbone.dts
+    freebsd_install_fdt beaglebone.dts ${BOARD_BOOT_MOUNTPOINT}/bbone.dtb
 }
 
-board_construct_boot_partition ( ) {
-    FAT_MOUNT=${WORKDIR}/_.mounted_fat
-    disk_fat_create 2m
-    disk_fat_mount ${FAT_MOUNT}
-
-    beaglebone_populate_boot_partition ${FAT_MOUNT}
-
-    cd ${FAT_MOUNT}
-    customize_boot_partition ${FAT_MOUNT}
-    disk_fat_unmount ${FAT_MOUNT}
-    unset FAT_MOUNT
+board_populate_boot_partition ( ) {
+    beaglebone_populate_boot_partition ${BOARD_BOOT_MOUNTPOINT}
 }
 
-board_customize_freebsd_partition ( ) {
+board_populatee_freebsd_partition ( ) {
+    generic_board_populate_freebsd_partition
     mkdir $1/boot/msdos
     freebsd_ubldr_copy_ubldr_help $1/boot
-
-    # XXX For experimentation, put a copy of the DTS/DTB in /boot
-    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dts
-    freebsd_install_fdt beaglebone.dts $1/boot/beaglebone.dtb
 }

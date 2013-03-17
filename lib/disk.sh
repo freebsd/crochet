@@ -1,4 +1,29 @@
 
+_DISK_MOUNTED=""  # List of things to be unmounted in an emergency.
+_DISK_MDS=""  # List of MDs that should be cleaned up on trap.
+disk_unmount ( ) {
+    cd ${TOPDIR}
+    for d in ${_DISK_MOUNTED}; do
+	echo umount $d
+	umount $d
+    done
+    _DISK_MOUNTED=""
+    for d in ${_DISK_MDS}; do
+	echo mdconfig -d -u  $d
+	mdconfig -d -u  $d
+    done
+    _DISK_MDS=""
+}
+
+# $1 - mount that should be cleaned up on exit.
+disk_record_mount ( ) {
+    _DISK_MOUNTED="${_DISK_MOUNTED} $1"
+}
+
+# $1 - md that should be cleaned up on exit.
+disk_record_md ( ) {
+    _DISK_MDS="${_DISK_MDS} $1"
+}
 
 # $1: full path of image file
 # $2: size of SD image
@@ -8,11 +33,7 @@ disk_create_image ( ) {
     [ -f $1 ] && rm -f $1
     dd if=/dev/zero of=$1 bs=512 seek=$(($2 / 512)) count=0 >/dev/null 2>&1
     _DISK_MD=`mdconfig -a -t vnode -f $1`
-}
-
-disk_release_image ( ) {
-    mdconfig -d -u ${_DISK_MD}
-    unset _DISK_MD
+    disk_record_md ${_DISK_MD}
 }
 
 # Partition the virtual disk using MBR.
@@ -67,14 +88,7 @@ disk_fat_mount ( ) {
     fi
     mkdir "$1"
     mount_msdosfs ${_DISK_FAT_DEV} "$1"
-}
-
-# $1: Mount point
-disk_fat_unmount ( ) {
-    echo "Unmounting FAT partition"
-    cd ${TOPDIR}
-    umount $1
-    rmdir $1
+    disk_record_mount ${_DISK_FAT_DEV}
 }
 
 # TODO: Make this work.
@@ -118,6 +132,7 @@ disk_ufs_mount ( ) {
     fi
     mkdir $1
     mount ${_DISK_UFS_DEV} $1
+    _DISK_MOUNTED="${_DISK_MOUNTED} ${_DISK_UFS_DEV}"
 }
 
 disk_add_swap_file ( ) {
@@ -125,12 +140,4 @@ disk_add_swap_file ( ) {
     dd if=/dev/zero of="usr/swap0" bs=1024k count=$1
     chmod 0600 "usr/swap0"
     echo 'swapfile="/usr/swap0"' >> etc/rc.conf
-}
-
-# $1: directory where UFS partition was mounted
-disk_ufs_unmount ( ) {
-    echo "Unmounting the UFS partition at "`date`
-    cd ${TOPDIR}
-    umount $1
-    rmdir $1
 }

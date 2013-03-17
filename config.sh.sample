@@ -25,14 +25,14 @@
 
 # REQUIRED: SD_SIZE
 #
-# Size of the disk image that will be built.
-# This is usually the same size as your card,
-# but it can be smaller.
+# Size of the disk image that will be built.  This is usually the same
+# size as your card, but it can be smaller.
 #
 # MB and GB are predefined for convenience here
 #
-# The sizes here are rounded down some to make
-# sure they fit on a matching card.
+# The sizes here are rounded down some to make sure they fit on a
+# matching card.  ($MB, $GB are pre-defined as 1000000 and 1000000000,
+# respectively.)
 #
 # SD_SIZE=$((100 * MB)) # for kernel-only images
 # SD_SIZE=$((1950 * MB)) # for 2 Gigabyte card
@@ -41,52 +41,64 @@
 # SD_SIZE=$((15900 * MB)) # for 16 Gigabyte card
 # SD_SIZE=$((31900 * MB)) # for 32 Gigabyte card
 
-# The board_setup above picks a default KERNCONF
-# but you can override it here.  (Overriding here
-# won't impact the default IMG filename; you may
-# want to change that below as well.)
+#
+# OPTIONAL STUFF
+#
+# Nothing below here is mandatory; setting a board and an SD_SIZE
+# should be enough to build a bootable image for a supported board.
+#
+# There are, of course, many other variables that you may want to
+# tweak.  Some of the more popular are described below.  Many others
+# can be found by reading the source code.  (Variables beginning with
+# "_" should not be touched.)
+#
+# The most advanced customizations may require defining a "customize"
+# shell function.  If you can't easily do what you want even with the
+# "customize" hooks, consider defining a custom board definition or
+# ask us for ideas.
+# 
+
+# The board_setup above picks a default KERNCONF but you can override
+# it here.  (Overriding here won't impact the default IMG filename;
+# you may want to change that below as well.)
 #
 # KERNCONF=MYCONF
 
-# The script assumes you're running a pretty recent
-# copy of FreeBSD-CURRENT and have FreeBSD-CURRENT
-# source code available in /usr/src.
+# The script assumes you're running a sufficiently recent copy of
+# FreeBSD and have FreeBSD-CURRENT source code available in /usr/src.
 
-# FreeBSD source that will be used for kernel,
-# world, and ubldr.
+# FreeBSD source that will be used for kernel, world, and ubldr.
 #
-# If you are already running on a sufficiently
-# recent FreeBSD-CURRENT, you can just use /usr/src here.
+# If you are already running on a sufficiently recent FreeBSD-CURRENT,
+# you can just use /usr/src here.
 #
 # FREEBSD_SRC=/usr/src
 
-# If you aren't running FreeBSD-CURRENT or cannot
-# update /usr/src, then uncomment the following.
+# If you aren't running FreeBSD-CURRENT or cannot update /usr/src,
+# then uncomment the following.
 #
-# This directory doesn't need to exist yet.
-# When you run the script, it will tell you how to get
-# appropriate sources into this directory.
+# This directory doesn't need to exist yet.  When you run the script,
+# it will tell you how to get appropriate sources into this directory.
 #
 # FREEBSD_SRC=$TOPDIR/freebsd-src
 
-# Directory to hold U-Boot source code.
-# U-Boot is a popular bootloader used on many different
-# boards.  This is ignored if the board configuration
-# you're using doesn't use U-Boot.
+# You probably will never override this, but you may need to
+# understand it: WORKDIR holds all of the created files (in
+# particular, the FreeBSD "obj" is redirected here).  It also holds a
+# lot of log files: If something goes wrong, there's probably a record
+# here.
 #
-# The U-Boot source is about 120MB. U-Boot will also be compiled
-# in this directory, so you'll need about 150MB total space here.
+# After successful world or kernel builds, a marker is put in this
+# directory; subsequent runs of this script check for the marker and
+# avoid rebuilding.  This makes it easy to tinker with the image
+# layout and build without having to wait on all of FreeBSD to build
+# every single time.
 #
-# This directory doesn't need to exist yet.
-# When you run the script, it will tell you how to get
-# appropriate sources into this directory if you need them.
+# In particular: If you need to do a clean build of everything from
+# scratch, remove the contents of $WORKDIR first.
 #
-# UBOOT_SRC=$TOPDIR/u-boot
+# WORKDIR=${TOPDIR}/work
 
-# Directory where build artifacts will go; this should be a
-# directory with enough space for the final disk image.
-#
-# WORKDIR=$TOPDIR/work
 
 # The name of the final disk image.
 # This file will be as large as SD_SIZE above, so make
@@ -97,27 +109,21 @@
 # Uncomment to suppress installworld.  This is
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
-# generation.  Set SD_SIZE to 80 * MB or even smaller if
-# you can:
+# generation.  Set SD_SIZE to 50 * MB or even smaller
+# to really shorten your build/test cycles:
 #
 # unset FREEBSD_INSTALL_WORLD
-
-# Uncomment to suppress installkernel.  Not often useful.
-#
-# unset FREEBSD_INSTALL_KERNEL
 
 # Uncomment to populate /usr/src with a copy
 # of the sources the image was built with.
 # You probably want at least a 4GB card.
-# (Requires FREEBSD_INSTALL_WORLD.)
 #
-# INSTALL_USR_SRC=yes
+# FREEBSD_INSTALL_USR_SRC=yes
 
 # Uncomment to fetch a fresh /usr/ports tree and put
 # it on the image.
-# (Requires FREEBSD_INSTALL_WORLD.)
 #
-# INSTALL_USR_PORTS=yes
+# FREEBSD_INSTALL_USR_PORTS=yes
 
 # Extra arguments for world.
 #
@@ -146,7 +152,13 @@
 # customization hooks are run.  For example, you can
 # put a custom passwd or fstab file into
 # ${WORKDIR}/overlay/etc.  If this file needs to be
-# built dynamically, you can build it here.
+# built dynamically, you can build it right here.
+
+# For example, if you want to just add an entry to fstab, try
+# something like this:
+#
+# cp ${BOARDDIR}/overlay/etc/fstab ${WORKDIR}/overlay/etc/fstab
+# echo "md /tmp mfs rw,noatime,-s30m 0 0" >> ${WORKDIR}/overlay/etc/fstab
 
 
 # GENERIC CUSTOMIZATION HOOKS
@@ -161,13 +173,10 @@
 #  * A FreeBSD partition holds the FreeBSD world
 #    (and usually kernel).
 #
-# These are constructed one at a time:  The
-# partition is created, mounted, files are copied
-# onto it, then the partition is unmounted.
-# The following shell functions are the very last
-# thing run before the partition is unmounted,
-# so you can effectively override or modify anything
-# done by earlier system-building phases.
+# The following functions are run after the
+# default board setup has run, so you can feel
+# free to delete or rearrange files on the image
+# as you see fit.
 #
 # WARNING:  Unlike some other system-building scripts,
 # these do *not* run in a chroot or jail.  (It can't
@@ -184,8 +193,7 @@
 # The lib/*.sh files also define a number of functions
 # that you may find useful here.
 #
-# # Runs after boot partition is built, just before it
-# # is unmounted.
+# # Runs after boot partition is built.
 # # $1 is the full path to the mounted boot partition
 # customize_boot_partition ( ) {
 # }
@@ -193,15 +201,21 @@
 # Note that the following runs even if FREEBSD_INSTALL_KERNEL
 # and FREEBSD_INSTALL_WORLD are not enabled.
 #
-# # Runs after FreeBSD partition is built and populated,
-# # just before it is unmounted.
+# # Runs after FreeBSD partition is built and populated.
 # # $1 is the full path to the mounted boot partition
 # customize_freebsd_partition ( ) {
 # }
 
-# TODO: Package installation.
-# I would like to be able to just drop some packages
-# in ${BOARDDIR}/packages and have the script install
-# them.  The old pkg_add tool couldn't really do this;
-# maybe pkgng can?
+# For example, here's another way to add an entry to the default fstab:
+#
+# customize_freebsd_partition ( ) {
+#   echo "md /tmp mfs rw,noatime,-s30m 0 0" >> $1/etc/fstab
+# }
 
+# If you can't do what you want with the above, try this:
+# customize_post_unmount is called after the image is fully created
+# and unmounted.  $1 is the filename of the constructed image file.
+# You can remount, resize partitions, change partition options, etc.
+# If you do anything interesting with this, please let me know.  (I've
+# never actually needed it and am dreadfully curious what someone
+# might use it for.)
