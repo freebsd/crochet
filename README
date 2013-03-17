@@ -1,5 +1,5 @@
-Crochet is a tool for building bootable FreeBSD images for
-popular ARM-based development boards.
+Crochet builds bootable FreeBSD images for a number of
+popular boards.
 
 It was formerly known as "freebsd-beaglebone" or "beaglebsd"
 as the original work was done for BeagleBone.  But it now supports
