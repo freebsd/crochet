@@ -1,6 +1,9 @@
 KERNCONF=BEAGLEBONE
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-beaglebone-freebsd
 
+__MAKE_CONF=${BOARDDIR}/make.conf
+export __MAKE_CONF
+
 beaglebone_check_prerequisites ( ) {
     freebsd_current_test
 
