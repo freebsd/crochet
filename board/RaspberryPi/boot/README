@@ -39,6 +39,9 @@ That partition must be formatted as FAT16 or FAT32.
 
 * start.elf reads config.txt and uses it to configure the hardware.
 
+* Optional: start.elf loads an FDT machine description into memory
+  at a fixed address.
+
 * Optional: start.elf reads cmdline.txt with arguments for kernel.img
 
 The next part depends on what OS you are loading.  In any
@@ -76,9 +79,18 @@ start.elf loads the u-boot.bin file:
 
 * u-boot loads and initializes
 
+* U-Boot loads either uEnv.txt or uBoot.scr to configure
+  itself.  Among other things, these files should tell
+  U-Boot where the FDT file is located in memory.
+
 * u-boot loads ubldr from the FAT partition.
   ubldr is a version of the FreeBSD standard loader(8) which
   uses the u-boot API to access the hardware.
+
+* ubldr initializes, finds U-Boot in memory so it
+  can use U-Boot API for hardware access
+
+* ubldr gets the FDT address from U-Boot
 
 * ubldr locates a UFS partition on the SD card.
 
@@ -86,6 +98,9 @@ start.elf loads the u-boot.bin file:
   boot-time parameters.
 
 * ubldr loads the FreeBSD kernel from UFS
+
+* ubldr attaches the FDT to the kernel so the
+  the kernel will find it.
 
 * The FreeBSD kernel initializes and runs.
 
@@ -95,7 +110,9 @@ PHASE TWO for FreeBSD without ubldr:
 ====================================
 
 It should be possible to load the FreeBSD kernel directly from U-Boot
-or even directly from start.elf.
+or even directly from start.elf.  This might require teaching the
+FreeBSD kernel how to more fully utilize the Linux-format boot
+information provided by U-Boot.
 
 Pro: Potentially faster booting by eliminating the U-Boot and
 ubldr phases.

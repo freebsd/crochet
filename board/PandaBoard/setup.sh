@@ -31,7 +31,4 @@ board_construct_boot_partition ( ) {
     cp ${UBOOT_SRC}/u-boot.bin ${FAT_MOUNT}
 
     freebsd_ubldr_copy ${FAT_MOUNT}
-
-    disk_fat_unmount ${FAT_MOUNT}
-    unset FAT_MOUNT
 }

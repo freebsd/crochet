@@ -61,7 +61,9 @@ and UFS partitions containing the following files:
      bootcode.bin - First stage boot
      start.elf - Second stage boot
      config.txt - configuration for start.elf
-     ubldr - Third stage: FreeBSD bootloader
+     uboot.bin - Third stage: U-Boot loader
+     uEnv.txt - configuration file for U-Boot
+     ubldr - Fourth stage: FreeBSD bootloader
 
   UFS Partition
      /boot/kernel - dynamic kernel
@@ -70,13 +72,5 @@ and UFS partitions containing the following files:
 More details on RaspberryPi boot sequence can
 be found in the README file in the "boot"
 directory.
-
-(Note that the "Phase One" RaspberryPi boot
-process is still evolving.)
-
-Note:  I suspect there may be merit in having
-start.elf load the FreeBSD kernel directly, bypassing
-ubldr.  There are some issues still to be resolved
-before this is feasible.
 
 ========================================================================
