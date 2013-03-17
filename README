@@ -1,3 +1,7 @@
+(This is the projet formerly known as freebsd-beaglebone aka beaglebsd.
+It has been significantly refactored and supports much more than
+just BeagleBone now, hence the name change.)
+
 This is a set of scripts and configuration files that
 can build a bootable FreeBSD image for some popular ARM-based
 development boards.
