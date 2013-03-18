@@ -120,6 +120,6 @@ board_populate_boot_partition ( ) {
 
 board_populate_freebsd_partition ( ) {
     generic_board_populate_freebsd_partition
-    mkdir $1/boot/msdos
-    freebsd_ubldr_copy_ubldr_help $1/boot
+    mkdir ${BOARD_FREEBSD_MOUNTPOINT}/boot/msdos
+    freebsd_ubldr_copy_ubldr_help ${BOARD_FREEBSD_MOUNTPOINT}/boot
 }

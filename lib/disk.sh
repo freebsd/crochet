@@ -1,10 +1,11 @@
 
-_DISK_MOUNTED=""  # List of things to be unmounted in an emergency.
-_DISK_MDS=""  # List of MDs that should be cleaned up on trap.
+_DISK_MDS=""  # List of MDs to clean up
+_DISK_MOUNTED_DIRS=""  # List of things to be unmounted when we're done
 disk_unmount_all ( ) {
     cd ${TOPDIR}
-    for d in ${_DISK_MOUNTED}; do
+    for d in ${_DISK_MOUNTED_DIRS}; do
 	umount $d
+	rmdir $d
     done
     _DISK_MOUNTED=""
     for d in ${_DISK_MDS}; do
@@ -14,7 +15,7 @@ disk_unmount_all ( ) {
 }
 
 # $1 - mount that should be cleaned up on exit.
-disk_record_mount ( ) {
+disk_record_mountdir ( ) {
     _DISK_MOUNTED="${_DISK_MOUNTED} $1"
 }
 
@@ -82,13 +83,13 @@ disk_fat_mount ( ) {
     echo "Mounting FAT partition"
     if [ -d "$1" ]; then
 	echo "   Removing already-existing mount directory."
-	umount "$1"
-	rmdir "$1"
+	umount $1
+	rmdir $1
 	echo "   Removed pre-existing mount directory; creating new one."
     fi
-    mkdir "$1"
-    mount_msdosfs ${_DISK_FAT_DEV} "$1"
-    disk_record_mount ${_DISK_FAT_DEV}
+    mkdir $1
+    mount_msdosfs ${_DISK_FAT_DEV} $1
+    disk_record_mountdir $1
 }
 
 # TODO: Make this work.
@@ -127,7 +128,7 @@ disk_ufs_create ( ) {
 # $1: directory where UFS partition will be mounted
 disk_ufs_mount ( ) {
     echo "Mounting UFS partition"
-    if [ -d $1 ]; then
+    if [ -d "$1" ]; then
 	echo "   Removing already-existing mount directory."
 	umount $1
 	rmdir $1
@@ -135,7 +136,7 @@ disk_ufs_mount ( ) {
     fi
     mkdir $1 || exit 1
     mount ${_DISK_UFS_DEV} $1 || exit 1
-    disk_record_mount ${_DISK_UFS_DEV}
+    disk_record_mountdir $1
 }
 
 disk_add_swap_file ( ) {
