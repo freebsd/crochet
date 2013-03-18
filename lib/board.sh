@@ -106,3 +106,6 @@ generic_board_show_message ( ) {
 board_show_message ( ) {
     generic_board_show_message
 }
+
+board_post_unmount ( ) {
+}

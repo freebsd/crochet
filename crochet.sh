@@ -26,7 +26,7 @@ customize_post_unmount ( ) { }
 
 handle_trap ( ) {
     echo "Abort requested!"
-    disk_cleanup
+    disk_unmount_all
     exit
 }
 trap handle_trap INT QUIT KILL
@@ -64,7 +64,7 @@ customize_boot_partition
 customize_freebsd_partition
 
 # Unmount all the partitions, clean up the MD node, etc.
-disk_unmount
+disk_unmount_all
 
 # Some people might need to play games with partitions after they're
 # unmounted.  (E.g., NanoBSD-style duplicate partitions or tunefs.)

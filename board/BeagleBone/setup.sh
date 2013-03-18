@@ -46,7 +46,12 @@ board_build_bootloader ( ) {
 board_partition_image ( ) {
     disk_partition_mbr
     disk_fat_create 2m
+    disk_ufs_create
+}
+
+board_mount_partitions ( ) {
     disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
+    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
 }
 
 beaglebone_populate_boot_partition ( ) {

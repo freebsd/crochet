@@ -1,15 +1,13 @@
 
 _DISK_MOUNTED=""  # List of things to be unmounted in an emergency.
 _DISK_MDS=""  # List of MDs that should be cleaned up on trap.
-disk_unmount ( ) {
+disk_unmount_all ( ) {
     cd ${TOPDIR}
     for d in ${_DISK_MOUNTED}; do
-	echo umount $d
 	umount $d
     done
     _DISK_MOUNTED=""
     for d in ${_DISK_MDS}; do
-	echo mdconfig -d -u  $d
 	mdconfig -d -u  $d
     done
     _DISK_MDS=""
@@ -102,6 +100,7 @@ disk_swap_create ( ) {
 disk_ufs_create ( ) {
     echo "Creating the UFS partition at "`date`
 
+    # TODO: Can we obtain the slice information from gpart?
     gpart add -t freebsd ${_DISK_MD}
     _DISK_UFS_SLICE_NUMBER=2
     _DISK_UFS_SLICE=s${_DISK_UFS_SLICE_NUMBER}
@@ -127,12 +126,13 @@ disk_ufs_create ( ) {
 disk_ufs_mount ( ) {
     echo "Mounting UFS partition"
     if [ -d $1 ]; then
+	echo "   Removing already-existing mount directory."
 	umount $1
 	rmdir $1
     fi
-    mkdir $1
-    mount ${_DISK_UFS_DEV} $1
-    _DISK_MOUNTED="${_DISK_MOUNTED} ${_DISK_UFS_DEV}"
+    mkdir $1 || exit 1
+    mount ${_DISK_UFS_DEV} $1 || exit 1
+    disk_record_mount ${_DISK_UFS_DEV}
 }
 
 disk_add_swap_file ( ) {
