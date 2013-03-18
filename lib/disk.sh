@@ -79,10 +79,12 @@ disk_fat_create ( ) {
 
 # $1: Directory where FAT partition will be mounted
 disk_fat_mount ( ) {
-    echo "Mounting the virtual FAT partition"
+    echo "Mounting FAT partition"
     if [ -d "$1" ]; then
+	echo "   Removing already-existing mount directory."
 	umount "$1"
 	rmdir "$1"
+	echo "   Removed pre-existing mount directory; creating new one."
     fi
     mkdir "$1"
     mount_msdosfs ${_DISK_FAT_DEV} "$1"
@@ -129,6 +131,7 @@ disk_ufs_mount ( ) {
 	echo "   Removing already-existing mount directory."
 	umount $1
 	rmdir $1
+	echo "   Removed pre-existing mount directory; creating new one."
     fi
     mkdir $1 || exit 1
     mount ${_DISK_UFS_DEV} $1 || exit 1
