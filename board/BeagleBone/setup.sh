@@ -72,7 +72,7 @@ beaglebone_populate_boot_partition ( ) {
 }
 
 board_populate_boot_partition ( ) {
-    beaglebone_populate_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+    beaglebone_populate_boot_partition
 }
 
 board_populatee_freebsd_partition ( ) {

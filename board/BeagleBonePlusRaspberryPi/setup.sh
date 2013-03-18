@@ -53,9 +53,9 @@ board_mount_partitions ( ) {
 
 board_populate_boot_partition ( ) {
     BOARDDIR=${BEAGLEBONE_BOARDDIR}
-    beaglebone_populate_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+    beaglebone_populate_boot_partition
     BOARDDIR=${RASPBERRY_PI_BOARDDIR}
-    raspberry_pi_populate_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+    raspberry_pi_populate_boot_partition
     BOARDDIR=${MYBOARDDIR}
 }
 

@@ -115,7 +115,7 @@ raspberry_pi_populate_boot_partition ( ) {
 }
 
 board_populate_boot_partition ( ) {
-    raspberry_pi_populate_boot_partition ${$BOARD_BOOT_MOUNTPOINT}
+    raspberry_pi_populate_boot_partition
 }
 
 board_populate_freebsd_partition ( ) {
