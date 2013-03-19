@@ -4,10 +4,11 @@ _DISK_MOUNTED_DIRS=""  # List of things to be unmounted when we're done
 disk_unmount_all ( ) {
     cd ${TOPDIR}
     for d in ${_DISK_MOUNTED_DIRS}; do
+	echo "Unmounting $d"
 	umount $d
 	rmdir $d
     done
-    _DISK_MOUNTED=""
+    _DISK_MOUNTED_DIRS=""
     for d in ${_DISK_MDS}; do
 	mdconfig -d -u  $d
     done
@@ -16,7 +17,7 @@ disk_unmount_all ( ) {
 
 # $1 - mount that should be cleaned up on exit.
 disk_record_mountdir ( ) {
-    _DISK_MOUNTED="${_DISK_MOUNTED} $1"
+    _DISK_MOUNTED_DIRS="${_DISK_MOUNTED_DIRS} $1"
 }
 
 # $1 - md that should be cleaned up on exit.
