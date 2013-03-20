@@ -29,7 +29,7 @@ handle_trap ( ) {
     disk_unmount_all
     exit
 }
-trap handle_trap INT QUIT KILL
+trap handle_trap INT QUIT KILL EXIT
 
 #
 # Load user configuration
@@ -60,8 +60,19 @@ board_mount_partitions
 #
 board_populate_boot_partition
 board_populate_freebsd_partition
-customize_boot_partition
-customize_freebsd_partition
+
+if cd ${BOARD_BOOT_MOUNTPOINT}; then
+    customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+else
+    echo "Skipping customize_boot_partition, since there isn't one."
+fi
+if cd ${BOARD_FREEBSD_MOUNTPOINT}; then
+    customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
+else
+    echo "This is bad: there is no FreeBSD mountpoint."
+    exit 1
+fi
+cd ${TOPDIR}
 
 # Unmount all the partitions, clean up the MD node, etc.
 disk_unmount_all
