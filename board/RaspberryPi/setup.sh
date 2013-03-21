@@ -105,6 +105,11 @@ raspberry_pi_populate_boot_partition ( ) {
     # Install ubldr to FAT partition
     freebsd_ubldr_copy ${BOARD_BOOT_MOUNTPOINT}
 
+    # XXX For production use, we could boot faster by
+    # bypassing u-boot and ubldr.  That requires the kernel
+    # to accept the FDT directly from the RPi boot loader
+    # using Linux kernel conventions.
+
     # Experimental.
     # Copy kernel.bin to FAT partition
     #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'

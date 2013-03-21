@@ -1,6 +1,6 @@
 --- u-boot-2012.07-orig/include/configs/omap4_common.h	2012-07-31 02:24:37.000000000 +0800
 +++ u-boot-2012.07/include/configs/omap4_common.h	2012-10-09 15:42:30.248845843 +0800
-@@ -124,11 +124,14 @@
+@@ -124,11 +124,16 @@
  #include <config_cmd_default.h>
  
  /* Enabled commands */
@@ -9,9 +9,11 @@
  #define CONFIG_CMD_I2C		/* I2C serial bus support	*/
  #define CONFIG_CMD_MMC		/* MMC support                  */
  
++#ifndef CONFIG_SPL_BUILD
 +#define CONFIG_CMD_ELF
 +#define CONFIG_API
 +#define CONFIG_SYS_MMC_MAX_DEVICE 1
++#endif
 +
  /* Disabled commands */
  #undef CONFIG_CMD_NET
