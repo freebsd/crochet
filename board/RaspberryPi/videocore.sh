@@ -24,8 +24,8 @@ videocore_build ( ) {
     echo "Building VideoCore kernel module"
     cd ${FREEBSD_SRC}
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
-    echo "buildenv: $buildenv"
-    eval $buildenv SYSDIR=${FREEBSD_SRC}/sys MAKESYSPATH=${FREEBSD_SRC}/share/mk make -C ${RPI_VC_SRC} || exit 1
+    cd ${RPI_VC_SRC}
+    eval $buildenv SYSDIR=${FREEBSD_SRC}/sys MAKESYSPATH=${FREEBSD_SRC}/share/mk make || exit 1
 
     touch ${WORKDIR}/_.built-videocore-module
 }
