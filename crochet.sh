@@ -25,7 +25,6 @@ customize_freebsd_partition ( ) { }
 customize_post_unmount ( ) { }
 
 handle_trap ( ) {
-    echo "Abort requested!"
     disk_unmount_all
     exit
 }
