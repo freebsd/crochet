@@ -10,6 +10,7 @@ disk_unmount_all ( ) {
     done
     _DISK_MOUNTED_DIRS=""
     for d in ${_DISK_MDS}; do
+	echo "Releasing $d"
 	mdconfig -d -u  $d
     done
     _DISK_MDS=""
