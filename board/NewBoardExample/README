@@ -10,13 +10,13 @@ About U-Boot
 --------------------------------
 
 A lot of boards use U-Boot to boot FreeBSD.  U-Boot is a widely-used
-boot loader that has support for very many different boards and
-continues to be actively maintained.
+Linux boot loader that has support for very many different boards and
+is being actively maintained.
 
-There are many forks of U-Boot being maintained by different
-groups of people to support different boards.  Generally, the
-master U-Boot project at denx.de has been good about adding
-new board support to the master sources as such support stabilizes.
+There are many forks of U-Boot created by different groups of people
+to support different boards.  Generally, the master U-Boot project at
+denx.de has been good about adding new board support to the master
+sources as such support stabilizes.
 
 With FreeBSD/ARM, U-Boot is often paired with ubldr.  ubldr is part of
 the FreeBSD source tree; it is a variant of FreeBSD's loader(8)
@@ -43,7 +43,7 @@ U-Boot you're building against.
 ubldr uses the "U-Boot API" to call into U-Boot for
 hardware interaction.  This requires adding code similar
 to the following to the appropriate board configuration
-in include/configs/someboard.h:
+in _uboot_sources_/include/configs/someboard.h:
 
     #ifndef CONFIG_SPL_BUILD
     #define CONFIG_API
@@ -74,12 +74,13 @@ should generally:
 Building U-Boot in Crochet
 --------------------------------
 
-Crochet is designed so that tools such as U-Boot are
-always built directly from source.  This requires that
-you test carefully:
+Crochet is designed so that tools such as U-Boot are always built
+directly from source.  (The existence of binary blobs in the Crochet
+project itself is generally a bug.)  This requires that you test
+carefully and be aware of a few issues:
 
-* The setup.sh should use uboot_test and provide an accurate set of
-  instructions for downloading appropriate U-Boot source.  (Try the
+* The board setup.sh should use uboot_test and provide an accurate set
+  of instructions for downloading appropriate U-Boot source.  (Try the
   BeagleBone or RaspberryPi builds to see how this should work.)
 
 * U-Boot is patched, configured, and built directly within the
