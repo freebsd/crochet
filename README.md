@@ -68,7 +68,8 @@ be improved:
 
 * More boards.  Currently, it supports Beaglebone, RaspberryPi, and
   PandaBoard.  There are a lot of other boards with similar concerns
-  that could easily be supported.
+  that could easily be supported.  Look at board/NewBoardExample for
+  explanations for adding support for a new board.
 
 * Non-ARM support.  I see no reason this script could not be used for
   other architectures.  I just haven't done so yet.
