@@ -23,6 +23,9 @@ it to Ethernet, adding USB peripherals (such as external disk drives
 or wireless network interfaces) or attaching new hardware to the
 connectors on the board.
 
+Note: We believe this image will also work on the "next-gen
+BeagleBone" but as of March 2013 have not yet had a chance to try it.
+
 ============================================================
 
 How to boot the BeagleBone
@@ -61,9 +64,11 @@ and UFS partitions containing the following files:
 
   FAT Partition
      MLO  - First stage boot, from U-Boot
-     u-boot.img - Second stage: U-Boot
-     uEnv.txt - configuration for U-Boot
-     ubldr - Third stage: FreeBSD bootloader
+     BB-uboot.img - Second stage: U-Boot
+     BB-uEnv.txt - configuration for U-Boot
+     BBONE.DTB - Binary FDT
+     BBONE.DTS - Source FDT for reference
+     BBubldr - Third stage: FreeBSD bootloader
 
   UFS Partition
      /boot/kernel - dynamic kernel
@@ -78,14 +83,14 @@ The boot process works like this:
     under 110k to fit within the on-chip RAM.  MLO here is a
     stripped-down version of U-Boot.
 
- 2) MLO loads u-boot.img from the first FAT partition.
+ 2) MLO loads BB-UBOOT.IMG from the first FAT partition.
 
     U-Boot is a highly modular boot loader system that can be used on
     a wide variety of systems.  The loader is configured with built-in
     script commands that can be partially overridden by additional
-    commands in the uEnv.txt file.
+    commands in the BB-uEnv.txt file.
 
- 3) U-Boot loads uEnv.txt and follows those commands to load ubldr at
+ 3) U-Boot loads BB-uEnv.txt and follows those commands to load BBubldr at
     address 0x88000000.
 
     ubldr is a variant of FreeBSD's standard loader(8) program that is
@@ -96,16 +101,22 @@ The boot process works like this:
  4) ubldr locates the UFS partition, loads /boot/kernel/kernel from
     UFS to address 0x80200000 and executes it.
 
+Note: Except for MLO, which must have exactly that name
+in order to be found and loaded by the ROM code, all the
+FAT partition boot files begin with "BB."  This was done
+to allow more than one boot system to reside on the same
+disk image.  See the BeagleBonePlusRaspberryPi board definition
+for more details about this.
+
 ============================================================
 
 NATIVE SOURCE REBUILDS
 ---------------------------------------
 
-One of my goals is for the usual "make buildworld",
-"make installworld", "make buildkernel", and
-"make installkernel" to all work natively on the BeagleBone.
-A few people have had success, though a buildworld
-seems to take more than 30 hours.
+The usual "make buildworld", "make installworld",
+"make buildkernel", and "make installkernel" all work
+natively on the BeagleBone.  Due to limited memory and
+slow speed of SD, this can take 30-40 hours:
 
  $ make buildworld
  $ make installworld
@@ -131,36 +142,36 @@ download and install a ports tree, build the subversion
 port, and checkout the FreeBSD source code using that.
 This works, I've done it.
 
-============================================================
+================================================================
 
 PROJECTS
------------------------------------------
+--------------------------------
 
 If you're interested, there are a lot of things still to
 be done:
 
- * Use the system.  The stability has been generally improving
-   but the more people use and stress it, the more issues we'll
-   be able to shake out.  Report any problems on freebsd-arm
-   mailing list.
- * Test ports.  I've tried building a few ports natively with
-   somewhat mixed success.  Try things and let us know what
-   you find.
- * USB.  Oleksandr has a patchset floating around but it's
-   incomplete.  Ask if you're interested.
- * GPIO.  Some initial GPIO work is done but there are
-   evolving ideas about how to make the GPIO framework
-   more robust.
- * Other drivers.  The AM3358 SoC has a lot of hardware
-   components that are still unsupported.
- * Refining the system configuration:  A machine with only
-   256MB RAM probably should not have sendmail, syslog, and
-   other daemons started by default.
- * Memory.  Some recent change reduced available memory quite
-   a bit.  Easy fix is to turn off things in rc.conf.
-   There are probably also kernel tweaks possible.
- * USB client.  The Linux distros have a virtual Ethernet
-   client that allows true single-cable development.  I would
-   like to do something similar for FreeBSD.
+* Use the system.  The stability has been generally improving
+  but the more people use and stress it, the more issues we'll
+  be able to shake out.  Report any problems on freebsd-arm
+  mailing list.
+* Test ports.  I've tried building a few ports natively with
+  somewhat mixed success.  Try things and let us know what
+  you find.
+* USB.  Oleksandr has a patchset floating around but it's
+  incomplete.  Ask if you're interested.
+* GPIO.  Some initial GPIO work is done but there are
+  evolving ideas about how to make the GPIO framework
+  more robust.
+* Other drivers.  The AM3358 SoC has a lot of hardware
+  components that are still unsupported.
+* Refining the system configuration:  A machine with only
+  256MB RAM probably should not have sendmail, syslog, and
+  other daemons started by default.
+* Memory.  Some recent change reduced available memory quite
+  a bit.  Easy fix is to turn off things in rc.conf.
+  There are probably also kernel tweaks possible.
+* USB client.  The Linux distros have a virtual Ethernet
+  client that allows true single-cable development.  I would
+  like to do something similar for FreeBSD.
 
 ============================================================

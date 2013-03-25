@@ -1,11 +1,4 @@
-Crochet builds bootable FreeBSD images for a number of popular
-boards, including:
-
-* <a href="tree/master/board/BeagleBone/">BeagleBone</a>
-* <a href="tree/master/board/RaspberryPi/">Raspberry Pi</a>
-* <a href="tree/master/board/PandaBoard/">PandaBoard</a>
-* <a href="tree/master/board/VersatilePB/">VersatileBP</a>
-* <a href="tree/master/board/BeagleBonePlusRaspberryPi/">Generic ARM</a>
+Crochet builds bootable FreeBSD images for a number of popular boards.
 
 This tool was formerly known as "freebsd-beaglebone" or
 "beaglebsd" as the original work was done for BeagleBone.
@@ -25,12 +18,16 @@ have had success running it on FreeBSD 9-STABLE.
 
 Using the script to build an image consists of a few steps:
 
-1. READ board/<board-name>/README
+1. READ board/*board-name*/README
 
    The board-specific directories each have a README
    with various details about running FreeBSD on a particular
    system.  (Some boards have several README files in
    subdirectories with additional technical information.)
+
+   If you are looking at this on the Github web
+   interface, click "board" above to see more about
+   the boards that are currently supported.
 
 2. EDIT config.sh
 
@@ -59,7 +56,7 @@ Using the script to build an image consists of a few steps:
 
 5. BOOT the image on your board.
 
-   Again, read board/<board-name>/README for details.
+   Again, read board/*board-name*/README for details.
 
 ***********************************************************
 
