@@ -1,0 +1,18 @@
+This is a *VERY* experimental ongoing project to build a
+FreeBSD/arm system image that can boot on more than one
+system.
+
+In this case, the two systems I'm targeting are BeagleBone
+and RaspberryPi.
+
+This board definition successfully installs a full set of
+boot bits for both boards:  The result can load a FreeBSD
+kernel on either system and present that kernel with the
+correct machine-specific FDT data.
+
+Unfortunately, there is not yet a single FreeBSD kernel that
+can actually run on either system, although several people
+are actively working on it.  There are a number of issues
+that need to be addressed before this is possible; please
+ask on the freebsd-arm mailing list if you have questions
+or would like to help with this effort.
