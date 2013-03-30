@@ -1,0 +1,10 @@
+The AutoSize option adds a startup command that will attempt to use
+growfs to enlarge the FreeBSD partition.
+
+This allows you to create and distribute a relatively small image that
+will automatically expand to fill whatever media it is installed on.
+
+For example, you could create a 1GB RaspberryPi image that would fit
+on a small 1GB SD card but could also be copied onto a 32GB SD card.
+In the latter case, the filesystem would be automatically expanded on
+the first boot to fill the card.

@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# PROVIDE: autosize
+# BEFORE: sysctl
+# KEYWORD: firstbootonly
+
+# Special for BeagleBone.
+#
+# Automatically grow mmcsd0s2a to fill the
+# entire SD card.
+#
+# This allows us to distribute a single image
+# and have it work on essentially any size SD card.
+#
+# TODO: Make this more generic; it currently has
+# the partition name(s) hardcoded.
+#
+# TODO: Figure out a clean way to have this run
+# only on first boot.  (We can't write anything to
+# disk here since the root disk is still mounted
+# read-only at this point.)  Fortunately, it completes
+# very quickly if it can't actually grow the partition.
+#
+# TODO: Figure out where this should really be ordered.
+# I suspect it should go just after fsck but before mountcritlocal
+# but it's hard to tell for sure because of the bug described
+# below.
+# 
+
+. /etc/rc.subr
+
+name="autosize"
+start_cmd="autosize_start"
+stop_cmd=":"
+rcvar="autosize_enable"
+
+autosize_start ()
+{
+    echo "Enlarging root partition"
+    gpart resize -i 2 mmcsd0
+    # XXX There seems to be a bug in "gpart resize": If the previous
+    # resize actually changed anything, then the following resize
+    # won't actually do anything.  In practice, this means we need two
+    # boots for the full resize and growfs to succeed.
+    gpart resize -i 1 mmcsd0s2
+    growfs -y /dev/mmcsd0s2a
+}
+
+load_rc_config $name
+run_rc_command "$1"
