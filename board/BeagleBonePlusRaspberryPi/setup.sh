@@ -22,22 +22,23 @@ BOARDDIR=${RASPBERRY_PI_BOARDDIR}
 . ${RASPBERRY_PI_BOARDDIR}/setup.sh
 BOARDDIR=${MYBOARDDIR}
 
-# TODO: KERNCONF=GENERIC
-KERNCONF=RPI-B
+KERNCONF=GENERIC
 
-board_check_prerequisites ( ) (
+board_check_prerequisites ( ) {
     BOARDDIR=${BEAGLEBONE_BOARDDIR}
     beaglebone_check_prerequisites
     BOARDDIR=${RASPBERRY_PI_BOARDDIR}
     raspberry_pi_check_prerequisites
-)
+    BOARDDIR=${MYBOARDDIR}
+}
 
-board_build_bootloader ( ) (
+board_build_bootloader ( ) {
     BOARDDIR=${BEAGLEBONE_BOARDDIR}
     beaglebone_build_bootloader
     BOARDDIR=${RASPBERRY_PI_BOARDDIR}
     raspberry_pi_build_bootloader
-)
+    BOARDDIR=${MYBOARDDIR}
+}
 
 board_partition_image ( ) {
     disk_partition_mbr
