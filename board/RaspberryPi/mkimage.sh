@@ -1,6 +1,6 @@
 
 mkimage_check ( ) {
-    if python --version; then
+    if python --version >/dev/null 2>&1; then
 	true
     else
 	echo "Need Python to run RaspberryPi mkimage tool"
