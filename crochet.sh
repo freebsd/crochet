@@ -68,7 +68,7 @@ freebsd_buildkernel
 board_build_bootloader
 
 #
-# Create and partition the image(s)
+# Create the image, partition it, and mount the partitions.
 #
 board_create_image ${IMG} ${SD_SIZE}
 board_partition_image
@@ -80,15 +80,15 @@ board_mount_partitions
 board_populate_boot_partition
 board_populate_freebsd_partition
 
-if cd ${BOARD_BOOT_MOUNTPOINT}; then
+if cd ${BOARD_BOOT_MOUNTPOINT} >/dev/null 2>&1; then
     customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
 else
-    echo "Skipping customize_boot_partition, since there isn't one."
+    echo "No separate boot partition; skipping customize_boot_partition."
 fi
 if cd ${BOARD_FREEBSD_MOUNTPOINT}; then
     customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
 else
-    echo "This is bad: there is no FreeBSD mountpoint."
+    echo "This is bad: there is no FreeBSD partition."
     exit 1
 fi
 cd ${TOPDIR}
