@@ -96,12 +96,12 @@ _freebsd_build ( ) {
     echo "Building FreeBSD $1 $2 at "`date`
     echo "    (Logging to ${WORKDIR}/_.build$1.$2.log)"
 
-    if [ -f ${WORKDIR}/_.built-$1 ]
+    if [ -f ${WORKDIR}/_.built-$1.$2 ]
     then
 	echo " Rebuilding because previous build$1 used different flags:"
 	echo " Old: "`cat ${WORKDIR}/_.built-$1.$2`
 	echo " new: "`cat ${WORKDIR}/_.build$1.$2.sh`
-	rm ${WORKDIR}/_.built-$1.$2
+	rm -f ${WORKDIR}/_.built-$1.$2
     fi
 
     cd $FREEBSD_SRC
