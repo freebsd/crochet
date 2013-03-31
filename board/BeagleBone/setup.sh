@@ -6,6 +6,7 @@ export __MAKE_CONF
 
 beaglebone_check_prerequisites ( ) {
     freebsd_current_test
+    freebsd_dtc_test
 
     # I used to use the Arago project sources directly, but those
     # change quickly and I got tired of chasing patches.  If you want

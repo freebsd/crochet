@@ -39,6 +39,23 @@ freebsd_download_instructions ( ) {
     exit 1
 }
 
+freebsd_dtc_test ( ) {
+    if dtc -v >/dev/null
+    then
+	true
+    else
+	echo "You need the dtc compiler installed on your system."
+	echo "Newer versions of FreeBSD have this installed by default."
+	echo "On older FreeBSD versions:"
+	echo "  $ cd /usr/src/usr.bin/dtc"
+	echo "  $ make"
+	echo "  $ make install"
+	echo ""
+	echo "Rerun this script after you install it."
+	exit 1
+    fi
+}
+
 # freebsd_src_test: Check FreeBSD src tree
 #
 # $1: Name of kernel configuration
@@ -53,7 +70,8 @@ freebsd_src_test ( ) {
 	freebsd_download_instructions "$@"
 	exit 1
     fi
-    echo "Found suitable FreeBSD source tree in $FREEBSD_SRC"
+    echo "Found suitable FreeBSD source tree in:"
+    echo "    $FREEBSD_SRC"
 }
 
 # freebsd_current_test:  Check that FreeBSD-CURRENT sources are available

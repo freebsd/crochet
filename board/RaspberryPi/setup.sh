@@ -34,6 +34,7 @@ raspberry_pi_check_prerequisites ( ) {
 	exit 1
     fi
     mkimage_check
+    freebsd_dtc_test
     videocore_src_check
     videocore_user_check
 }
