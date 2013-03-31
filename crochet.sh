@@ -55,6 +55,18 @@ done
 #
 load_config
 
+# Check that IMAGE_SIZE is set.
+# For now, support SD_SIZE for backwards compatibility.
+# June 2013: Remove SD_SIZE support entirely.
+if [ -z "${IMAGE_SIZE}" ]; then
+    if [ -z "${SD_SIZE}" ]; then
+	echo "Error: \$IMAGE_SIZE not set."
+	exit 1
+    fi
+    echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
+    IMAGE_SIZE=${SD_SIZE}
+fi
+
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
@@ -70,7 +82,7 @@ board_build_bootloader
 #
 # Create and partition the image(s)
 #
-board_create_image ${IMG} ${SD_SIZE}
+board_create_image ${IMG} ${IMAGE_SIZE}
 board_partition_image
 board_mount_partitions
 
