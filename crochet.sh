@@ -6,6 +6,7 @@ echo 'Starting at '`date`
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
+CONFIGFILE=config.sh
 
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
@@ -29,6 +30,25 @@ handle_trap ( ) {
     exit
 }
 trap handle_trap INT QUIT KILL EXIT
+
+# Parse command-line options
+args=`getopt c: $*`
+if [ $? -ne 0 ]; then
+    echo 'Usage: ...'
+    exit 2
+fi
+set -- $args
+while true; do
+    case "$1" in
+        -c)
+            CONFIGFILE="$2"
+            shift; shift
+            ;;
+        --)
+            shift; break
+            ;;
+    esac
+done
 
 #
 # Load user configuration
