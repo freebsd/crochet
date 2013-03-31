@@ -2,7 +2,7 @@
 # CONFIGURATION
 #
 
-# Note: Only board_setup and SD_SIZE should
+# Note: Only board_setup and IMAGE_SIZE should
 # be required for building a standard image,
 # assuming /usr/src has suitable FreeBSD
 # sources.  Everything else below is optional.
@@ -23,10 +23,10 @@
 # a few of the most common ones.
 #
 
-# REQUIRED: SD_SIZE
+# REQUIRED: IMAGE_SIZE
 #
 # Size of the disk image that will be built.  This is usually the same
-# size as your card, but it can be smaller.
+# size as your memory card or disk drive, but it can be smaller.
 #
 # MB and GB are predefined for convenience here
 #
@@ -34,17 +34,23 @@
 # matching card.  ($MB, $GB are pre-defined as 1000000 and 1000000000,
 # respectively.)
 #
-# SD_SIZE=$((100 * MB)) # for kernel-only images
-# SD_SIZE=$((1950 * MB)) # for 2 Gigabyte card
-# SD_SIZE=$((3900 * MB)) # for 4 Gigabyte card
-# SD_SIZE=$((7900 * MB)) # for 8 Gigabyte card
-# SD_SIZE=$((15900 * MB)) # for 16 Gigabyte card
-# SD_SIZE=$((31900 * MB)) # for 32 Gigabyte card
+# IMAGE_SIZE=$((100 * MB)) # for kernel-only images
+# IMAGE_SIZE=$((1950 * MB)) # for 2 Gigabyte card
+# IMAGE_SIZE=$((3900 * MB)) # for 4 Gigabyte card
+# IMAGE_SIZE=$((7900 * MB)) # for 8 Gigabyte card
+# IMAGE_SIZE=$((15900 * MB)) # for 16 Gigabyte card
+# IMAGE_SIZE=$((31900 * MB)) # for 32 Gigabyte card
+#
+# NEW:  You can now use "option ImageSize" to set this a little
+# more conveniently.  For example:
+#  option ImageSize 7900MB
+# The ImageSize option also allows MiB and GiB if you
+# really need power-of-two sizes.
 
 #
 # OPTIONAL STUFF
 #
-# Nothing below here is mandatory; setting a board and an SD_SIZE
+# Nothing below here is mandatory; setting a board and an IMAGE_SIZE
 # should be enough to build a bootable image for a supported board.
 #
 # There are, of course, many other variables that you may want to
@@ -111,7 +117,7 @@
 
 
 # The name of the final disk image.
-# This file will be as large as SD_SIZE above, so make
+# This file will be as large as IMAGE_SIZE above, so make
 # sure it's located somewhere with enough space.
 #
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
@@ -119,7 +125,7 @@
 # Uncomment to suppress installworld.  This is
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
-# generation.  Set SD_SIZE to 50 * MB or even smaller
+# generation.  Set IMAGE_SIZE to 50 * MB or even smaller
 # to really shorten your build/test cycles:
 #
 # unset FREEBSD_INSTALL_WORLD

@@ -89,16 +89,16 @@ freebsd_current_test ( ) {
 _freebsd_build ( ) {
     if diff ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2 >/dev/null 2>&1
     then
-	echo "Using FreeBSD $1 from previous $2 build"
+	echo "Using FreeBSD $2 $1 from previous build"
 	return 0
     fi
 
-    echo "Building FreeBSD $1 $2 at "`date`
+    echo "Building FreeBSD $2 $1 at "`date`
     echo "    (Logging to ${WORKDIR}/_.build$1.$2.log)"
 
     if [ -f ${WORKDIR}/_.built-$1.$2 ]
     then
-	echo " Rebuilding because previous build$1 used different flags:"
+	echo " Rebuilding because previous build used different flags:"
 	echo " Old: "`cat ${WORKDIR}/_.built-$1.$2`
 	echo " new: "`cat ${WORKDIR}/_.build$1.$2.sh`
 	rm -f ${WORKDIR}/_.built-$1.$2
@@ -109,7 +109,7 @@ _freebsd_build ( ) {
     then
 	mv ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2
     else
-	echo "Failed to build FreeBSD $1."
+	echo "Failed to build FreeBSD $2 $1."
 	echo "Log in ${WORKDIR}/_.build$1.$2.log"
 	exit 1
     fi
