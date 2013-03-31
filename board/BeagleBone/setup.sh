@@ -62,7 +62,7 @@ beaglebone_populate_boot_partition ( ) {
     echo "Installing U-Boot onto the FAT partition"
     cp ${BEAGLEBONE_UBOOT_SRC}/MLO ${BOARD_BOOT_MOUNTPOINT}
     cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img ${BOARD_BOOT_MOUNTPOINT}/bb-uboot.img
-    cp ${BOARDDIR}/bootfiles/uEnv.txt ${BOARD_BOOT_MOUNTPOINT}/bb-uEnv.txt
+    cp ${BOARDDIR}/files/uEnv.txt ${BOARD_BOOT_MOUNTPOINT}/bb-uEnv.txt
 
     # Issue: ubldr is actually board-specific right now, but only
     # because of the link address.  Changing ubldr to a static binary
