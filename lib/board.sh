@@ -32,7 +32,7 @@ board_setup ( ) {
 
     echo "Imported board setup for $1"
 
-    IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
+    IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
 }
 
 board_check_prerequisites ( ) {

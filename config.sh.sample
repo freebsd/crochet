@@ -58,6 +58,16 @@
 # ask us for ideas.
 # 
 
+#
+# Enabling optional build features.
+#
+# Look at the "option" directory for a list of supported optional
+# features.  You can enable one or more of them with the "option"
+# command.  A few examples:
+#
+# option AutoSize
+#
+
 # The board_setup above picks a default KERNCONF but you can override
 # it here.  (Overriding here won't impact the default IMG filename;
 # you may want to change that below as well.)
