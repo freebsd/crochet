@@ -217,10 +217,10 @@ freebsd_ubldr_build ( ) {
     mkdir -p ${WORKDIR}/ubldr
 
     cd sys/boot
-    eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log
-    eval $buildenv make -m $ubldr_makefiles clean >> ${WORKDIR}/_.ubldr.build.log
-    eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log
-    if /bin/sh -e ${WORKDIR}/_.ubldr.sh >> ${WORKDIR}/_.ubldr.build.log
+    eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log 2>&1
+    eval $buildenv make -m $ubldr_makefiles clean >> ${WORKDIR}/_.ubldr.build.log 2>&1
+    eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log 2>&1
+    if /bin/sh -e ${WORKDIR}/_.ubldr.sh >> ${WORKDIR}/_.ubldr.build.log 2>&1
     then
 	mv ${WORKDIR}/_.ubldr.sh ${WORKDIR}/_.ubldr.built
 	cd arm/uboot
