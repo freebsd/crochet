@@ -21,13 +21,20 @@ option ( ) {
     OPTION=$1
     shift
     OPTIONDIR=${TOPDIR}/option/${OPTION}
-    if [ ! -e ${OPTIONDIR}/setup.sh ]; then
+    BOARDOPTIONDIR=${BOARDDIR}/option/${OPTION}
+    if [ -e ${OPTIONDIR}/setup.sh ]; then
+	. $OPTIONDIR/setup.sh "$@"
+	echo "Imported option $OPTION"
+    elif [ -e ${BOARDOPTIONDIR}/setup.sh ]; then
+	. $BOARDOPTIONDIR/setup.sh "$@"
+	echo "Imported board-specific option $OPTION"
+    else
 	echo "Cannot setup option $OPTION."
-	echo "No setup.sh in ${OPTIONDIR}."
+	echo "No setup.sh found in either:"
+	echo "  * ${OPTIONDIR} or"
+	echo "  * ${BOARDOPTIONDIR}"
 	exit 1
     fi
-    . $OPTIONDIR/setup.sh "$@"
-    echo "Imported option $OPTION"
 }
 
 #
@@ -37,9 +44,9 @@ option ( ) {
 #                  after board-specific customization,
 #                  but before the user customize hook.
 #
-# NOTE: These following hook functions are most definitely not
-# intended for user customizations, and should never be called
-# directly from config.sh.
+# NOTE: These following hook functions are for options
+# to register hooks, and should not be called directly
+# from user configuration files.
 #
 # TODO: As new options are implemented, evaluate what hooks
 # are provided here and add new hooks as needed.
