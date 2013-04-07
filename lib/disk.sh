@@ -26,6 +26,10 @@ disk_record_md ( ) {
     _DISK_MDS="${_DISK_MDS} $1"
 }
 
+strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
+
+
+
 # $1: full path of image file
 # $2: size of SD image
 disk_create_image ( ) {
@@ -134,12 +138,4 @@ disk_ufs_mount ( ) {
     mkdir $1 || exit 1
     mount ${DISK_UFS_DEVICE} $1 || exit 1
     disk_record_mountdir $1
-}
-
-# TODO: Move this into an option
-disk_add_swap_file ( ) {
-    echo "Creating swap file"
-    dd if=/dev/zero of="usr/swap0" bs=1024k count=$1
-    chmod 0600 "usr/swap0"
-    echo 'swapfile="/usr/swap0"' >> etc/rc.conf
 }

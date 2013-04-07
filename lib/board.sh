@@ -12,10 +12,9 @@
 BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
 BOARD_BOOT_MOUNTPOINT=${WORKDIR}/_.mount.boot
 
-# Default is to install both kernel and WORLD but not
+# Default is to install world but not
 # populate /usr/src and /usr/ports
 FREEBSD_INSTALL_WORLD=y
-FREEBSD_INSTALL_KERNEL=y
 FREEBSD_INSTALL_USR_SRC=
 FREEBSD_INSTALL_USR_PORTS=
 
@@ -35,63 +34,38 @@ board_setup ( ) {
     IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
 }
 
-board_check_prerequisites ( ) {
-    freebsd_current_test
+board_default_create_image ( ) {
+    disk_create_image $IMG $IMAGE_SIZE
 }
-
-board_build_bootloader ( ) { }
-
-# $1 - name of image file
-# $2 - SD size from user config.sh
-board_create_image ( ) {
-    disk_create_image $1 $2
-}
+strategy_add $PHASE_IMAGE_BUILD_LWW board_default_create_image
 
 # Default is to create a single UFS partition inside an MBR
-board_partition_image ( ) {
+board_default_partition_image ( ) {
     disk_partition_mbr
     disk_ufs_create
 }
+strategy_add $PHASE_PARTITION_LWW board_default_partition_image
 
 # Default mounts just the FreeBSD partition
-board_mount_partitions ( ) {
+board_default_mount_partitions ( ) {
     disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
 }
+strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
-# Default board setup doesn't use a separate boot partition
-board_populate_boot_partition ( ) {
-}
-
-generic_board_populate_freebsd_partition ( ) {
-    freebsd_installkernel ${BOARD_FREEBSD_MOUNTPOINT}
+board_installworld ( ) {
     if [ -n "$FREEBSD_INSTALL_WORLD" ]; then
 	freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
-    if [ -n "$FREEBSD_INSTALL_USR_SRC" ]; then
-	freebsd_install_usr_src ${BOARD_FREEBSD_MOUNTPOINT}
-    fi
-    if [ -n "$FREEBSD_INSTALL_USR_PORTS" ]; then
-	freebsd_install_usr_ports ${BOARD_FREEBSD_MOUNTPOINT}
-    fi
-    # TODO: Install packages here ?  Or leave that for user customization?
-    if [ -d ${BOARDDIR}/overlay ]
-    then
+}
+strategy_add $PHASE_FREEBSD_BASE_INSTALL board_installworld
+
+board_overlay_files ( ) {
+    if [ -d ${BOARDDIR}/overlay ]; then
 	echo "Overlaying board-specific files from ${BOARDDIR}/overlay"
 	(cd ${BOARDDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
     fi
-    if [ -d ${WORKDIR}/overlay ]
-    then
-	echo "Overlaying files from ${WORKDIR}/overlay"
-	(cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
-    fi
 }
-
-# Many board definitions will override this with a routine that calls
-# generic_board_populate_freebsd_partition and then copies/tweaks a
-# few board-specific items.
-board_populate_freebsd_partition ( ) {
-    generic_board_populate_freebsd_partition
-}
+strategy_add $PHASE_FREEBSD_LATE_CUSTOMIZATION board_overlay_files
 
 generic_board_show_message ( ) {
     echo "DONE."
@@ -105,7 +79,4 @@ generic_board_show_message ( ) {
 
 board_show_message ( ) {
     generic_board_show_message
-}
-
-board_post_unmount ( ) {
 }

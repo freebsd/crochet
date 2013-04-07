@@ -12,7 +12,7 @@
 # be correctly resized until after the second boot.)
 #
 
-option_autosize_post_installworld ( ) {
+option_autosize_install ( ) {
     cp ${OPTIONDIR}/autosize etc/rc.d/autosize
     cat >>etc/rc.conf <<EOF
 # On first boot, enlarge the root filesystem to fill the SD card
@@ -21,4 +21,4 @@ EOF
 }
 
 # Register the function to run after installworld.
-add_option_post_installworld option_autosize_post_installworld
+strategy_add $PHASE_FREEBSD_EXTRA_INSTALL option_autosize_install

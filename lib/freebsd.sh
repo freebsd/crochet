@@ -81,6 +81,7 @@ freebsd_current_test ( ) {
 	${KERNCONF} \
  	" $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
 }
+strategy_add $PHASE_CHECK freebsd_current_test
 
 # Common code for buildworld and buildkernel.
 # In particular, this compares the command we're about to
@@ -125,6 +126,8 @@ freebsd_buildworld ( ) {
     _freebsd_build world ${TARGET_ARCH}
 }
 
+strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
+
 
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
 #
@@ -135,6 +138,9 @@ freebsd_buildkernel ( ) {
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${KERNCONF}.sh
     _freebsd_build kernel ${KERNCONF}
 }
+
+strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
+
 
 # freebsd_installworld: Install FreeBSD world to image
 #
@@ -174,14 +180,18 @@ freebsd_installworld ( ) {
 
 # freebsd_installkernel: Install FreeBSD kernel to image
 #
-# $1: Root directory of UFS partition
+# $1: Root directory of FreeBSD system where we should install
+# kernel; defaults to cwd.
 #
 freebsd_installkernel ( ) {
-    # TODO: check and warn if kernel isn't built.
+    if [ -n "$1" ]; then
+	cd $1
+    fi
+    DESTDIR=`pwd`
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel at "`date`
-    echo "    Destination: $1"
-    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.${KERNCONF}.sh
+    echo "    Destination: $DESTDIR"
+    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$DESTDIR installkernel > ${WORKDIR}/_.installkernel.${KERNCONF}.sh
     if /bin/sh -e ${WORKDIR}/_.installkernel.${KERNCONF}.sh > ${WORKDIR}/_.installkernel.${KERNCONF}.log 2>&1
     then
 	# success

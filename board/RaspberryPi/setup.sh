@@ -10,20 +10,20 @@ RPI_GPU_MEM=32
 RPI_FIRMWARE_SRC=${BOARDDIR}
 
 . ${BOARDDIR}/mkimage.sh
-. ${BOARDDIR}/videocore.sh
 
-# Note: A lot of the work here is done in "raspberry_pi_" functions.
-# The standard "board_" functions just delegate to the "raspberry_pi_"
-# versions.  This was done to simplify the (stil *very* experimental)
-# BeagleBonePlusRaspberryPi board that tries to install everything
-# for both boards onto a single image.
 
-raspberry_pi_check_prerequisites ( ) {
+strategy_add $PHASE_CHECK freebsd_current_test
+strategy_add $PHASE_CHECK freebsd_dtc_test
+
+raspberry_pi_check_uboot ( ) {
     uboot_test \
 	RPI_UBOOT_SRC \
 	"$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
 	"git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
+}
+strategy_add $PHASE_CHECK raspberry_pi_check_uboot
 
+raspberry_pi_check_bootcode ( ) {
     if [ ! -f "${RPI_FIRMWARE_SRC}/boot/bootcode.bin" ]; then
 	echo "Need Rasberry Pi closed-source boot files."
 	echo "Use the following command to fetch them:"
@@ -33,78 +33,59 @@ raspberry_pi_check_prerequisites ( ) {
 	echo "Run this script again after you have the files."
 	exit 1
     fi
-    mkimage_check
-    freebsd_dtc_test
-    videocore_src_check
-    videocore_user_check
 }
+strategy_add $PHASE_CHECK raspberry_pi_check_bootcode
 
-board_check_prerequisites ( ) {
-    freebsd_current_test
-    raspberry_pi_check_prerequisites
-}
+# Build U-Boot
+strategy_add $PHASE_BUILD_OTHER uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+strategy_add $PHASE_BUILD_OTHER uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
+strategy_add $PHASE_BUILD_OTHER uboot_build ${RPI_UBOOT_SRC}
 
-raspberry_pi_build_bootloader ( ) {
-    # Closed-source firmware is already built.
+# Build ubldr.
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
 
-    # Build U-Boot
-    uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
-    uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
-    uboot_build ${RPI_UBOOT_SRC}
-
-    # Build ubldr.
-    freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
-
-    # Build videocore driver and userland
-    videocore_build
-    videocore_user_build
-}
-
-board_build_bootloader ( ) {
-    raspberry_pi_build_bootloader
-}
-
-board_partition_image ( ) {
+raspberry_pi_partition_image ( ) {
     disk_partition_mbr
     # Raspberry Pi boot loaders require FAT16, so this must be at least 17m
     disk_fat_create 17m 16
     disk_ufs_create
 }
 
-board_mount_partitions ( ) {
+strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
+
+raspberry_pi_mount_partitions ( ) {
     disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
     disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
 }
 
+strategy_add $PHASE_MOUNT_LWW raspberry_pi_mount_partitions
+
 raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi boot files to FAT partition
-    cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin ${BOARD_BOOT_MOUNTPOINT}
-    cp ${RPI_FIRMWARE_SRC}/boot/fixup.dat ${BOARD_BOOT_MOUNTPOINT}
-    cp ${RPI_FIRMWARE_SRC}/boot/fixup_cd.dat ${BOARD_BOOT_MOUNTPOINT}
-    cp ${RPI_FIRMWARE_SRC}/boot/start.elf ${BOARD_BOOT_MOUNTPOINT}
-    cp ${RPI_FIRMWARE_SRC}/boot/start_cd.elf ${BOARD_BOOT_MOUNTPOINT}
+    cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin .
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup.dat .
+    cp ${RPI_FIRMWARE_SRC}/boot/fixup_cd.dat .
+    cp ${RPI_FIRMWARE_SRC}/boot/start.elf .
+    cp ${RPI_FIRMWARE_SRC}/boot/start_cd.elf .
 
     # Configure Raspberry Pi boot files
-    cp ${RPI_FIRMWARE_SRC}/boot/config.txt ${BOARD_BOOT_MOUNTPOINT}
-    echo "gpu_mem=${RPI_GPU_MEM}" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
+    cp ${RPI_FIRMWARE_SRC}/boot/config.txt .
+    echo "gpu_mem=${RPI_GPU_MEM}" >> config.txt
 
     # RPi boot loader loads initial device tree file
     # Ubldr customizes this and passes it to the kernel.
     # (See overlay/boot/loader.rc)
-    freebsd_install_fdt bcm2835-rpi-b.dts ${BOARD_BOOT_MOUNTPOINT}/rpi-b.dtb
-    echo "device_tree=rpi-b.dtb" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
-    echo "device_tree_address=0x100" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
-
-    # Use Oleksandr's uboot.img file.
-    #cp ${RPI_FIRMWARE_SRC}/boot/uboot.img ${BOARD_BOOT_MOUNTPOINT}
+    freebsd_install_fdt bcm2835-rpi-b.dts rpi-b.dtb
+    echo "device_tree=rpi-b.dtb" >> config.txt
+    echo "device_tree_address=0x100" >> config.txt
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    mkimage ${RPI_UBOOT_SRC}/u-boot.bin ${BOARD_BOOT_MOUNTPOINT}/uboot.img
-    echo "kernel=uboot.img" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
-    cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt ${BOARD_BOOT_MOUNTPOINT}
+    mkimage ${RPI_UBOOT_SRC}/u-boot.bin uboot.img
+    echo "kernel=uboot.img" >> config.txt
+    cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt .
 
     # Install ubldr to FAT partition
-    freebsd_ubldr_copy ${BOARD_BOOT_MOUNTPOINT}
+    freebsd_ubldr_copy .
 
     # XXX For production use, we could boot faster by
     # bypassing u-boot and ubldr.  That requires the kernel
@@ -116,16 +97,12 @@ raspberry_pi_populate_boot_partition ( ) {
     #FREEBSD_INSTALLKERNEL_BOARD_ARGS='KERNEL_KO=kernel.bin -DWITHOUT_KERNEL_SYMBOLS'
     #mkdir ${WORKDIR}/boot
     #freebsd_installkernel ${WORKDIR}
-    #cp ${WORKDIR}/boot/kernel/kernel.bin > ${BOARD_BOOT_MOUNTPOINT}/freebsd.bin
-    #echo "kernel=freebsd.bin" >> ${BOARD_BOOT_MOUNTPOINT}/config.txt
+    #cp ${WORKDIR}/boot/kernel/kernel.bin > freebsd.bin
+    #echo "kernel=freebsd.bin" >> config.txt
 }
 
-board_populate_boot_partition ( ) {
-    raspberry_pi_populate_boot_partition
-}
+strategy_add $PHASE_BOOT_INSTALL raspberry_pi_populate_boot_partition
 
-board_populate_freebsd_partition ( ) {
-    generic_board_populate_freebsd_partition
-    mkdir ${BOARD_FREEBSD_MOUNTPOINT}/boot/msdos
-    freebsd_ubldr_copy_ubldr_help ${BOARD_FREEBSD_MOUNTPOINT}/boot
-}
+strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BASE_INSTALL mkdir boot/msdos
+strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_ubldr_copy_ubldr_help boot

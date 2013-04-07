@@ -1,5 +1,5 @@
 
-mkimage_check ( ) {
+mkimage_python_check ( ) {
     if python --version >/dev/null 2>&1; then
 	true
     else
@@ -12,9 +12,14 @@ mkimage_check ( ) {
     fi
 }
 
+strategy_add $PHASE_CHECK mkimage_python_check
+
+
 # $1: input boot file
 # $2: output
-mkimage ( ) (
-    cd ${BOARDDIR}/mkimage
-    python imagetool-uncompressed.py $1 $2
-)
+mkimage ( ) {
+    (
+	cd ${BOARDDIR}/mkimage
+	python imagetool-uncompressed.py $1 -
+    ) > $2
+}
