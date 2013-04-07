@@ -306,19 +306,19 @@ freebsd_install_usr_ports ( ) {
 # devolves into a 'cp'.
 #
 freebsd_install_fdt ( ) (
-    cd $FREEBSD_SRC/sys/boot/fdt/dts
+    _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
     case $1 in
 	*.dtb)
 	    case $2 in
 		*.dtb)
-		    cp $1 $2
+		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dts)
-		    dtc -I dtb -O dts -p 8192 -o $2 $1
+		    (cd $_FDTDIR; dtc -I dtb -O dts -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			cp $1 $2
+			(cd $_FDTDIR; cat $1) > $2
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1
@@ -329,14 +329,14 @@ freebsd_install_fdt ( ) (
 	*.dts)
 	    case $2 in
 		*.dts)
-		    cp $1 $2
+		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dtb)
-		    dtc -I dts -O dtb -p 8192 -o $2 $1
+		    (cd $_FDTDIR; dtc -I dts -O dtb -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			cp $1 $2
+			(cd $_FDTDIR; cat $1) > $2
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1
