@@ -12,6 +12,11 @@ LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
 CONFIGFILE=config.sh
 
+# Initialize the work directory, clean out old logs and strategies.
+mkdir -p ${WORKDIR}
+rm -f ${WORKDIR}/*.log
+rm -f ${WORKDIR}/strategy_*
+
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
 
@@ -47,12 +52,6 @@ while true; do
             ;;
     esac
 done
-
-
-# Initialize the work directory, clean out old logs and strategies.
-mkdir -p ${WORKDIR}
-rm -f ${WORKDIR}/*.log
-rm -f ${WORKDIR}/strategy_*
 
 #
 # Load user configuration
