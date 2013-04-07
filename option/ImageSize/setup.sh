@@ -30,7 +30,7 @@ compute_size ( ) {
                 IMAGE_SIZE=$(($N * 1024 * 1024 * 1024))
                 ;;
         *)
-                echo "Size argument $2 not supported"
+                echo "Size argument $1 not supported"
                 exit 2
                 ;;
     esac
