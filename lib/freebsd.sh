@@ -155,7 +155,7 @@ freebsd_installworld ( ) {
 	# success
     else
 	echo "Installworld failed."
-	echo "    Log: ${WORKDIR}/_.installworld.log"
+	echo "    Log: ${WORKDIR}/_.installworld.${TARGET_ARCH}.log"
 	exit 1
     fi
 
