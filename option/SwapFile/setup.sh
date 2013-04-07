@@ -1,7 +1,7 @@
 
 
 option_swapfile_install ( ) {
-    echo "Creating swap file"
+    echo "Creating $1 swap file"
     S=`echo $1 | tr '[:upper:]' '[:lower:]'`
     N=`echo $S | tr -cd '[0-9]'`
     case $S in
