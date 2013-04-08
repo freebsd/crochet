@@ -25,4 +25,4 @@ option_swapfile_install ( ) {
     echo 'swapfile="/usr/swap0"' >> etc/rc.conf
 }
 
-strategy_add $PHASE_FREEBSD_LATE_CUSTOMIZATION option_swapfile_install $1
+strategy_add $PHASE_FREEBSD_OPTIONS_CUSTOMIZATION option_swapfile_install $1
