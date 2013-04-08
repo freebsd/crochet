@@ -19,6 +19,4 @@ option_autosize_install ( ) {
 autosize_enable="YES"
 EOF
 }
-
-# Register the function to run after installworld.
-strategy_add $PHASE_FREEBSD_EXTRA_INSTALL option_autosize_install
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_autosize_install

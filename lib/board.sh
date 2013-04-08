@@ -30,7 +30,7 @@ board_setup ( ) {
     echo "Imported board setup for $1"
 
     IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
-    strategy_add $PHASE_FREEBSD_BOARD_CUSTOMIZATION board_overlay_files $BOARDDIR
+    PRIORITY=20 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_overlay_files $BOARDDIR
     BOARDDIR=
 }
 
