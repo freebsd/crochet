@@ -1,12 +1,6 @@
 #
 # Default implementations of board routines.
 #
-# Most of these are just empty so that boards that don't need
-# a separate boot partition, for example, can just omit those routines.
-#
-# A few of the routines below are "generic_board" routines that
-# a lot of boards will want to call.
-#
 
 # Boards that need more than this can define their own.
 BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
@@ -21,6 +15,7 @@ FREEBSD_INSTALL_USR_PORTS=
 # $1: name of board directory
 #
 board_setup ( ) {
+    _LASTBOARD=$1
     BOARDDIR=${TOPDIR}/board/$1
     if [ ! -e ${BOARDDIR}/setup.sh ]; then
 	echo "Can't setup board $1."
@@ -32,7 +27,47 @@ board_setup ( ) {
     echo "Imported board setup for $1"
 
     IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
+    strategy_add $PHASE_FREEBSD_BOARD_CUSTOMIZATION board_overlay_files $BOARDDIR
+    BOARDDIR=
 }
+
+# $1 - BOARDDIR
+# Registered from end of board_setup so that it can get the BOARDDIR
+# as an argument.  (There are rare cases where we actually load
+# more than one board definition; in those cases this will get
+# registered and run once for each BOARDDIR.)
+# TODO: Are there other examples of this kind of thing?
+# If so, is there a better mechanism?
+board_overlay_files ( ) {
+    if [ -d $1/overlay ]; then
+	echo "Overlaying board-specific files from $1/overlay"
+	(cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+    fi
+}
+
+board_defined ( ) {
+    if [ -z "$_LASTBOARD" ]; then
+	echo "No board setup?"
+	echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
+	exit 1
+    fi
+}
+strategy_add $PHASE_POST_CONFIG board_defined
+
+board_check_image_size_set ( ) {
+    # Check that IMAGE_SIZE is set.
+    # For now, support SD_SIZE for backwards compatibility.
+    # June 2013: Remove SD_SIZE support entirely.
+    if [ -z "${IMAGE_SIZE}" ]; then
+	if [ -z "${SD_SIZE}" ]; then
+	    echo "Error: \$IMAGE_SIZE not set."
+	    exit 1
+	fi
+	echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
+	IMAGE_SIZE=${SD_SIZE}
+    fi
+}
+strategy_add $PHASE_CHECK board_check_image_size_set
 
 board_default_create_image ( ) {
     disk_create_image $IMG $IMAGE_SIZE
@@ -59,24 +94,13 @@ board_installworld ( ) {
 }
 strategy_add $PHASE_FREEBSD_BASE_INSTALL board_installworld
 
-board_overlay_files ( ) {
-    if [ -d ${BOARDDIR}/overlay ]; then
-	echo "Overlaying board-specific files from ${BOARDDIR}/overlay"
-	(cd ${BOARDDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
-    fi
-}
-strategy_add $PHASE_FREEBSD_LATE_CUSTOMIZATION board_overlay_files
-
-generic_board_show_message ( ) {
+generic_board_goodbye ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"
     echo
-    echo "Copy to a MicroSDHC card using a command such as:"
+    echo "Copy to a suitable memory card using a command such as:"
     echo "dd if=${IMG} of=/dev/da0 bs=1m"
-    echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
+    echo "(Replace /dev/da0 with the appropriate path for your card reader.)"
     echo
 }
-
-board_show_message ( ) {
-    generic_board_show_message
-}
+strategy_add $PHASE_GOODBYE_LWW generic_board_goodbye
