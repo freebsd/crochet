@@ -12,6 +12,7 @@ videocore_src_check ( ) {
 	exit 1
     fi
 }
+strategy_add $PHASE_CHECK videocore_src_check
 
 videocore_build ( ) {
     if [ -f ${WORKDIR}/_.built-videocore-module ]
@@ -28,6 +29,7 @@ videocore_build ( ) {
 
     touch ${WORKDIR}/_.built-videocore-module
 }
+strategy_add $PHASE_BUILD_OTHER videocore_build
 
 # cwd: Target directory for install
 videocore_install ( ) {
@@ -37,8 +39,4 @@ videocore_install ( ) {
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     eval $buildenv SYSDIR=${FREEBSD_SRC}/sys MAKESYSPATH=${FREEBSD_SRC}/share/mk make -C ${RPI_VC_SRC} DESTDIR=$DESTDIR install || exit 1
 }
-
-# Build and install videocore driver and userland
-strategy_add $PHASE_CHECK videocore_src_check
-strategy_add $PHASE_BUILD_OTHER videocore_build
-strategy_add $PHASE_FREEBSD_EXTRA_INSTALL videocore_install
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_install

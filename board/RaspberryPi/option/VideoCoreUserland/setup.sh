@@ -8,6 +8,7 @@ videocore_cmake_check ( ) {
 	exit 1
     fi
 }
+strategy_add $PHASE_CHECK videocore_cmake_check
 
 videocore_user_src_check ( ) {
     if [ ! -d $RPI_VC_USER_SRC ]; then
@@ -21,6 +22,7 @@ videocore_user_src_check ( ) {
 	exit 1
     fi
 }
+strategy_add $PHASE_CHECK videocore_user_check
 
 videocore_user_build ( ) {
     if [ -f ${WORKDIR}/_.built-videocore-library ]
@@ -42,14 +44,11 @@ videocore_user_build ( ) {
     eval $buildenv make>> ${WORKDIR}/_.videocore-userland.log 2>&1 || exit 1
     touch ${WORKDIR}/_.built-videocore-library
 }
+strategy_add $PHASE_BUILD_OTHER videocore_user_build
 
 # cwd: DESTDIR
 videocore_user_install ( ) {
     echo "TODO: Install videocore library"
     exit 1
 }
-
-strategy_add $PHASE_CHECK videocore_cmake_check
-strategy_add $PHASE_CHECK videocore_user_check
-strategy_add $PHASE_BUILD_OTHER videocore_user_build
-strategy_add $PHASE_FREEBSD_EXTRA_INSTALL videocore_user_install
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install
