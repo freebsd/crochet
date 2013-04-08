@@ -10,7 +10,7 @@ freebsd_xdev_test ( ) {
     # We need the cross-tools for arm, if they're not already built.
     # This should work with arm.arm or arm.armv6 equally well.
     if [ -z `which ${CC}` ]; then
-	echo "Can't find FreeBSD xdev tools for ARM."
+	echo "Can't find appropriate FreeBSD xdev tools."
 	echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
 	echo
 	echo "cd /usr/src && sudo make XDEV_ARCH=${TARGET_ARCH} xdev"
