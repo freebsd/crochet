@@ -15,7 +15,8 @@ CONFIGFILE=config.sh
 # Initialize the work directory, clean out old logs and strategies.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
-rm -f ${WORKDIR}/strategy_*
+rm -rf ${WORKDIR}/strategy
+mkdir -p ${WORKDIR}/strategy
 
 MB=$((1000 * 1000))
 GB=$((1000 * $MB))
@@ -58,22 +59,9 @@ done
 #
 load_config
 
-# Check that IMAGE_SIZE is set.
-# For now, support SD_SIZE for backwards compatibility.
-# June 2013: Remove SD_SIZE support entirely.
-if [ -z "${IMAGE_SIZE}" ]; then
-    if [ -z "${SD_SIZE}" ]; then
-	echo "Error: \$IMAGE_SIZE not set."
-	exit 1
-    fi
-    echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
-    IMAGE_SIZE=${SD_SIZE}
-fi
-
 #
 # This is where all the work gets done.
 #
 run_strategy
 
-board_show_message
 date
