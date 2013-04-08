@@ -12,16 +12,19 @@ FREEBSD_INSTALL_WORLD=y
 FREEBSD_INSTALL_USR_SRC=
 FREEBSD_INSTALL_USR_PORTS=
 
+# List of all board dirs.
+BOARDDIRS=""
+
 # $1: name of board directory
 #
 board_setup ( ) {
-    _LASTBOARD=$1
     BOARDDIR=${TOPDIR}/board/$1
     if [ ! -e ${BOARDDIR}/setup.sh ]; then
 	echo "Can't setup board $1."
 	echo "No setup.sh in ${BOARDDIR}."
 	exit 1
     fi
+    BOARDDIRS="$BOARDDIRS $BOARDDIR"
     . $BOARDDIR/setup.sh
 
     echo "Imported board setup for $1"
@@ -46,7 +49,7 @@ board_overlay_files ( ) {
 }
 
 board_defined ( ) {
-    if [ -z "$_LASTBOARD" ]; then
+    if [ -z "$BOARDDIRS" ]; then
 	echo "No board setup?"
 	echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
 	exit 1

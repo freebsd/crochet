@@ -14,26 +14,23 @@ load_config ( ) {
 option ( ) {
     OPTION=$1
     shift
-    OPTIONDIR=${TOPDIR}/option/${OPTION}
-    BOARDOPTIONDIR=${BOARDDIR}/option/${OPTION}
-    if [ -e ${BOARDOPTIONDIR}/setup.sh ]; then
-	OPTIONDIR=${BOARDOPTIONDIR}
-	echo "Importing board-specific option: $OPTION $@"
-	. $OPTIONDIR/setup.sh "$@"
-    elif [ -e ${OPTIONDIR}/setup.sh ]; then
-	echo "Importing option: $OPTION $@"
-	. $OPTIONDIR/setup.sh "$@"
-    else
-	echo "Cannot import option $OPTION."
-	echo "No setup.sh found in either:"
-	echo "  * ${OPTIONDIR} or"
-	echo "  * ${BOARDOPTIONDIR}"
-	exit 1
-    fi
+    for d in $BOARDDIRS ${TOPDIR}; do
+	OPTIONDIR=$d/option/${OPTION}
+	if [ -e ${OPTIONDIR}/setup.sh ]; then
+	    echo "Importing option: $OPTION $@"
+	    . $OPTIONDIR/setup.sh "$@"
+	    OPTION=
+	    OPTIONDIR=
+	    return 0
+	fi
+    done
 
-    OPTION=
-    OPTIONDIR=
-    BOARDOPTIONDIR=
+    echo "Cannot import option $OPTION."
+    echo "No setup.sh found in either:"
+    for d in $BOARDDIRS ${TOPDIR}; do
+	echo "  * $d/option"
+    done
+    exit 1
 }
 
 #
