@@ -8,5 +8,7 @@ customize_overlay_files ( ) {
 	(cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
     fi
 }
-strategy_add $PHASE_FREEBSD_LATE_CUSTOMIZATION customize_overlay_files
+PRIORITY=50 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_overlay_files
+
+PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
 
