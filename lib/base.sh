@@ -9,12 +9,6 @@ load_config ( ) {
 	echo "and customize for your application"
 	exit 1
     fi
-
-    if [ -z "$BOARDDIR" ]; then
-	echo "No board setup?"
-	echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
-	exit 1
-    fi
 }
 
 option ( ) {
@@ -48,20 +42,16 @@ option ( ) {
 
 echo > ${WORKDIR}/strategy_unsorted.sh
 
-# This is the default priority used for all commands that
-# don't specify one.  It should never be overwritten in
-# the global environment.
-PRIORITY=100
-
 # Most of Crochet runs off of a "strategy" list of
 # operations.  These operations are added to the strategy
 # by the various configuration options.  After configuration,
-# the entire strategy list is sorted and then run to actually
+# the strategy list is sorted and then run to actually
 # do the work.
 
 # Each strategy item specifies a "phase" and a "priority".
 # Items are run in order sorted by phase, then priority,
 # then by the order they were inserted.
+
 # DO NOT make up phase numbers.  If you need a new phase,
 # add a symbolic name.  Phase numbers will change as the
 # system evolves.
@@ -71,39 +61,54 @@ PRIORITY=100
 # the name.  They are registered in the same way, but
 # are handled internally a little differently.
 
+# POST_CONFIG phase is a chance to update internal configuration
+# after the user configuration has been completely read.
+PHASE_POST_CONFIG=100
 # CHECK phase is for testing that sources and necessary
-# tools are available
-PHASE_CHECK=100
-
-PHASE_TEST_LWW=101
+# tools are available.
+PHASE_CHECK=110
 
 # BUILD phases are for actually compiling stuff
+# Use BUILD_TOOLS for anything that's required by other build stages.
 PHASE_BUILD_TOOLS=200
 PHASE_BUILD_WORLD=210
 PHASE_BUILD_KERNEL=220
 PHASE_BUILD_OTHER=230
 
-# Actually build the image and partition it
+# Actually build the image and partition it.
+# These are all LWW so they can be replaced by board or user code.
 PHASE_IMAGE_BUILD_LWW=301
 PHASE_PARTITION_LWW=311
 PHASE_MOUNT_LWW=321
 
-# PHASE_BOOT items run with cwd set to root of boot filesystem (if any)
+# PHASE_BOOT items run with cwd set to root of boot filesystem (if any).
 PHASE_BOOT_START=500
 PHASE_BOOT_INSTALL=510
 PHASE_BOOT_DONE=599
 
-# PHASE_FREEBSD items run with cwd set to root of freebsd filesystem being constructed
+# PHASE_FREEBSD items run with cwd set to root of freebsd filesystem
 PHASE_FREEBSD_START=700
 PHASE_FREEBSD_BASE_INSTALL=710
 PHASE_FREEBSD_EXTRA_INSTALL=720
-PHASE_FREEBSD_LATE_CUSTOMIZATION=790
+PHASE_FREEBSD_BOARD_CUSTOMIZATION=750
+PHASE_FREEBSD_OPTIONS_CUSTOMIZATION=760
+PHASE_FREEBSD_USER_CUSTOMIZATION=790
 PHASE_FREEBSD_DONE=799
 
 PHASE_UNMOUNT_LWW=891 # For internal use only; don't override this.
 
 # PHASE_POST_UNMOUNT runs after the filesystems are unmounted.
 PHASE_POST_UNMOUNT=900
+
+# Prints the final status message with instructions for using the
+# image.  Can be replaced by boards that need special instructions.
+PHASE_GOODBYE_LWW=991
+
+
+# This is the default priority used for all commands that
+# don't specify one.  It should never be overwritten in
+# the global environment.
+PRIORITY=100
 
 
 # $1 - Phase to run this in.
@@ -119,58 +124,72 @@ PHASE_POST_UNMOUNT=900
 # function registered for that phase will actually be run.  Otherwise,
 # all registrations for a phase are run.
 
+ # Appended to priority so sort will preserve insertion order
 _STRATEGY_ADD_COUNTER=0
+ # Last phase that was actually run
+_CURRENT_PHASE=0
+
 strategy_add ( ) {
     PHASE=$1
     if [ $(($PHASE + 0)) -eq 0 ]; then
 	echo "Error: Phase not specified: strategy_add $@"
 	exit 1
     fi
+    if [ $PHASE -le $_CURRENT_PHASE ]; then
+	echo "Error: Inserting a strategy item for a phase that has already run"
+	echo "    strategy_add $@"
+	exit 1
+    fi
     shift
 
     _STRATEGY_ADD_COUNTER=$(($_STRATEGY_ADD_COUNTER + 1))
-    CMD="$@"
+    _PHASE_FILE=${WORKDIR}/strategy/${PHASE}.sh
     if [ $(($PHASE % 10)) -eq 1 ]; then
-	# Overwrite the file with the command for this phase.
-	echo $CMD >${WORKDIR}/strategy_$PHASE.sh
-	# Arrange for that file to get executed just once.
-	CMD="__once ${WORKDIR}/strategy_$PHASE.sh"
+	rm -f ${_PHASE_FILE}
     fi
-    _P0=$(($PHASE * 1000000 + ${PRIORITY} * 1000 + $_STRATEGY_ADD_COUNTER))
-    _P=`printf '%09d' $_P0`
-    cat >>${WORKDIR}/strategy_unsorted.sh <<EOF
-__run $_P OPTION=$OPTION OPTIONDIR=$OPTIONDIR BOARDDIR=$BOARDDIR $CMD
+    cat >>${_PHASE_FILE} <<EOF
+__run $_P OPTION=$OPTION OPTIONDIR=$OPTIONDIR BOARDDIR=$BOARDDIR $@
 EOF
+    echo ${PHASE} >> ${WORKDIR}/strategy/phases.txt
 }
 
-# $1 -- file with commands to be run exactly once.
-# This just renames the file to $1.finished to prevent it being
-# run again.
-__once ( ) {
-    if [ -f $1 ]; then
-	. $1
-	mv $1 $1.finished
-    fi
+# $1 - number of phase to run
+run_phase ( ) {
+    sort < ${WORKDIR}/strategy/${PHASE}_unsorted.sh > ${WORKDIR}/strategy/${PHASE}_sorted.sh
+    . ${WORKDIR}/strategy/${PHASE}_sorted.sh
 }
 
-
-# Run 
-# $1 - root of installed tree
+# Run all phases.
+# We rescan the phases.txt file each time because an item
+# can be registered for a later phase at any time, this might
+# cause new phases to become active.
 run_strategy ( ) {
-    cd $1
-    sort < ${WORKDIR}/strategy_unsorted.sh > ${WORKDIR}/strategy_sorted.sh
-    . ${WORKDIR}/strategy_sorted.sh
+    while true; do
+	_LAST_PHASE=$_CURRENT_PHASE
+	for P in `cat ${WORKDIR}/strategy/phases.txt | sort -n | uniq`; do
+	    if [ $P -gt $_CURRENT_PHASE ]; then
+		_CURRENT_PHASE=$P
+		_PHASE_FILE=${WORKDIR}/strategy/${P}.sh
+		# Sort by priority, then by insertion order.
+		sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
+		. ${_PHASE_FILE}.sorted
+		break
+	    fi
+	done
+	# If _CURRENT_PHASE did not progress, then we're done.
+	if [ $_LAST_PHASE -eq $_CURRENT_PHASE ]; then
+	    break
+	fi
+    done
 }
 
 # $1 - priority value, including encoded phase
 # $@ - command to run and arguments.
 __run ( ) {
-    # Recover the phase from the sort key (we don't care about priority here).
-    PHASE=$((`echo $1 | sed 's/^0*//'` / 1000000))
     # Set the cwd appropriately depending on the phase we're running.
-    if [ $PHASE -ge $PHASE_FREEBSD_START ] && [ $PHASE -le $PHASE_FREEBSD_DONE ]; then
+    if [ $_CURRENT_PHASE -ge $PHASE_FREEBSD_START ] && [ $_CURRENT_PHASE -le $PHASE_FREEBSD_DONE ]; then
 	cd ${BOARD_FREEBSD_MOUNTPOINT}
-    elif [ $PHASE -ge $PHASE_BOOT_START ] && [ $PHASE -le $PHASE_BOOT_DONE ]; then
+    elif [ $_CURRENT_PHASE -ge $PHASE_BOOT_START ] && [ $_CURRENT_PHASE -le $PHASE_BOOT_DONE ]; then
 	cd ${BOARD_BOOT_MOUNTPOINT}
     else
 	cd ${TOPDIR}
