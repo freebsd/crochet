@@ -2,15 +2,13 @@
 # typical  new   board.   This  should  help  people   add  new  board
 # definitions to Crochet.
 
-# Note that all of the functions you override begin with a board_
-# prefix.  If you find a need to override some other function, please
-# let me know as I often rename and refactor other parts of Crochet.
-
 # The kernel configuration that should be used.  Right now, this must
 # be part of the FreeBSD source tree.  (I would like to support
 # out-of-tree configurations but haven't worked out the necessary
 # build magic to make that possible.)
 KERNCONF=XXX
+TARGET_ARCH=YYY
+IMAGE_SIZE=$((1000 * 1000 * 1000))
 
 # If you use U-Boot, this is the directory the user will be
 # told to checkout U-Boot to.

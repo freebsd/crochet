@@ -1,15 +1,12 @@
-FREEBSD_SRC=/usr/src
 KERNCONF=VERSATILEPB
-IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
-FLASH=${WORKDIR}/FreeBSD-${KERNCONF}.flash
-FREEBSD_INSTALLKERNEL_BOARD_ARGS=KERNEL_EXTRA_INSTALL=kernel.bin
+TARGET_ARCH=armv6
+IMAGE_SIZE=$((1000 * 1000 * 1000))
+VERSATILEPB_FLASH=${WORKDIR}/FreeBSD-${KERNCONF}.flash
+FREEBSD_INSTALLKERNEL_BOARD_ARGS="KERNEL_EXTRA_INSTALL=kernel.bin"
 
-board_construct_boot_partition ( ) {
-    # dummy partition.
-    disk_fat_create 8m
-    # build kernel flush image
+versatilepb_build_flash_image ( ) {
     #  following code is stolen from gonzo, thanks.
-    rm -f $FLASH
+    rm -f $VERSATILEPB_FLASH
     # set r0..r3 to zero
     /usr/bin/printf "\0\0\240\343" > ${WORKDIR}/first_commands
     /usr/bin/printf "\0\020\240\343" >> ${WORKDIR}/first_commands
@@ -21,17 +18,20 @@ board_construct_boot_partition ( ) {
     [ ! -d ${WORKDIR}/_.kernel.bin ] && mkdir ${WORKDIR}/_.kernel.bin
     freebsd_installkernel ${WORKDIR}/_.kernel.bin
 
-    dd of=$FLASH bs=1M count=4 if=/dev/zero
-    dd of=$FLASH bs=1 conv=notrunc if=${WORKDIR}/first_commands
-    dd of=$FLASH bs=64k oseek=15 conv=notrunc if=${WORKDIR}/boot/kernel/kernel.bin
+    dd of=$VERSATILEPB_FLASH bs=1M count=4 if=/dev/zero
+    dd of=$VERSATILEPB_FLASH bs=1 conv=notrunc if=${WORKDIR}/first_commands
+    dd of=$VERSATILEPB_FLASH bs=64k oseek=15 conv=notrunc if=${WORKDIR}/boot/kernel/kernel.bin
 }
+strategy_add $PHASE_BUILD_OTHER versatilepb_build_flash_image
 
-board_show_message ( ) {
+versatilepb_instructions ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"
-    echo "And kernel image is in: ${FLASH}"
+    echo "And kernel image is in: ${VERSATILEPB_FLASH}"
     echo
-    echo "Try to run:"
-    echo "qemu-system-arm -M versatilepb -m 128M -kernel ${FLASH} -cpu arm1176 -hda ${IMG}"
+    echo "Use with qemu:"
+    echo
+    echo " $ qemu-system-arm -M versatilepb -m 128M -kernel ${VERSATILEPB_FLASH} -cpu arm1176 -hda ${IMG}"
     echo
 }
+strategy_add $PHASE_GOODBYE_LWW versatilepb_instructions
