@@ -5,6 +5,18 @@ FREEBSD_XDEV_PREFIX=
 #
 # TODO: support armv6 here as well.
 freebsd_xdev_test ( ) {
+    case ${TARGET_ARCH} in
+	arm*) TARGET=arm
+	    ;;
+	mips*) TARGET=mips
+	    ;;
+	pc98) TARGET=i386
+	    ;;
+	powerpc*) TARGET=powerpc
+	    ;;
+	*) TARGET=${TARGET_ARCH}
+	    ;;
+    esac
     FREEBSD_XDEV_PREFIX=${TARGET_ARCH}-freebsd-
     CC=${FREEBSD_XDEV_PREFIX}cc
     # We need the cross-tools for arm, if they're not already built.
@@ -13,7 +25,7 @@ freebsd_xdev_test ( ) {
 	echo "Can't find appropriate FreeBSD xdev tools."
 	echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
 	echo
-	echo "cd /usr/src && sudo make XDEV_ARCH=${TARGET_ARCH} xdev"
+	echo "cd /usr/src && sudo make XDEV=${TARGET} XDEV_ARCH=${TARGET_ARCH} xdev"
 	echo
 	echo "Run this script again after you have the xdev tools installed."
 	exit 1
