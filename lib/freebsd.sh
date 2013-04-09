@@ -79,7 +79,7 @@ freebsd_src_test ( ) {
 freebsd_current_test ( ) {
     freebsd_src_test \
 	${KERNCONF} \
- 	" $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
+ 	" $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
 }
 
 # Common code for buildworld and buildkernel.
