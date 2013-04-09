@@ -203,8 +203,9 @@
 # Some useful shell variables:
 #   ${WORKDIR} is the full path to the 'work' directory
 #       which you can use for intermediate files
-#   ${BOARDDIR}
-#   ${TOPDIR}
+#   ${BOARDDIR} is the directory where the board specific files
+#       are located
+#   ${TOPDIR} is the current directory where crochet is located
 #
 # The lib/*.sh files also define a number of functions
 # that you may find useful here.
