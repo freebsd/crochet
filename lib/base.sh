@@ -1,4 +1,11 @@
+#
+# Load the user configuration file.
+#
 load_config ( ) {
+    # Used in old config files, before "option ImageSize" was added.
+    MB=$((1000 * 1000))
+    GB=$((1000 * $MB))
+
     if [ -f $CONFIGFILE ]; then
 	echo "Loading configuration from $CONFIGFILE"
 	. $CONFIGFILE
@@ -11,6 +18,10 @@ load_config ( ) {
     fi
 }
 
+#
+# Invoke an option, which might be in one of the board
+# directories or in the top-level option directory.
+#
 option ( ) {
     OPTION=$1
     shift
@@ -33,36 +44,37 @@ option ( ) {
     exit 1
 }
 
-#
-# Add something to the strategy list to be executed
-# as part of the main Crochet strategy run.
+# Strategy List management
 
-echo > ${WORKDIR}/strategy_unsorted.sh
+# Most of Crochet runs off of a "strategy" list of operations.  These
+# operations are added to the strategy by the various configuration
+# options.  After configuration, the strategy list is sorted and then
+# run to actually do the work.
 
-# Most of Crochet runs off of a "strategy" list of
-# operations.  These operations are added to the strategy
-# by the various configuration options.  After configuration,
-# the strategy list is sorted and then run to actually
-# do the work.
+# The strategy list is kept in files under ${WORKDIR}/strategy;
+# we need to clean that out before we start.
+rm -rf ${WORKDIR}/strategy
+mkdir -p ${WORKDIR}/strategy
 
-# Each strategy item specifies a "phase" and a "priority".
-# Items are run in order sorted by phase, then priority,
-# then by the order they were inserted.
+# Each strategy item specifies a "phase" and a "priority".  Items are
+# run in order sorted by phase, then priority, then by the order they
+# were inserted.  In the strategy directory, there is a separate file
+# for each phase (this allows items run by earlier phases to add stuff
+# to later phases).
 
-# DO NOT make up phase numbers.  If you need a new phase,
-# add a symbolic name.  Phase numbers will change as the
-# system evolves.
+# DO NOT make up phase numbers.  If you need a new phase, add a
+# symbolic name.  Phase numbers will change as the system evolves.
 
-# There are a few phases that can only have a single item
-# registered.  These include "LWW" (Last Write Wins) in
-# the name.  They are registered in the same way, but
-# are handled internally a little differently.
+# There are a few phases that can only have a single item registered.
+# These include "LWW" (Last Write Wins) in the name.  They are
+# registered in the same way, but are handled internally a little
+# differently.
 
 # POST_CONFIG phase is a chance to update internal configuration
 # after the user configuration has been completely read.
 PHASE_POST_CONFIG=100
-# CHECK phase is for testing that sources and necessary
-# tools are available.
+
+# CHECK is for testing that sources and necessary tools are available.
 PHASE_CHECK=110
 
 # BUILD phases are for actually compiling stuff
@@ -127,6 +139,7 @@ _CURRENT_PHASE=0
 
 strategy_add ( ) {
     PHASE=$1
+    # Forgetting or misspelling the phase argument is a common error.
     if [ $(($PHASE + 0)) -eq 0 ]; then
 	echo "Error: Phase not specified: strategy_add $@"
 	exit 1
@@ -140,6 +153,7 @@ strategy_add ( ) {
 
     _STRATEGY_ADD_COUNTER=$(($_STRATEGY_ADD_COUNTER + 1))
     _PHASE_FILE=${WORKDIR}/strategy/${PHASE}.sh
+    # LWW items are flagged with last digit '1'
     if [ $(($PHASE % 10)) -eq 1 ]; then
 	rm -f ${_PHASE_FILE}
     fi
@@ -147,12 +161,6 @@ strategy_add ( ) {
 __run $_P OPTION=$OPTION OPTIONDIR=$OPTIONDIR BOARDDIR=$BOARDDIR $@
 EOF
     echo ${PHASE} >> ${WORKDIR}/strategy/phases.txt
-}
-
-# $1 - number of phase to run
-run_phase ( ) {
-    sort < ${WORKDIR}/strategy/${PHASE}_unsorted.sh > ${WORKDIR}/strategy/${PHASE}_sorted.sh
-    . ${WORKDIR}/strategy/${PHASE}_sorted.sh
 }
 
 # Run all phases.
@@ -179,7 +187,7 @@ run_strategy ( ) {
     done
 }
 
-# $1 - priority value, including encoded phase
+# $1 - priority value for sorting; ignored
 # $@ - command to run and arguments.
 __run ( ) {
     # Set the cwd appropriately depending on the phase we're running.

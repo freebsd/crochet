@@ -1,9 +1,5 @@
 #!/bin/sh
-
-#set -x # For debugging.
-
 set -e
-
 echo 'Starting at '`date`
 
 # General configuration and useful definitions
@@ -15,11 +11,6 @@ CONFIGFILE=config.sh
 # Initialize the work directory, clean out old logs and strategies.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
-rm -rf ${WORKDIR}/strategy
-mkdir -p ${WORKDIR}/strategy
-
-MB=$((1000 * 1000))
-GB=$((1000 * $MB))
 
 # Load builder libraries.
 . ${LIBDIR}/base.sh
@@ -29,14 +20,10 @@ GB=$((1000 * $MB))
 . ${LIBDIR}/board.sh
 . ${LIBDIR}/customize.sh
 
-handle_trap ( ) {
-    disk_unmount_all
-    exit
-}
-trap handle_trap INT QUIT KILL EXIT
-
 # Parse command-line options
-args=`getopt c: $*`
+args=`getopt b:c: $*`
+echo $?
+exit 2
 if [ $? -ne 0 ]; then
     echo 'Usage: ...'
     exit 2
@@ -44,6 +31,10 @@ fi
 set -- $args
 while true; do
     case "$1" in
+	-b)
+	    board_setup $2
+	    shift; shift
+	    ;;
         -c)
             CONFIGFILE="$2"
             shift; shift
@@ -51,6 +42,9 @@ while true; do
         --)
             shift; break
             ;;
+	*)
+	    crochet_usage
+	    exit 0
     esac
 done
 
@@ -58,6 +52,15 @@ done
 # Load user configuration
 #
 load_config
+
+#
+# What to do when things go wrong.
+#
+handle_trap ( ) {
+    disk_unmount_all
+    exit 2
+}
+trap handle_trap INT QUIT KILL EXIT
 
 #
 # This is where all the work gets done.
