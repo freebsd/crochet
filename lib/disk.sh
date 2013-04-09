@@ -95,12 +95,6 @@ disk_fat_mount ( ) {
     disk_record_mountdir $1
 }
 
-# TODO: Make this work.
-disk_swap_create ( ) {
-    #gpart add -s790m -t freebsd -i 3 -f x ${DISK_MD}
-    #_DISK_SWAP_PARTITION=s3
-}
-
 # TODO: Support $1 size argument
 # TODO: If $1 is empty, use whole disk.
 disk_ufs_create ( ) {
