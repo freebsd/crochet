@@ -22,8 +22,6 @@ rm -f ${WORKDIR}/*.log
 
 # Parse command-line options
 args=`getopt b:c: $*`
-echo $?
-exit 2
 if [ $? -ne 0 ]; then
     echo 'Usage: ...'
     exit 2
