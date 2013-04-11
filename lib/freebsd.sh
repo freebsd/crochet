@@ -83,11 +83,19 @@ freebsd_current_test ( ) {
 	${KERNCONF} \
  	" $ svn co http://svn.freebsd.org/base/head $FREEBSD_SRC"
 }
+# TODO: Not everything requires -CURRENT; copy this into all the
+# board setups and remove it from here.
 strategy_add $PHASE_CHECK freebsd_current_test
 
-# Common code for buildworld and buildkernel.
-# In particular, this compares the command we're about to
-# run to the previous run and rebuilds if anything is different.
+# Common code for buildworld and buildkernel.  In particular, this
+# compares the command we're about to run to the previous run and
+# rebuilds if anything is different.  So if you build multiple
+# images for multiple systems with the same options, you won't
+# have to repeat a full buildworld and/or buildkernel.
+#
+# TODO: We could do even better by using a separate MKOBJDIRPREFIX
+# for each different combination of buildworld flags.  Then
+# each separate world would end up in a separate directory.
 #
 _freebsd_build ( ) {
     if diff ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2 >/dev/null 2>&1
@@ -127,7 +135,6 @@ freebsd_buildworld ( ) {
     echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${TARGET_ARCH}.sh
     _freebsd_build world ${TARGET_ARCH}
 }
-
 strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 
 
@@ -140,7 +147,6 @@ freebsd_buildkernel ( ) {
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${KERNCONF}.sh
     _freebsd_build kernel ${KERNCONF}
 }
-
 strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
 
 
@@ -209,6 +215,10 @@ freebsd_installkernel ( ) {
 # Note: Assumes world is already built.
 #
 # $@: make arguments for building
+#
+# TODO: Add $1 argument as a directory to install to (instead of
+# work/ubldr/) so we can juggle multiple ubldrs compiled with
+# different options.
 #
 freebsd_ubldr_build ( ) {
     cd ${FREEBSD_SRC}
