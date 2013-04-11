@@ -1,6 +1,6 @@
 KERNCONF=BEAGLEBONE
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-beaglebone-freebsd
-IMAGE_SIZE=$((1000 * 1000 * 1000)
+IMAGE_SIZE=$((1000 * 1000 * 1000))
 
 strategy_add $PHASE_CHECK freebsd_current_test
 
