@@ -12,7 +12,7 @@ CONFIGFILE=config.sh
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
-# Load builder libraries.
+# Load utility libraries.
 . ${LIBDIR}/base.sh
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
@@ -20,11 +20,15 @@ rm -f ${WORKDIR}/*.log
 . ${LIBDIR}/board.sh
 . ${LIBDIR}/customize.sh
 
+crochet_usage ( ) {
+    echo "Usage: ..."
+    exit 2
+}
+
 # Parse command-line options
 args=`getopt b:c: $*`
 if [ $? -ne 0 ]; then
-    echo 'Usage: ...'
-    exit 2
+    crochet_usage
 fi
 set -- $args
 while true; do
@@ -42,12 +46,11 @@ while true; do
             ;;
 	*)
 	    crochet_usage
-	    exit 0
     esac
 done
 
 #
-# Load user configuration
+# Load user configuration:  This builds the strategy.
 #
 load_config
 
@@ -61,7 +64,7 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL EXIT
 
 #
-# This is where all the work gets done.
+# Run the strategy and actually do all of the work.
 #
 run_strategy
 
