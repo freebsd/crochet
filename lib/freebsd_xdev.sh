@@ -4,25 +4,27 @@ FREEBSD_XDEV_PREFIX=
 # freebsd_xdev_test: Verify that xdev tools exist.
 #
 freebsd_xdev_test ( ) {
-    case ${TARGET_ARCH} in
-	arm*) TARGET=arm
+    XDEV_ARCH=${TARGET_ARCH}
+    case ${XDEV_ARCH} in
+	arm*) XDEV=arm
 	    ;;
-	mips*) TARGET=mips
+	mips*) XDEV=mips
 	    ;;
-	pc98) TARGET=i386
+	pc98) XDEV=i386
 	    ;;
-	powerpc*) TARGET=powerpc
+	powerpc*) XDEV=powerpc
 	    ;;
-	*) TARGET=${TARGET_ARCH}
+	*) XDEV=${XDEV_ARCH}
 	    ;;
     esac
-    FREEBSD_XDEV_PREFIX=${TARGET_ARCH}-freebsd-
+
+    FREEBSD_XDEV_PREFIX=${XDEV_ARCH}-freebsd-
     CC=${FREEBSD_XDEV_PREFIX}cc
     if [ -z `which ${CC}` ]; then
 	echo "Can't find appropriate FreeBSD xdev tools."
 	echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
 	echo
-	echo "cd /usr/src && sudo make XDEV=${TARGET} XDEV_ARCH=${TARGET_ARCH} xdev"
+	echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} xdev"
 	echo
 	echo "Run this script again after you have the xdev tools installed."
 	exit 1
@@ -36,5 +38,5 @@ freebsd_xdev_test ( ) {
 	echo "Please install a newer version of the xdev tools."
 	exit 1
     fi
-    echo "Found FreeBSD xdev tools for ${TARGET_ARCH}"
+    echo "Found FreeBSD xdev tools for ${XDEV_ARCH}"
 }
