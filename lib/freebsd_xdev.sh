@@ -1,5 +1,11 @@
 FREEBSD_XDEV_PREFIX=
 
+case ${TARGET_ARCH} in
+    armv6)
+        XDEV=arm
+        XDEV_ARCH=armv6
+        ;;
+esac
 
 # freebsd_xdev_test: Verify that xdev tools exist.
 #
