@@ -1,5 +1,11 @@
 FREEBSD_XDEV_PREFIX=
 
+case ${TARGET_ARCH} in
+    armv6)
+        XDEV=arm
+        XDEV_ARCH=armv6
+        ;;
+esac
 
 # freebsd_xdev_test: Verify that xdev tools exist.
 #
@@ -13,7 +19,7 @@ freebsd_xdev_test ( ) {
 	echo "Can't find FreeBSD xdev tools for ARM."
 	echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
 	echo
-	echo "cd /usr/src && sudo make XDEV_ARCH=${TARGET_ARCH} xdev"
+	echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} xdev"
 	echo
 	echo "Run this script again after you have the xdev tools installed."
 	exit 1
