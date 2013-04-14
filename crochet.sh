@@ -6,7 +6,8 @@ echo 'Starting at '`date`
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
-CONFIGFILE=config.sh
+CONFIGFILE=
+BOARD=
 
 # Initialize the work directory, clean out old logs and strategies.
 mkdir -p ${WORKDIR}
@@ -21,7 +22,9 @@ rm -f ${WORKDIR}/*.log
 . ${LIBDIR}/customize.sh
 
 crochet_usage ( ) {
-    echo "Usage: ..."
+    echo "Usage: $0 -b <board> -c <configfile>"
+    echo " -b <board>: Load standard configuration for board"
+    echo " -c <file>: Load configuration from file"
     exit 2
 }
 
@@ -34,7 +37,7 @@ set -- $args
 while true; do
     case "$1" in
 	-b)
-	    board_setup $2
+	    BOARD="$2"
 	    shift; shift
 	    ;;
         -c)
@@ -52,7 +55,15 @@ done
 #
 # Load user configuration:  This builds the strategy.
 #
-load_config
+if [ -z "$BOARD" ] && [ -z "$CONFIGFILE" ]; then
+    crochet_usage
+fi
+if [ -n "$BOARD" ]; then
+    board_setup $BOARD
+fi
+if [ -n "$CONFIGFILE" ]; then
+    load_config $CONFIGFILE
+fi
 
 #
 # What to do when things go wrong.

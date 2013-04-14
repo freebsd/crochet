@@ -1,19 +1,18 @@
 #
 # Load the user configuration file.
 #
+# $1 - name of config file to load
+#
 load_config ( ) {
     # Used in old config files, before "option ImageSize" was added.
     MB=$((1000 * 1000))
     GB=$((1000 * $MB))
 
-    if [ -f $CONFIGFILE ]; then
-	echo "Loading configuration from $CONFIGFILE"
-	. $CONFIGFILE
+    if [ -f $1 ]; then
+	echo "Loading configuration from $1"
+	. $1
     else
-	echo "Could not load $CONFIGFILE"
-	echo "Please"
-	echo "  $ cp config.sh.sample $CONFIGFILE"
-	echo "and customize for your application"
+	echo "Could not load $1"
 	exit 1
     fi
 }
@@ -152,6 +151,7 @@ strategy_add ( ) {
     shift
 
     _STRATEGY_ADD_COUNTER=$(($_STRATEGY_ADD_COUNTER + 1))
+    _P=`printf '%03d%03d' ${PRIORITY} ${_STRATEGY_ADD_COUNTER}`
     _PHASE_FILE=${WORKDIR}/strategy/${PHASE}.sh
     # LWW items are flagged with last digit '1'
     if [ $(($PHASE % 10)) -eq 1 ]; then
