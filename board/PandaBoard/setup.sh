@@ -35,7 +35,7 @@ strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/
 strategy_add $PHASE_BUILD_OTHER uboot_configure ${PANDABOARD_UBOOT_SRC} omap4_panda
 strategy_add $PHASE_BUILD_OTHER uboot_build ${PANDABOARD_UBOOT_SRC}
 
-board_populate_boot_partition ( ) {
+pandaboard_populate_boot_partition ( ) {
     echo "Installing U-Boot onto the boot partition"
     # For now, we use a copy of an MLO built by someone else.
     cp ${BOARDDIR}/boot/MLO ${BOARD_BOOT_MOUNTPOINT}
