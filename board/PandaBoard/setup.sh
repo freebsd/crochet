@@ -26,7 +26,7 @@ pandaboard_check_prerequisites ( ) {
 strategy_add $PHASE_CHECK pandaboard_check_prerequisites
 
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy ubldr
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 # ubldr help file goes on the UFS partition.
 strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
