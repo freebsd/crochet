@@ -40,7 +40,7 @@ pandaboard_populate_boot_partition ( ) {
     # For now, we use a copy of an MLO built by someone else.
     cp ${BOARDDIR}/boot/MLO ${BOARD_BOOT_MOUNTPOINT}
     # TODO: We should be able to use MLO built by U-Boot. <sigh>
-    #cp ${PANDABOARD_UBOOT_SRC}/MLO ${FAT_MOUNT}
+    #cp ${PANDABOARD_UBOOT_SRC}/MLO ${BOARD_BOOT_MOUNTPOINT}
     cp ${PANDABOARD_UBOOT_SRC}/u-boot.bin ${BOARD_BOOT_MOUNTPOINT}
 }
 strategy_add $PHASE_BOOT_INSTALL pandaboard_populate_boot_partition
