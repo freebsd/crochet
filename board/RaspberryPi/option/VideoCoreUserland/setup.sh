@@ -18,11 +18,11 @@ videocore_user_src_check ( ) {
 	echo " $ git clone -b freebsd git://github.com/gonzoua/userland.git ${RPI_VC_USER_SRC}"
 	echo
 	echo "Run this script again after you have the files."
-	rm ${WORKDIR}/_.built-videocore-library
+	rm -f ${WORKDIR}/_.built-videocore-library
 	exit 1
     fi
 }
-strategy_add $PHASE_CHECK videocore_user_check
+strategy_add $PHASE_CHECK videocore_user_src_check
 
 videocore_user_build ( ) {
     if [ -f ${WORKDIR}/_.built-videocore-library ]
@@ -39,10 +39,26 @@ videocore_user_build ( ) {
     cd ${_VC_BUILDDIR}
     # Should the toolchain file be in the board directory?
     # Would that let us use the upstream videocore directly?
-    eval $buildenv $CMAKE -DCMAKE_TOOLCHAIN_FILE=${RPI_VC_USER_SRC}/makefiles/cmake/toolchains/arm-freebsd.cmake -DCMAKE_BUILD_TYPE=Release ${RPI_VC_USER_SRC}> ${WORKDIR}/_.videocore-userland.log 2>&1 || exit 1
+    log=${WORKDIR}/_.videocore-userland.log
+    cmd="$buildenv $CMAKE -DCMAKE_TOOLCHAIN_FILE=${RPI_VC_USER_SRC}/makefiles/cmake/toolchains/arm-freebsd.cmake -DCMAKE_BUILD_TYPE=Release ${RPI_VC_USER_SRC}"
+    echo $cmd > $log
+    if eval $cmd >> $log 2>&1; then
+	true
+    else
+	echo "Failed to configure VideoCore user library."
+	echo "Log file:"
+	echo "   $log"
+	exit 1
+    fi
     cd ${_VC_BUILDDIR}
-    eval $buildenv make>> ${WORKDIR}/_.videocore-userland.log 2>&1 || exit 1
-    touch ${WORKDIR}/_.built-videocore-library
+    if eval $buildenv make >> $log 2>&1; then
+	touch ${WORKDIR}/_.built-videocore-library
+    else
+	echo "Failed to build VideoCore user library."
+	echo "Log file:"
+	echo "   $log"
+	exit 1
+    fi
 }
 strategy_add $PHASE_BUILD_OTHER videocore_user_build
 
