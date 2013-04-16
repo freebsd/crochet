@@ -29,7 +29,7 @@ freebsd_xdev_test ( ) {
 	echo "Run this script again after you have the xdev tools installed."
 	exit 1
     fi
-    _INCLUDE_DIR=`${CC} -print-file-name=include`
+    _INCLUDE_DIR=`${CC} --print-file-name=include`
     if [ ! -e "${_INCLUDE_DIR}/stdarg.h" ]; then
 	echo "FreeBSD xdev tools are broken."
 	echo "The following command should print the full path to the crossbuild"
