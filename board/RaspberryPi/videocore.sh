@@ -42,7 +42,7 @@ CMAKE=`which cmake`
 cmake_check ( ) {
     if [ -z ${CMAKE} ]; then
 	echo "VideoCore userland build requires 'cmake'"
-	echo "Please install and re-run this script."
+	echo "Please install devel/cmake and re-run this script."
 	exit 1
     fi
 }
