@@ -1,5 +1,15 @@
 RPI_VC_USER_SRC=${TOPDIR}/vcuserland
 
+#
+# Option to build and install the VideoCore userland
+# support.  Requires the VideoCoreKernel driver as
+# well.  Add these two lines to your Crochet configuration
+# file to enable:
+#
+#  option VideoCoreKernel
+#  option VideoCoreUserland
+#
+
 CMAKE=`which cmake`
 videocore_cmake_check ( ) {
     if [ -z ${CMAKE} ]; then

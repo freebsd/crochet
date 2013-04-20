@@ -9,6 +9,12 @@
 # but that's coming...
 #
 
+# XXXXXX BROKEN XXXXX
+# 
+echo "The BeagleBonePlusRaspberryPi board configuration is very broken."
+echo "It has not been updated to the new 'strategy-based' architecture."
+exit 1
+
 # This is mostly just a lot of juggling so that the RPi and BBone
 # routines see the right BOARDDIR.
 

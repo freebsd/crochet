@@ -2,16 +2,28 @@
 # typical  new   board.   This  should  help  people   add  new  board
 # definitions to Crochet.
 
-# The kernel configuration, target architecture, and a default image
-# size that should be used.  Right now, the kernel config must be part
-# of the FreeBSD source tree.  (I would like to support out-of-tree
-# configurations but haven't worked out the necessary build magic to
-# make that possible.)
+# Of course, it's probably easiest to start from a working
+# definition.  Here are a few good ones to look at.  The
+# biggest difference is how the boot bits are structured:
+#   VersatilePB - Two images: one for booting kernel, other for World
+#   BeagleBone - Single image with separate boot partition
+#   GenericI386 - Single partition with boot bits integrated
+
+# Comments below explain a lot of the theory and probably
+# will make more sense after you skim one or more of the
+# the real configurations above.
+
+# There are a bunch of standard shell variables.  These three
+# should be defined by any board definition:
 KERNCONF=XXX
 TARGET_ARCH=YYY
 IMAGE_SIZE=$((1000 * 1000 * 1000))
+# Right now, the kernel config must be part of the FreeBSD source
+# tree.  (I would like to support out-of-tree configurations but
+# haven't worked out the necessary build magic to make that possible.)
 
-# If you require additional sources, define where you expect them.
+# If you require additional sources, define variables for them
+# so users can override if they have them somewhere else.
 # For example, a lot of boards use a special version of U-Boot:
 #NEWBOARD_UBOOT_SRC=${TOPDIR}/u-boot-xxx
 
@@ -23,12 +35,15 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # by phase.  See lib/base.sh for more details about how you can
 # use "priority" to further tune the final ordering.
 
-# There are a number of shell variables you might find useful:
+# A number of useful shell variables are defined for you:
 #
+# FREEBSD_SRC - Full path to FreeBSD source tree.  Defaults to /usr/src
+#    but users may override if they have separate checkouts.
+#    You should generally not override it here.
 # WORKDIR - The full path of the work directory for temporary and built files.
 # BOARDDIR - the full path of this directory.  Many boards have additional
-#      files in subdirectories.
-# BOARD_BOOT_MOUNTPOINT - full path where the boot partition is mounted
+#    files in subdirectories that can be referenced using ${BOARDDIR}/<subdir>
+# BOARD_BOOT_MOUNTPOINT - full path where the boot partition is mounted (if any)
 # BOARD_FREEBSD_MOUNTPOINT - full path of the freebsd partition
 
 ########################################################################
@@ -38,10 +53,9 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # have certain third-party sources, check for those and tell
 # the user how to get them if they're missing.
 
-# Here's a helper that checks that /usr/src exists
-# and looks vaguely like a FreeBSD source checkout.
-# (This is actually run for you but it doesn't hurt to
-# run it again.)
+# Here's a helper that checks that /usr/src exists and looks vaguely
+# like a FreeBSD source checkout.  (This is actually already
+# registered by Crochet for you but it doesn't hurt to run it again.)
 strategy_add $PHASE_CHECK freebsd_current_test
 
 # If your board requires U-Boot, you may find uboot_test
@@ -54,17 +68,25 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # strategy_add $PHASE_CHECK myboard_check_uboot
 
 # If you need to compile stuff for the target, you
-# might find the FreeBSD xdev environment useful:
+# might find the FreeBSD xdev cross-compiler useful.
+# This tests that it's available and prompts the user
+# to install it if not:
 #
 # strategy_add $PHASE_CHECK freebsd_xdev_test
+
+# Note: As a rule, Crochet never changes anything on the host system.
+# This is why freebsd_xdev_test prompts the user to install the xdev
+# tools rather than doing it for them.  Likewise, Crochet never
+# downloads anything automatically.  Users might have locally tweaked
+# and customized sources that they want to use instead.
 
 ########################################################################
 #
 # BUILD PHASE.
 #
-# There are actually several build phases.  The one you
-# will probably use is PHASE_BUILD_OTHER.  At this point,
-# FreeBSD world and kernel have already been built.
+# There are actually several build phases.  The one you will probably
+# use is PHASE_BUILD_OTHER.  At this point, FreeBSD world and kernel
+# have already been built.
 #
 
 # As an example, if you need to build a custom bootloader,
@@ -90,19 +112,19 @@ strategy_add $PHASE_CHECK freebsd_current_test
 #
 # strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
 #
-# TODO: ubldr is entirely generic except for the load address; converting
-# it to a PIC binary would remove this and allow us to use a single
-# binary on many platforms.
+# TODO: ubldr is entirely generic except for the load address;
+# converting it to a PIC binary would allow us to use a single binary
+# on many platforms.
 
 ########################################################################
 #
 # PARTITIONING the IMAGE
 #
-# The PHASE_PARTITION_LWW is a little bit magic:  Most phases
-# simply run everything that's registered.  There are a very few
-# "Last Write Wins" phases that only run the last item registered.
-# Partitioning is one such.  Since there can only be one item registered,
-# you probably want to define a function.
+# The PHASE_PARTITION_LWW is a little bit magic: Most phases simply
+# run everything that's registered.  There are a very few "Last Write
+# Wins" phases that only run the last item registered.  Partitioning
+# is one such.  Since there can only be one item registered, you
+# probably want to define a function.
 #
 # The helpers in lib/disk.sh make this pretty trivial for most boards.
 # For example, to use MBR partitioning with a 5 MB FAT partition
@@ -115,17 +137,21 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # }
 # strategy_add $PHASE_PARTITION_LWW myboard_partition_image
 #
-# More complex partitioning may require you to muck
-# with gpart, fdisk, or other tools directly.
-# If you have ideas for generalizing the tools in
-# lib/disk.sh, please let me know.
+# More complex partitioning may require you to muck with gpart, fdisk,
+# or other tools directly.  You might even need to override
+# PHASE_IMAGE_LWW to change how the image file itself is built.  If
+# you have ideas for generalizing the tools in lib/disk.sh, please let
+# me know.
 
 ########################################################################
 #
 # Mount Phase
 #
 # Like partitioning, mounting is also LWW.  The only partition that's
-# generally mandatory is ${BOARD_FREEBSD_MOUNTPOINT}.
+# generally mandatory is ${BOARD_FREEBSD_MOUNTPOINT}.  (In fact,
+# if that's all you need, you may not need to do anything here,
+# since the default mount handler does that much by itself.)
+# 
 # If your board needs a separate boot partition, mount that
 # at ${BOARD_BOOT_MOUNTPOINT}.
 #
@@ -144,24 +170,28 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # This can sometimes simplify things a bit:
 #
 # If you don't need a separate boot partition, you can ignore
-# this phase.
-#
+# this phase.  Useful bits here:
+
 # If you built ubldr:
+#
 # strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ${BOARD_BOOT_MOUNTPOINT}/ubldr
 
-# Copy an FDT file.  The file is read from the FreeBSD
-# source tree by default.  If the suffixes don't match,
-# this function will automatically invoke the DTC compiler
-# as necessary:
+# Copy an FDT file.  The file is read from the FreeBSD source tree by
+# default.  If the suffixes don't match, this function will
+# automatically invoke the DTC compiler as necessary:
+#
 # strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt newboard.dts ${BOARD_BOOT_MOUNTPOINT}/newboard.dtb
 
 ########################################################################
 #
 # Populate FreeBSD partition
 #
-# The core system runs installworld/distribute/etc for you,
-# so you can assume there's a basic FreeBSD installation at
-# this point.
+# The core system runs installworld/distribute/etc for you, so you can
+# assume there's a basic FreeBSD installation at this point.  (If you
+# really must, you can override PHASE_FREEBSD_INSTALLWORLD_LWW, but
+# I've never needed to.  I've always been able to do what I wanted by
+# either adding stuff to FREEBSD_EXTRA_xxx variables or by registering
+# something at BOARD_INSTALL that modifies the installed world.)
 #
 # All of the PHASE_FREEBSD_XXX phases run with cwd set to
 # BOARD_FREEBSD_MOUNTPOINT.  There are several such phases; look at
@@ -169,9 +199,9 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # occur in PHASE_FREEBSD_BOARD_INSTALL.
 #
 
-# installkernel is not registered for you because some boards need
-# this on the boot partition and some on the freebsd partition.  The
-# helper makes this easy:
+# Unlike installworld, installkernel is not done by default because
+# some boards need this on the boot partition and some on the freebsd
+# partition.  A helper makes this easy:
 #
 # strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 

@@ -1,3 +1,6 @@
+#
+# A utility used by the Raspberry Pi build.
+#
 
 mkimage_python_check ( ) {
     if python --version >/dev/null 2>&1; then

@@ -1,6 +1,15 @@
-KERNCONF=RPI-B
+KERNCONF=ZEDBOARD
 TARGET_ARCH=armv6
 IMAGE_SIZE=$((1000 * 1000 * 1000))
+
+#
+# Support for ZedBoard and possibly other Xilinx Zynq-7000 platforms.
+#
+# Based on Thomas Skibo's information from
+# http://www.thomasskibo.com/zedbsd/
+#
+# Untested, since I don't have a ZedBoard.
+#
 
 strategy_add $PHASE_CHECK freebsd_current_test
 

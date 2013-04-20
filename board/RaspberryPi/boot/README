@@ -8,9 +8,9 @@ considerably.
 PHASE ONE: Initialize the hardware
 ==================================
 
-This first phase is common to any use of RaspberryPi, whether you're
-booting Linux, FreeBSD, or any other software.  It loads a series of
-proprietary boot loader files that initialize the
+This first boot phase is common to any use of RaspberryPi, whether
+you're booting Linux, FreeBSD, or any other software.  It loads a
+series of proprietary boot loader files that initialize the
 hardware and ultimately load and run some executable.
 
 These initial bits are loaded from the first partition on the SD card.
@@ -94,8 +94,8 @@ start.elf loads the u-boot.bin file:
 
 * ubldr locates a UFS partition on the SD card.
 
-* ubldr loads /boot/loader.rc and uses it to set up some
-  boot-time parameters.
+* ubldr loads /boot/loader.rc from the UFS partition and
+  uses it to set up some boot-time parameters.
 
 * ubldr loads the FreeBSD kernel from UFS
 
@@ -122,8 +122,7 @@ the early kernel initialization.  Booting without those would
 reduce some of the customizability.
 
 Con: Requires kernel to live on the MSDOS partition.  (There
-may be ways to make this less awkward; can /boot be mounted
-from a FAT partition?)
+may be ways to make this less awkward.)
 
 For now, being able to debug and configure the early
 boot stages is very valuable, but as FreeBSD gets

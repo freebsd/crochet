@@ -1,5 +1,19 @@
 RPI_VC_SRC=${TOPDIR}/vchiq-freebsd
 
+#
+# Support for the VideoCore graphics driver for RaspberryPi.
+#
+# This is not needed for ordinary text usage of the RPi
+# so it has been separated into an optional module.
+# To enable it, add the following to your Crochet configuration:
+#
+#  option VideoCoreKernel
+#
+# To use it, you'll probably also want the userland libraries:
+#
+#  option VideoCoreUserland
+#
+
 videocore_src_check ( ) {
     if [ ! -d $RPI_VC_SRC ]; then
 	echo "Need VideoCore kernel module code for FreeBSD"

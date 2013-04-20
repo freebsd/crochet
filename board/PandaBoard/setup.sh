@@ -40,6 +40,13 @@ pandaboard_populate_boot_partition ( ) {
     # For now, we use a copy of an MLO built by someone else.
     cp ${BOARDDIR}/boot/MLO ${BOARD_BOOT_MOUNTPOINT}
     # TODO: We should be able to use MLO built by U-Boot. <sigh>
+    #
+    # As of late 2012, this is broken in the Denx U-Boot sources.
+    # Specifically, PandaBoard requires MLO to be under 32k and the
+    # default MLO is 38k.  If you'd like to help fix this, try setting
+    # CONFIG_SPL_MAX_SIZE in include/configs/omap4_common.h and then
+    # see if you can puzzle out how to get it to actually build.
+    #
     #cp ${PANDABOARD_UBOOT_SRC}/MLO ${BOARD_BOOT_MOUNTPOINT}
     cp ${PANDABOARD_UBOOT_SRC}/u-boot.bin ${BOARD_BOOT_MOUNTPOINT}
 }

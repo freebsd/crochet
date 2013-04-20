@@ -46,8 +46,8 @@ IF SOMETHING GOES WRONG
 
 If the image fails to boot:
   * Look at the build and install logs under the 'work' directory.
-  * Ask on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
-help.
+  * Ask on the freebsd-arm@freebsd.org or freebsd-current@freebsd.org
+    mailing list for help.
 
 ============================================================
 

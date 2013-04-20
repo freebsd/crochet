@@ -4,6 +4,14 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 VERSATILEPB_FLASH=${WORKDIR}/FreeBSD-${KERNCONF}.flash
 FREEBSD_INSTALLKERNEL_BOARD_ARGS="KERNEL_EXTRA_INSTALL=kernel.bin"
 
+#
+# Support for building an image suitable for booting on qemu.
+#
+# Note that the default image generation, partitioning,
+# and installworld works fine here so we only have to
+# define how to build the flash image.
+#
+
 versatilepb_build_flash_image ( ) {
     #  following code is stolen from gonzo, thanks.
     rm -f $VERSATILEPB_FLASH
