@@ -2,7 +2,9 @@ KERNCONF=PANDABOARD
 PANDABOARD_UBOOT_SRC=${TOPDIR}/u-boot-2012.07
 IMAGE_SIZE=$((1000 * 1000 * 1000))
 
-
+#
+# PandaBoard uses MBR image with 2mb FAT partition for booting.
+#
 pandaboard_partition_image ( ) {
     disk_partition_mbr
     disk_fat_create 2m
@@ -16,6 +18,9 @@ pandaboard_mount_partitions ( ) {
 }
 strategy_add $PHASE_MOUNT_LWW pandaboard_mount_partitions
 
+#
+# PandaBoard uses U-Boot
+#
 pandaboard_check_prerequisites ( ) {
     uboot_test \
 	PANDABOARD_UBOOT_SRC \
@@ -24,18 +29,11 @@ pandaboard_check_prerequisites ( ) {
 	"tar xf u-boot-2012.07.tar.bz2"
 }
 strategy_add $PHASE_CHECK pandaboard_check_prerequisites
-
-strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
-# ubldr help file goes on the UFS partition.
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
-
-
 strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
 strategy_add $PHASE_BUILD_OTHER uboot_configure ${PANDABOARD_UBOOT_SRC} omap4_panda
 strategy_add $PHASE_BUILD_OTHER uboot_build ${PANDABOARD_UBOOT_SRC}
 
-pandaboard_populate_boot_partition ( ) {
+pandaboard_install_uboot ( ) {
     echo "Installing U-Boot onto the boot partition"
     # For now, we use a copy of an MLO built by someone else.
     cp ${BOARDDIR}/boot/MLO ${BOARD_BOOT_MOUNTPOINT}
@@ -50,6 +48,18 @@ pandaboard_populate_boot_partition ( ) {
     #cp ${PANDABOARD_UBOOT_SRC}/MLO ${BOARD_BOOT_MOUNTPOINT}
     cp ${PANDABOARD_UBOOT_SRC}/u-boot.bin ${BOARD_BOOT_MOUNTPOINT}
 }
-strategy_add $PHASE_BOOT_INSTALL pandaboard_populate_boot_partition
+strategy_add $PHASE_BOOT_INSTALL pandaboard_install_uboot
 
+#
+# PandaBoard uses ubldr
+#
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+# ubldr help file goes on the UFS partition.
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
+
+#
+# Make a /boot/msdos directory so the running image
+# can mount the FAT partition.  (See overlay/etc/fstab.)
+#
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos

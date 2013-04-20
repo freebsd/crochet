@@ -17,8 +17,6 @@ RPI_FIRMWARE_SRC=${BOARDDIR}
 
 . ${BOARDDIR}/mkimage.sh
 
-
-strategy_add $PHASE_CHECK freebsd_current_test
 strategy_add $PHASE_CHECK freebsd_dtc_test
 
 raspberry_pi_check_uboot ( ) {

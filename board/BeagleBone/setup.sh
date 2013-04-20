@@ -2,8 +2,6 @@ KERNCONF=BEAGLEBONE
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-beaglebone-freebsd
 IMAGE_SIZE=$((1000 * 1000 * 1000))
 
-strategy_add $PHASE_CHECK freebsd_current_test
-
 #
 # BeagleBone requires a FAT partition to hold the boot loader bits.
 #
@@ -67,6 +65,6 @@ strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 
-# Mount the FAT boot partition somewhere useful in the final image.
+# Make the FAT boot partition accessible on the running system.
 # See overlay/etc/fstab
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos

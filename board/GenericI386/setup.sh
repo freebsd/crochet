@@ -55,13 +55,11 @@ generic_i386_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW generic_i386_partition_image
 
-generic_i386_mount_partitions ( ) {
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
-}
-strategy_add $PHASE_MOUNT_LWW generic_i386_mount_partitions
+# Don't need custom mount since the default works for us.
 
-generic_i386_populate_freebsd_partition ( ) {
+generic_i386_board_install ( ) {
+    # I386 images expect all the boot bits in /boot
     echo "Installing loader(8)"
     (cd ${WORKDIR} ; find boot | cpio -dump ${BOARD_FREEBSD_MOUNTPOINT})
 }
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL generic_i386_populate_freebsd_partition
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL generic_i386_board_install

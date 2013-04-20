@@ -11,8 +11,6 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # Untested, since I don't have a ZedBoard.
 #
 
-strategy_add $PHASE_CHECK freebsd_current_test
-
 # ZedBoard requires a FAT partition to hold the boot loader bits.
 zedboard_partition_image ( ) {
     disk_partition_mbr
