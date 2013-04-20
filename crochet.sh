@@ -14,16 +14,19 @@ mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
 # Load utility libraries.
-. ${LIBDIR}/base.sh
+. ${LIBDIR}/strategy.sh  # Must go first
+. ${LIBDIR}/board.sh
+. ${LIBDIR}/config.sh
+. ${LIBDIR}/customize.sh
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
-. ${LIBDIR}/board.sh
-. ${LIBDIR}/customize.sh
 
 crochet_usage ( ) {
-    echo "Usage: $0 -b <board> -c <configfile>"
+    echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
     echo " -b <board>: Load standard configuration for board"
+    echo "    (Equivalent to loading a config file that contains"
+    echo "    only a single board_setup command.)"
     echo " -c <file>: Load configuration from file"
     exit 2
 }

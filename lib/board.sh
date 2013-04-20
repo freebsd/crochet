@@ -90,14 +90,14 @@ board_default_mount_partitions ( ) {
 }
 strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
-board_installworld ( ) {
+board_default_installworld ( ) {
     if [ -n "$FREEBSD_INSTALL_WORLD" ]; then
 	freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
 }
-strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_installworld
+strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_default_installworld
 
-generic_board_goodbye ( ) {
+board_default_goodbye ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"
     echo
@@ -106,4 +106,4 @@ generic_board_goodbye ( ) {
     echo "(Replace /dev/da0 with the appropriate path for your card reader.)"
     echo
 }
-strategy_add $PHASE_GOODBYE_LWW generic_board_goodbye
+strategy_add $PHASE_GOODBYE_LWW board_default_goodbye
