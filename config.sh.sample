@@ -6,16 +6,21 @@
 #
 
 # Note: Only board_setup is actually required, assuming /usr/src has
-# suitably new FreeBSD sources.  Everything else below is optional.
+# suitable FreeBSD sources.  Everything else below is optional.
 
 # REQUIRED: 
 # Uncomment one to choose the default configuration for your board
 #
 # board_setup BeagleBone
-# board_setup RaspberryPi
-# board_setup PandaBoard
-# board_setup VersatilePB
 # board_setup GenericI386
+# board_setup PandaBoard
+# board_setup RaspberryPi
+# board_setup VersatilePB
+# board_setup ZedBoard
+
+# Don't see your board here?  board/NewBoardExample has details for
+# how to add a new board definition.  If you need help, ask.  If you
+# get it working, please consider contributing it.
 
 #
 # Read board/<board-name>/README for more details

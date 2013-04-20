@@ -1,6 +1,6 @@
-# An example  outline explaining  what needs to  be in setup.sh  for a
-# typical  new   board.   This  should  help  people   add  new  board
-# definitions to Crochet.
+# NewBoardExample provides a detailed outline explaining how to define
+# a new board.  This should help people add new board definitions to
+# Crochet.
 
 # Of course, it's probably easiest to start from a working
 # definition.  Here are a few good ones to look at.  The
@@ -12,6 +12,18 @@
 # Comments below explain a lot of the theory and probably
 # will make more sense after you skim one or more of the
 # the real configurations above.
+
+# When the configuration file invokes "board_setup Board", Crochet
+# looks for an runs board/Board/setup.sh.  The setup.sh file is the
+# only requirement for a board definition.  But many boards require
+# additional files (e.g., etc/fstab, boot blobs, etc).  Those files
+# can be stored in board/Board or subdirectories thereof and
+# referenced via the ${BOARDDIR} variable.
+
+# All of the helper files in lib (e.g., lib/disk.sh, lib/freebsd.sh)
+# are already loaded when the board setup is run.  Those define lots
+# of useful helper functions designed specifically to make board
+# definitions simpler.
 
 # There are a bunch of standard shell variables.  These three
 # should be defined by any board definition:
@@ -29,7 +41,6 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 
 # The general structure is to register operations with strategy_add
 # that will be run in different phases.
-# There are also a number of 'options' that add their own operations.
 #
 # Once all the configuration is complete, everything is run in order
 # by phase.  See lib/base.sh for more details about how you can
@@ -53,9 +64,11 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # have certain third-party sources, check for those and tell
 # the user how to get them if they're missing.
 
-# Here's a helper that checks that /usr/src exists and looks vaguely
-# like a FreeBSD source checkout.  (This is actually already
-# registered by Crochet for you but it doesn't hurt to run it again.)
+# For example, here's how to register the standard
+# freebsd_current_test helper that checks that /usr/src exists and
+# looks vaguely like a FreeBSD source checkout.  (This is actually
+# already registered by Crochet for you but it doesn't hurt to run it
+# again.)
 strategy_add $PHASE_CHECK freebsd_current_test
 
 # If your board requires U-Boot, you may find uboot_test
@@ -182,6 +195,12 @@ strategy_add $PHASE_CHECK freebsd_current_test
 #
 # strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt newboard.dts ${BOARD_BOOT_MOUNTPOINT}/newboard.dtb
 
+# Examples that just copy one or more files; note we can use '.' here
+# because PHASE_BOOT_INSTALL sets cwd appropriately:
+#
+# strategy_add $PHASE_BOOT_INSTALL cp ${BOARDDIR}/bootfiles/boot.bin .
+# strategy_add $PHASE_BOOT_INSTALL cp ${BOARDDIR}/bootfiles/* .
+
 ########################################################################
 #
 # Populate FreeBSD partition
@@ -218,13 +237,38 @@ strategy_add $PHASE_CHECK freebsd_current_test
 #
 # For example, most board definitions include the following:
 #
-#   overlay/etc/fstab
-#   overlay/etc/rc.conf
+#   ${BOARDDIR}/overlay/etc/fstab
+#   ${BOARDDIR}/overlay/etc/rc.conf
 
 ########################################################################
 #
 # Other Phases
 #
-# The full process includes a number of phases not described
-# above.  lib/base.sh includes a full list of phases and descriptions
-# for most of them.
+# The descriptions above only describe the most commonly-used phases.
+# Read lib/base.sh to see the full list of supported phases and
+# descriptions for most of them.
+#
+# It's relatively easy to add more phases if we need to.  However,
+# remember that there are other ways to tweak ordering:
+#
+# * Items with the same phase and priority are run in the order
+#   they were registered.  Within a single board definition file,
+#   it usually suffices to just register things in the order you
+#   want them run.
+#
+# * Priority can be used to manually force ordering.  This is
+#   most helpful with options that may appear in different orders
+#   in a config file.
+#
+
+########################################################################
+#
+# Board-specific Options
+#
+# Options can appear in an "option" directory under a board.
+# Such options are run with BOARDDIR and OPTIONDIR both defined.
+# For example, the RaspberryPi definition provides options to
+# build and install the VideoCore kernel module and libraries.
+#
+# See ${TOPDIR}/option/Example/setup.sh for more information
+# about options.
