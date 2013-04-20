@@ -64,7 +64,24 @@ strategy_add $PHASE_BUILD_OTHER videocore_user_build
 
 # cwd: DESTDIR
 videocore_user_install ( ) {
-    echo "TODO: Install videocore library"
-    exit 1
+    cd ${FREEBSD_SRC}
+    buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
+    _VC_BUILDDIR=${RPI_VC_USER_SRC}/build/arm-freebsd/release/
+    DESTDIR=${BOARD_FREEBSD_MOUNTPOINT}
+
+    eval $buildenv make -C ${_VC_BUILDDIR} DESTDIR=${DESTDIR} install
+    echo /opt/vc/lib > ${DESTDIR}/etc/ld-elf.so.conf
 }
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install
+
+# hello_triangle demo, not really necessary
+videocore_user_install_demo ( ) {
+    cd ${FREEBSD_SRC}
+    buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
+    DESTDIR=${BOARD_FREEBSD_MOUNTPOINT}
+
+    cd ${RPI_VC_USER_SRC}/host_applications/linux/apps/hello_pi/hello_triangle
+    eval $buildenv SDKSTAGE=${DESTDIR} gmake
+    cp hello_triangle.bin *.raw ${DESTDIR}/root
+}
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install_demo
