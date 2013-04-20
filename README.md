@@ -29,7 +29,7 @@ Using the script to build an image consists of a few steps:
    interface, click "board" above to see more about
    the boards that are currently supported.
 
-2. EDIT config.sh
+2. CREATE a config file
 
    Start by copying config.sh.sample.
 
@@ -39,7 +39,7 @@ Using the script to build an image consists of a few steps:
 
 3. RUN crochet.sh as root
 
-   $ sudo /bin/sh crochet.sh
+   $ sudo /bin/sh crochet.sh -c <config file>
 
    The script will first check that you have any needed sources.
    If you don't, the script will tell you exactly how to obtain the
@@ -66,13 +66,13 @@ PROJECTS
 There are still plenty of ways this script could
 be improved:
 
-* More boards.  Currently, it supports Beaglebone, RaspberryPi, and
-  PandaBoard.  There are a lot of other boards with similar concerns
-  that could easily be supported.  Look at board/NewBoardExample for
-  explanations for adding support for a new board.
+* More boards.  Currently, it supports Beaglebone, RaspberryPi,
+  PandaBoard, ZedBoard, and a few others.  There are a lot of
+  other boards with similar concerns that could easily be
+  supported.  Look at board/NewBoardExample for explanations
+  for adding support for a new board.
 
-* Non-ARM support.  I see no reason this script could not be used for
-  other architectures.  I just haven't done so yet.
+* Non-ARM support.  The GenericI386 target proves this is possible.
 
 * Out-of-tree kernel configuration.  Right now, these scripts assume
   kernel configuration files are in the FreeBSD source tree.  I don't

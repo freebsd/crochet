@@ -45,10 +45,10 @@ option ( ) {
 
 # Strategy List management
 
-# Most of Crochet runs off of a "strategy" list of operations.  These
-# operations are added to the strategy by the various configuration
-# options.  After configuration, the strategy list is sorted and then
-# run to actually do the work.
+# Most of Crochet runs off of a "strategy list" of operations.  The
+# configuration hooks all invoke strategy_add to add operations to the
+# strategy list.  After configuration, the strategy list is sorted and
+# then the items are run to actually do the work.
 
 # The strategy list is kept in files under ${WORKDIR}/strategy;
 # we need to clean that out before we start.
@@ -61,16 +61,21 @@ mkdir -p ${WORKDIR}/strategy
 # for each phase (this allows items run by earlier phases to add stuff
 # to later phases).
 
-# DO NOT make up phase numbers.  If you need a new phase, add a
-# symbolic name.  Phase numbers will change as the system evolves.
+# DO NOT use numbers in the argument to strategy_add.  If you need a
+# new phase, add a symbolic name.  The specific phase numbers will
+# change as the system evolves.  If you just need to run something
+# "a little earlier" or "a little later", try fudging the priority
+# instead of adding a new phase.  If you do need a new phase, let
+# me know; I'm curious what I overlooked.
 
 # There are a few phases that can only have a single item registered.
-# These include "LWW" (Last Write Wins) in the name.  They are
-# registered in the same way, but are handled internally a little
-# differently.
+# These include "LWW" (Last Write Wins) in the name.  They use
+# the same registration interface, but only the last registration
+# will actually get run.
 
 # POST_CONFIG phase is a chance to update internal configuration
-# after the user configuration has been completely read.
+# after the user configuration has been completely read but before
+# any real work is attempted.
 PHASE_POST_CONFIG=100
 
 # CHECK is for testing that sources and necessary tools are available.
@@ -96,9 +101,14 @@ PHASE_BOOT_DONE=599
 
 # PHASE_FREEBSD items run with cwd set to root of freebsd filesystem
 PHASE_FREEBSD_START=700
-PHASE_FREEBSD_BASE_INSTALL=710
+# Basic freebsd installworld, which is registered in lib/board.sh but can be overridden
+PHASE_FREEBSD_INSTALLWORLD_LWW=711
+# "Board" is reserved for board definitions
 PHASE_FREEBSD_BOARD_INSTALL=720
+# "Option" is reserved for options
 PHASE_FREEBSD_OPTION_INSTALL=760
+# "User" is reserved for user customization and should not be used
+# by any board or option definition.
 PHASE_FREEBSD_USER_CUSTOMIZATION=790
 PHASE_FREEBSD_DONE=799
 
@@ -111,12 +121,9 @@ PHASE_POST_UNMOUNT=900
 # image.  Can be replaced by boards that need special instructions.
 PHASE_GOODBYE_LWW=991
 
-
 # This is the default priority used for all commands that
-# don't specify one.  It should never be overwritten in
-# the global environment.
+# don't specify one.
 PRIORITY=100
-
 
 # $1 - Phase to run this in.
 # $@ - shell function and options
@@ -125,7 +132,8 @@ PRIORITY=100
 #    strategy_add $PHASE_X foofunc fooarg1 fooarg2
 #
 # To override PRIORITY (lower is earlier; default is 100):
-#    PRIORITY=70 strategy_add $PHASE_X foofunc fooargs
+#    PRIORITY=70 strategy_add $PHASE_X addfrogs earlyfrogs
+#    PRIORITY=200 strategy_add $PHASE_X addfrogs latefrogs
 #
 # If phase is one of the special LWW phases, then only the last
 # function registered for that phase will actually be run.  Otherwise,

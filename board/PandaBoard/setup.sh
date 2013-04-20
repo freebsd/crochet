@@ -28,7 +28,7 @@ strategy_add $PHASE_CHECK pandaboard_check_prerequisites
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 # ubldr help file goes on the UFS partition.
-strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_ubldr_copy_ubldr_help boot
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
 
 strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
@@ -45,4 +45,4 @@ pandaboard_populate_boot_partition ( ) {
 }
 strategy_add $PHASE_BOOT_INSTALL pandaboard_populate_boot_partition
 
-strategy_add $PHASE_FREEBSD_BASE_INSTALL mkdir boot/msdos
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos

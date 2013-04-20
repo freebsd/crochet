@@ -95,7 +95,7 @@ board_installworld ( ) {
 	freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
 }
-strategy_add $PHASE_FREEBSD_BASE_INSTALL board_installworld
+strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_installworld
 
 generic_board_goodbye ( ) {
     echo "DONE."

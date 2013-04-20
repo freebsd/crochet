@@ -53,4 +53,4 @@ generic_i386_populate_freebsd_partition ( ) {
     echo "Installing loader(8)"
     (cd ${WORKDIR} ; find boot | cpio -dump ${BOARD_FREEBSD_MOUNTPOINT})
 }
-strategy_add $PHASE_FREEBSD_BASE_INSTALL generic_i386_populate_freebsd_partition
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL generic_i386_populate_freebsd_partition

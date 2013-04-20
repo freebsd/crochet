@@ -104,6 +104,6 @@ raspberry_pi_populate_boot_partition ( ) {
 
 strategy_add $PHASE_BOOT_INSTALL raspberry_pi_populate_boot_partition
 
-strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_installkernel .
-strategy_add $PHASE_FREEBSD_BASE_INSTALL mkdir boot/msdos
-strategy_add $PHASE_FREEBSD_BASE_INSTALL freebsd_ubldr_copy_ubldr_help boot
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
