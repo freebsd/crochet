@@ -1,4 +1,7 @@
-This is a *VERY* experimental ongoing project to build a
+N.B.: This is broken since I rearchitected crochet
+to use the strategy list approach.  Needs to be overhauled.
+
+This was a *VERY* experimental ongoing project to build a
 FreeBSD/arm system image that can boot on more than one
 system.
 

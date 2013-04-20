@@ -26,6 +26,10 @@ disk_record_md ( ) {
     _DISK_MDS="${_DISK_MDS} $1"
 }
 
+strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
+
+
+
 # $1: full path of image file
 # $2: size of SD image
 disk_create_image ( ) {
@@ -91,12 +95,6 @@ disk_fat_mount ( ) {
     disk_record_mountdir $1
 }
 
-# TODO: Make this work.
-disk_swap_create ( ) {
-    #gpart add -s790m -t freebsd -i 3 -f x ${DISK_MD}
-    #_DISK_SWAP_PARTITION=s3
-}
-
 # TODO: Support $1 size argument
 # TODO: If $1 is empty, use whole disk.
 disk_ufs_create ( ) {
@@ -134,12 +132,4 @@ disk_ufs_mount ( ) {
     mkdir $1 || exit 1
     mount ${DISK_UFS_DEVICE} $1 || exit 1
     disk_record_mountdir $1
-}
-
-# TODO: Move this into an option
-disk_add_swap_file ( ) {
-    echo "Creating swap file"
-    dd if=/dev/zero of="usr/swap0" bs=1024k count=$1
-    chmod 0600 "usr/swap0"
-    echo 'swapfile="/usr/swap0"' >> etc/rc.conf
 }

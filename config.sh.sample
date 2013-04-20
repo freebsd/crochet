@@ -1,104 +1,113 @@
 #
-# CONFIGURATION
+# SAMPLE CONFIGURATION
+#
+# Copy this to another file and use that when running Crochet, e.g.
+#  $ sudo /bin/sh Crochet.sh -c <myconfig>
 #
 
-# Note: Only board_setup and IMAGE_SIZE should
-# be required for building a standard image,
-# assuming /usr/src has suitable FreeBSD
-# sources.  Everything else below is optional.
+# Note: Only board_setup is actually required, assuming /usr/src has
+# suitable FreeBSD sources.  Everything else below is optional.
 
-# REQUIRED:
+# REQUIRED: 
 # Uncomment one to choose the default configuration for your board
 #
 # board_setup BeagleBone
-# board_setup RaspberryPi
+# board_setup GenericI386
 # board_setup PandaBoard
+# board_setup RaspberryPi
 # board_setup VersatilePB
+# board_setup ZedBoard
+
+# Don't see your board here?  board/NewBoardExample has details for
+# how to add a new board definition.  If you need help, ask.  If you
+# get it working, please consider contributing it.
 
 #
 # Read board/<board-name>/README for more details
 # about configuring for your particular board.
 #
-# The variables documented below are just
-# a few of the most common ones.
-#
 
-# REQUIRED: IMAGE_SIZE
+# Suggested: option ImageSize
 #
 # Size of the disk image that will be built.  This is usually the same
 # size as your memory card or disk drive, but it can be smaller.
+# Each board setup above defines a default value, but it's deliberately
+# chosen to be very small.
 #
-# MB and GB are predefined for convenience here
+# 'mb' = 10 ^ 6,  'gb' = 10 ^ 9, 'mib' = 2 ^ 20 and 'gib' = 2 ^ 30
 #
-# The sizes here are rounded down some to make sure they fit on a
-# matching card.  ($MB, $GB are pre-defined as 1000000 and 1000000000,
-# respectively.)
-#
-# IMAGE_SIZE=$((100 * MB)) # for kernel-only images
-# IMAGE_SIZE=$((1950 * MB)) # for 2 Gigabyte card
-# IMAGE_SIZE=$((3900 * MB)) # for 4 Gigabyte card
-# IMAGE_SIZE=$((7900 * MB)) # for 8 Gigabyte card
-# IMAGE_SIZE=$((15900 * MB)) # for 16 Gigabyte card
-# IMAGE_SIZE=$((31900 * MB)) # for 32 Gigabyte card
-#
-# NEW:  You can now use "option ImageSize" to set this a little
-# more conveniently.  For example:
-#  option ImageSize 7900MB
-# The ImageSize option also allows MiB and GiB if you
-# really need power-of-two sizes.
+#option ImageSize 100mb # for kernel-only images
+#option ImageSize 1950mb # for 2 Gigabyte card
+#option ImageSize 3900mb # for 4 Gigabyte card
 
 #
-# OPTIONAL STUFF
+# How to Customize Your Build
 #
-# Nothing below here is mandatory; setting a board and an IMAGE_SIZE
-# should be enough to build a bootable image for a supported board.
+# Crochet supports a variety of customization approaches:
 #
-# There are, of course, many other variables that you may want to
-# tweak.  Some of the more popular are described below.  Many others
-# can be found by reading the source code.  (Variables beginning with
-# "_" should not be touched.)
+# 1) "options" provide canned functionality.  If there is not
+#   an option that provides what you want, consider contributing
+#   a new one.  There's a template in option/Sample that explains
+#   how to write a new one.
+# 2) There are a large number of shell variables that control
+#   how various internal features work.  A very few are described
+#   below; you can find many more by skimming the source code.
+#   (Variables beginning with '_' should not be touched.)
+# 3) "overlay" files are simply copied to the image as-is.  Crochet
+#   looks in a couple of standard places; you can just add the file
+#   you want and it will get copied for you.
+# 4) Functions beginning with "customize_" are provide for user
+#   customization.  The default definitions are empty; feel free to
+#   override them.  There are examples at the end of this file.
+# 5) Crochet internally uses a "strategy list" of shell functions that
+#   will be run.  The board definitions and options all add items to
+#   the strategy list; you can also define your own functions and
+#   add them directly to the strategy list using strategy_add.
+#   Read the comments in lib/base.sh for details of how this works.
 #
-# The most advanced customizations may require defining a "customize"
-# shell function.  If you can't easily do what you want even with the
-# "customize" hooks, consider defining a custom board definition or
-# ask us for ideas.
-# 
+# If none of the above mechanisms support your requirements, ask
+# and we'll see if we can add something else.
+#
 
-#
-# Enabling optional build features.
-#
-# Look at the "option" directory for a list of supported optional
-# features.  You can enable one or more of them with the "option"
-# command.  A few examples:
-#
 # option AutoSize
 #
+# "AutoSize" adds a startup item that will use "growfs" to
+# grow the UFS partition as large as it can.  This can be used
+# to construct small (e.g., 1GB) images that can be copied onto larger
+# (e.g., 32GB) media.  At boot, such images will automatically resize
+# to fully utilize the larger media.
 
-# The board_setup above picks a default KERNCONF but you can override
-# it here.  (Overriding here won't impact the default IMG filename;
-# you may want to change that below as well.)
+# option SwapFile
 #
+# Takes a size argument (e.g., "768mb") and adds a swap file
+# to the UFS partition of the indicated size.  This also adds
+# the appropriate rc.conf entries to use the swap file.
+
+# option UsrPorts
+#
+# Uses "portsnap" to download an up-to-date ports tree and
+# install it on the image.
+
+# option UsrSrc
+#
+# Copies the src tree that was used to build this image to /usr/src
+# on the image.
+
 # KERNCONF=MYCONF
-
-# The script assumes you're running a sufficiently recent copy of
-# FreeBSD and have FreeBSD-CURRENT source code available in /usr/src.
-
-# FreeBSD source that will be used for kernel, world, and ubldr.
 #
-# If you are already running on a sufficiently recent FreeBSD-CURRENT,
-# you can just use /usr/src here.
-#
+# Each board picks a default KERNCONF but you can override it.
+
 # FREEBSD_SRC=/usr/src
-
-# If you aren't running FreeBSD-CURRENT or cannot update /usr/src,
-# then uncomment the following.
 #
+# FreeBSD source that will be used for kernel, world, and ubldr.
 # This directory doesn't need to exist yet.  When you run the script,
 # it will tell you how to get appropriate sources into this directory.
-#
-# FREEBSD_SRC=$TOPDIR/freebsd-src
+# (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
 
-# You probably will never override this, but you may need to
+
+# WORKDIR=${TOPDIR}/work
+#
+# You will probably never override this, but you may need to
 # understand it: WORKDIR holds all of the created files (in
 # particular, the FreeBSD "obj" is redirected here).  It also holds a
 # lot of log files: If something goes wrong, there's probably a record
@@ -112,39 +121,32 @@
 #
 # In particular: If you need to do a clean build of everything from
 # scratch, remove the contents of $WORKDIR first.
+
+
+# IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 #
-# WORKDIR=${TOPDIR}/work
-
-
 # The name of the final disk image.
 # This file will be as large as IMAGE_SIZE above, so make
 # sure it's located somewhere with enough space.
-#
-# IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 
-# Uncomment to suppress installworld.  This is
+# FREEBSD_INSTALL_WORLD=y
+#
+# Unset this to suppress installworld.  This is
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
 # generation.  Set IMAGE_SIZE to 50 * MB or even smaller
 # to really shorten your build/test cycles:
 #
-# unset FREEBSD_INSTALL_WORLD
-
-# Uncomment to populate /usr/src with a copy
-# of the sources the image was built with.
-# You probably want at least a 4GB card.
-#
-# FREEBSD_INSTALL_USR_SRC=yes
-
-# Uncomment to fetch a fresh /usr/ports tree and put
-# it on the image.
-#
-# FREEBSD_INSTALL_USR_PORTS=yes
 
 # Extra arguments for world.
 #
+# Each board definition specifies certain options for the world and
+# kernel builds.  Note that these are recorded in ${WORKDIR} when
+# Crochet runs a build; subsequent Crochet runs will skip the
+# corresponding build if the options are unchanged.
+#
 # Passed to both buildworld and installworld.
-# FREEBSD_WORLD_EXTRA_ARGS="DEBUG_FLAGS=-g"
+# FREEBSD_WORLD_EXTRA_ARGS=""
 # Passed to only one:
 # FREEBSD_BUILDWORLD_EXTRA_ARGS="-DNOCLEAN"
 # FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
@@ -163,55 +165,51 @@
 # Most customization simply consists of putting extra
 # files onto the image.
 #
-# The contents of ${BOARDDIR}/overlay and ${WORKDIR}/overlay
-# are copied over the image just before the generic
-# customization hooks are run.  For example, you can
-# put a custom passwd or fstab file into
-# ${WORKDIR}/overlay/etc.  If this file needs to be
-# built dynamically, you can build it right here.
-
-# For example, if you want to just add an entry to fstab, try
-# something like this:
-#
-# cp ${BOARDDIR}/overlay/etc/fstab ${WORKDIR}/overlay/etc/fstab
-# echo "md /tmp mfs rw,noatime,-s30m 0 0" >> ${WORKDIR}/overlay/etc/fstab
+# The contents of ${BOARDDIR}/overlay, ${TOPDIR}/overlay, and
+# ${WORKDIR}/overlay are copied over the image in that order.  For
+# example, you can put a custom passwd or fstab file into
+# ${TOPDIR}/overlay/etc and it will be picked up automatically.
 
 
-# GENERIC CUSTOMIZATION HOOKS
+# Adding Strategy Items
 #
-# You can do arbitrary configuration by redefining
-# the following shell functions.
+# XXX explain how to use strategy_add and why you might want to XXX
 #
-# Most boards set up two partitions:
-#  * A boot partition (often FAT formatted)
-#    holds the various boot loaders.  This
-#    varies significantly by board.
-#  * A FreeBSD partition holds the FreeBSD world
-#    (and usually kernel).
+
+
+# STANDARD customize_ FUNCTIONS
 #
-# The following functions are run after the
-# default board setup has run, so you can feel
-# free to delete or rearrange files on the image
+# There are a few standard functions beginning with customize_
+# that are specifically provided for you to override.  These
+# are never defined by Crochet.
+#
+# Most board definitions work with two partitions (for some boards,
+# these are in different image files):
+#  * A boot partition holds the various boot loaders.  This varies
+#    significantly by board.
+#  * A FreeBSD partition holds the FreeBSD world (and usually kernel).
+#    Board definitions should keep this as standard as possible.
+#
+# The following functions are run after the default board setup has
+# run, so you can feel free to delete or rearrange files on the image
 # as you see fit.
 #
-# WARNING:  Unlike some other system-building scripts,
-# these do *not* run in a chroot or jail.  (It can't
-# because we're cross-building.)  For example, if you
-# want to add an account, be sure to refer
-# to etc/passwd and not /etc/passwd!
+# WARNING: Unlike some other system-building scripts, these do *not*
+# run in a chroot or jail.  (It can't because we're cross-building.)
+# For example, if you want to add an account, be sure to refer to
+# etc/passwd and not /etc/passwd!
 #
 # Some useful shell variables:
 #   ${WORKDIR} is the full path to the 'work' directory
 #       which you can use for intermediate files
-#   ${BOARDDIR} is the directory where the board specific files
-#       are located
 #   ${TOPDIR} is the current directory where crochet is located
 #
 # The lib/*.sh files also define a number of functions
 # that you may find useful here.
 #
 # # Runs after boot partition is built.
-# # $1 is the full path to the mounted boot partition
+# # The current working directory is at the root of the mounted
+# # boot partition.
 # customize_boot_partition ( ) {
 # }
 #
@@ -219,14 +217,15 @@
 # and FREEBSD_INSTALL_WORLD are not enabled.
 #
 # # Runs after FreeBSD partition is built and populated.
-# # $1 is the full path to the mounted boot partition
+# # The current working directory is at the root of the mounted
+# # freebsd partition.
 # customize_freebsd_partition ( ) {
 # }
 
-# For example, here's another way to add an entry to the default fstab:
+# For example, here's one way to add an entry to the default fstab:
 #
 # customize_freebsd_partition ( ) {
-#   echo "md /tmp mfs rw,noatime,-s30m 0 0" >> $1/etc/fstab
+#   echo "md /tmp mfs rw,noatime,-s30m 0 0" >> etc/fstab
 # }
 
 # If you can't do what you want with the above, try this:

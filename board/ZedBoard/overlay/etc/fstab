@@ -1,0 +1,3 @@
+# Device	Mountpoint	FStype	Options	Dump	Pass#
+/dev/mmcsd0s2a	/		ufs	rw	1	1
+/dev/mmcsd0s1	/mnt/boot	msdosfs	rw	0	0

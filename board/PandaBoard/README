@@ -17,7 +17,7 @@ project.  Details can be found at:
 
   http://pandaboard.org
 
-The PandaBoard features a dual-core Cortex-A9 processor
+The PandaBoard ES features a dual-core Cortex-A9 processor
 (ARMv7) with 1 GB RAM, 10/100 Ethernet, WiFi, Bluetooth,
 audio, integrated video with hardware 3D acceleration,
 and USB support all built in.

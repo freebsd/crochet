@@ -83,10 +83,19 @@ freebsd_current_test ( ) {
 	${KERNCONF} \
  	" $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
 }
+# TODO: Not everything requires -CURRENT; copy this into all the
+# board setups and remove it from here.
+strategy_add $PHASE_CHECK freebsd_current_test
 
-# Common code for buildworld and buildkernel.
-# In particular, this compares the command we're about to
-# run to the previous run and rebuilds if anything is different.
+# Common code for buildworld and buildkernel.  In particular, this
+# compares the command we're about to run to the previous run and
+# rebuilds if anything is different.  So if you build multiple
+# images for multiple systems with the same options, you won't
+# have to repeat a full buildworld and/or buildkernel.
+#
+# TODO: We could do even better by using a separate MKOBJDIRPREFIX
+# for each different combination of buildworld flags.  Then
+# each separate world would end up in a separate directory.
 #
 _freebsd_build ( ) {
     if diff ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2 >/dev/null 2>&1
@@ -126,6 +135,7 @@ freebsd_buildworld ( ) {
     echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${TARGET_ARCH}.sh
     _freebsd_build world ${TARGET_ARCH}
 }
+strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 
 
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
@@ -137,6 +147,8 @@ freebsd_buildkernel ( ) {
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${KERNCONF}.sh
     _freebsd_build kernel ${KERNCONF}
 }
+strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
+
 
 # freebsd_installworld: Install FreeBSD world to image
 #
@@ -151,7 +163,7 @@ freebsd_installworld ( ) {
 	# success
     else
 	echo "Installworld failed."
-	echo "    Log: ${WORKDIR}/_.installworld.log"
+	echo "    Log: ${WORKDIR}/_.installworld.${TARGET_ARCH}.log"
 	exit 1
     fi
 
@@ -176,14 +188,18 @@ freebsd_installworld ( ) {
 
 # freebsd_installkernel: Install FreeBSD kernel to image
 #
-# $1: Root directory of UFS partition
+# $1: Root directory of FreeBSD system where we should install
+# kernel; defaults to cwd.
 #
 freebsd_installkernel ( ) {
-    # TODO: check and warn if kernel isn't built.
+    if [ -n "$1" ]; then
+	cd $1
+    fi
+    DESTDIR=`pwd`
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel at "`date`
-    echo "    Destination: $1"
-    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$1 installkernel > ${WORKDIR}/_.installkernel.${KERNCONF}.sh
+    echo "    Destination: $DESTDIR"
+    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$DESTDIR installkernel > ${WORKDIR}/_.installkernel.${KERNCONF}.sh
     if /bin/sh -e ${WORKDIR}/_.installkernel.${KERNCONF}.sh > ${WORKDIR}/_.installkernel.${KERNCONF}.log 2>&1
     then
 	# success
@@ -199,6 +215,10 @@ freebsd_installkernel ( ) {
 # Note: Assumes world is already built.
 #
 # $@: make arguments for building
+#
+# TODO: Add $1 argument as a directory to install to (instead of
+# work/ubldr/) so we can juggle multiple ubldrs compiled with
+# different options.
 #
 freebsd_ubldr_build ( ) {
     cd ${FREEBSD_SRC}
@@ -298,19 +318,19 @@ freebsd_install_usr_ports ( ) {
 # devolves into a 'cp'.
 #
 freebsd_install_fdt ( ) (
-    cd $FREEBSD_SRC/sys/boot/fdt/dts
+    _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
     case $1 in
 	*.dtb)
 	    case $2 in
 		*.dtb)
-		    cp $1 $2
+		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dts)
-		    dtc -I dtb -O dts -p 8192 -o $2 $1
+		    (cd $_FDTDIR; dtc -I dtb -O dts -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			cp $1 $2
+			(cd $_FDTDIR; cat $1) > $2
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1
@@ -321,14 +341,14 @@ freebsd_install_fdt ( ) (
 	*.dts)
 	    case $2 in
 		*.dts)
-		    cp $1 $2
+		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dtb)
-		    dtc -I dts -O dtb -p 8192 -o $2 $1
+		    (cd $_FDTDIR; dtc -I dts -O dtb -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			cp $1 $2
+			(cd $_FDTDIR; cat $1) > $2
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1

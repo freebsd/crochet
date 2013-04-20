@@ -1,23 +1,19 @@
 #
 # Default implementations of board routines.
 #
-# Most of these are just empty so that boards that don't need
-# a separate boot partition, for example, can just omit those routines.
-#
-# A few of the routines below are "generic_board" routines that
-# a lot of boards will want to call.
-#
 
 # Boards that need more than this can define their own.
 BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
 BOARD_BOOT_MOUNTPOINT=${WORKDIR}/_.mount.boot
 
-# Default is to install both kernel and WORLD but not
+# Default is to install world but not
 # populate /usr/src and /usr/ports
 FREEBSD_INSTALL_WORLD=y
-FREEBSD_INSTALL_KERNEL=y
 FREEBSD_INSTALL_USR_SRC=
 FREEBSD_INSTALL_USR_PORTS=
+
+# List of all board dirs.
+BOARDDIRS=""
 
 # $1: name of board directory
 #
@@ -28,84 +24,86 @@ board_setup ( ) {
 	echo "No setup.sh in ${BOARDDIR}."
 	exit 1
     fi
+    BOARDDIRS="$BOARDDIRS $BOARDDIR"
     . $BOARDDIR/setup.sh
 
     echo "Imported board setup for $1"
 
     IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
+    PRIORITY=20 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_overlay_files $BOARDDIR
+    BOARDDIR=
 }
 
-board_check_prerequisites ( ) {
-    freebsd_current_test
+# $1 - BOARDDIR
+# Registered from end of board_setup so that it can get the BOARDDIR
+# as an argument.  (There are rare cases where we actually load
+# more than one board definition; in those cases this will get
+# registered and run once for each BOARDDIR.)
+# TODO: Are there other examples of this kind of thing?
+# If so, is there a better mechanism?
+board_overlay_files ( ) {
+    if [ -d $1/overlay ]; then
+	echo "Overlaying board-specific files from $1/overlay"
+	(cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+    fi
 }
 
-board_build_bootloader ( ) { }
-
-# $1 - name of image file
-# $2 - SD size from user config.sh
-board_create_image ( ) {
-    disk_create_image $1 $2
+board_defined ( ) {
+    if [ -z "$BOARDDIRS" ]; then
+	echo "No board setup?"
+	echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
+	exit 1
+    fi
 }
+strategy_add $PHASE_POST_CONFIG board_defined
+
+board_check_image_size_set ( ) {
+    # Check that IMAGE_SIZE is set.
+    # For now, support SD_SIZE for backwards compatibility.
+    # June 2013: Remove SD_SIZE support entirely.
+    if [ -z "${IMAGE_SIZE}" ]; then
+	if [ -z "${SD_SIZE}" ]; then
+	    echo "Error: \$IMAGE_SIZE not set."
+	    exit 1
+	fi
+	echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
+	IMAGE_SIZE=${SD_SIZE}
+    fi
+}
+strategy_add $PHASE_CHECK board_check_image_size_set
+
+board_default_create_image ( ) {
+    disk_create_image $IMG $IMAGE_SIZE
+}
+strategy_add $PHASE_IMAGE_BUILD_LWW board_default_create_image
 
 # Default is to create a single UFS partition inside an MBR
-board_partition_image ( ) {
+board_default_partition_image ( ) {
     disk_partition_mbr
     disk_ufs_create
 }
+strategy_add $PHASE_PARTITION_LWW board_default_partition_image
 
 # Default mounts just the FreeBSD partition
-board_mount_partitions ( ) {
+board_default_mount_partitions ( ) {
     disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
 }
+strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
-# Default board setup doesn't use a separate boot partition
-board_populate_boot_partition ( ) {
-}
-
-generic_board_populate_freebsd_partition ( ) {
-    freebsd_installkernel ${BOARD_FREEBSD_MOUNTPOINT}
+board_installworld ( ) {
     if [ -n "$FREEBSD_INSTALL_WORLD" ]; then
 	freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
-    if [ -n "$FREEBSD_INSTALL_USR_SRC" ]; then
-	freebsd_install_usr_src ${BOARD_FREEBSD_MOUNTPOINT}
-    fi
-    if [ -n "$FREEBSD_INSTALL_USR_PORTS" ]; then
-	freebsd_install_usr_ports ${BOARD_FREEBSD_MOUNTPOINT}
-    fi
-    # TODO: Install packages here ?  Or leave that for user customization?
-    if [ -d ${BOARDDIR}/overlay ]
-    then
-	echo "Overlaying board-specific files from ${BOARDDIR}/overlay"
-	(cd ${BOARDDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
-    fi
-    if [ -d ${WORKDIR}/overlay ]
-    then
-	echo "Overlaying files from ${WORKDIR}/overlay"
-	(cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
-    fi
 }
+strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_installworld
 
-# Many board definitions will override this with a routine that calls
-# generic_board_populate_freebsd_partition and then copies/tweaks a
-# few board-specific items.
-board_populate_freebsd_partition ( ) {
-    generic_board_populate_freebsd_partition
-}
-
-generic_board_show_message ( ) {
+generic_board_goodbye ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"
     echo
-    echo "Copy to a MicroSDHC card using a command such as:"
+    echo "Copy to a suitable memory card using a command such as:"
     echo "dd if=${IMG} of=/dev/da0 bs=1m"
-    echo "(Replace /dev/da0 with the appropriate path for your SDHC card reader.)"
+    echo "(Replace /dev/da0 with the appropriate path for your card reader.)"
     echo
 }
-
-board_show_message ( ) {
-    generic_board_show_message
-}
-
-board_post_unmount ( ) {
-}
+strategy_add $PHASE_GOODBYE_LWW generic_board_goodbye

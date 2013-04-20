@@ -1,8 +1,9 @@
-This is a simple skeleton board configuration that
-can be copied as a template for creating new board
-definitions.
+This is a simple skeleton board configuration that can be copied as a
+template for creating new board definitions.
 
-Read the comments in setup.sh for more information.
+Read the comments in setup.sh for more information about how board
+definitions work; the following comments provide some additional
+details about particular components you might need to use.
 
 ================================================================
 
@@ -16,7 +17,8 @@ is being actively maintained.
 There are many forks of U-Boot created by different groups of people
 to support different boards.  Generally, the master U-Boot project at
 denx.de has been good about adding new board support to the master
-sources as such support stabilizes.
+sources as such support stabilizes, but for newer boards you may
+need to start from U-Boot sources provided by the board vendor.
 
 With FreeBSD/ARM, U-Boot is often paired with ubldr.  ubldr is part of
 the FreeBSD source tree; it is a variant of FreeBSD's loader(8)
@@ -31,8 +33,14 @@ lightly patched to fully support FreeBSD and ubldr:
 1. FreeBSD build patches.
 
 There are a couple of patches generally needed just so U-Boot can be
-built on FreeBSD.  This mostly is due to some subtle differences in
-library layout.
+built on FreeBSD.  These address the following issues:
+ * cc -print-file-name=include is broken on some versions of FreeBSD
+   U-Boot uses this to determine the directory containing "freestanding
+   include files".   Because this is broken, U-Boot's top-level config.mk
+   must be patched to set gccincdir to /usr/include.
+ * On FreeBSD/ARM, some key compiler support functions are only
+   available in libc.  In U-Boot's top-level Makefile, add "-lc" to
+   the end of PLATFORM_LIBS.
 
 Versions of these patches are already in the 'files' directory of this
 sample project; they may need slight adjustment for the version of
@@ -74,10 +82,11 @@ should generally:
 Building U-Boot in Crochet
 --------------------------------
 
-Crochet is designed so that tools such as U-Boot are always built
+Crochet is designed so that tools such as U-Boot can be always built
 directly from source.  (The existence of binary blobs in the Crochet
-project itself is generally a bug.)  This requires that you test
-carefully and be aware of a few issues:
+project itself is sometimes necessary, but we try to keep it to a
+minimum.)  This requires that you test carefully and be aware of a few
+issues:
 
 * The board setup.sh should use uboot_test and provide an accurate set
   of instructions for downloading appropriate U-Boot source.  (Try the

@@ -1,45 +1,45 @@
-#!/bin/sh -e
-
+#!/bin/sh
+set -e
 echo 'Starting at '`date`
 
 # General configuration and useful definitions
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
-CONFIGFILE=config.sh
+CONFIGFILE=
+BOARD=
 
-MB=$((1000 * 1000))
-GB=$((1000 * $MB))
+# Initialize the work directory, clean out old logs and strategies.
+mkdir -p ${WORKDIR}
+rm -f ${WORKDIR}/*.log
 
-# Load builder libraries.
+# Load utility libraries.
 . ${LIBDIR}/base.sh
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
 . ${LIBDIR}/board.sh
+. ${LIBDIR}/customize.sh
 
-# Empty definitions of functions to be overridden by user.
-# Goal:  config.sh should never need to override any of the
-# shell functions defined by the board or library routines.
-customize_boot_partition ( ) { }
-customize_freebsd_partition ( ) { }
-customize_post_unmount ( ) { }
-
-handle_trap ( ) {
-    disk_unmount_all
-    exit
+crochet_usage ( ) {
+    echo "Usage: $0 -b <board> -c <configfile>"
+    echo " -b <board>: Load standard configuration for board"
+    echo " -c <file>: Load configuration from file"
+    exit 2
 }
-trap handle_trap INT QUIT KILL EXIT
 
 # Parse command-line options
-args=`getopt c: $*`
+args=`getopt b:c: $*`
 if [ $? -ne 0 ]; then
-    echo 'Usage: ...'
-    exit 2
+    crochet_usage
 fi
 set -- $args
 while true; do
     case "$1" in
+	-b)
+	    BOARD="$2"
+	    shift; shift
+	    ;;
         -c)
             CONFIGFILE="$2"
             shift; shift
@@ -47,74 +47,36 @@ while true; do
         --)
             shift; break
             ;;
+	*)
+	    crochet_usage
     esac
 done
 
 #
-# Load user configuration
+# Load user configuration:  This builds the strategy.
 #
-load_config
-
-# Check that IMAGE_SIZE is set.
-# For now, support SD_SIZE for backwards compatibility.
-# June 2013: Remove SD_SIZE support entirely.
-if [ -z "${IMAGE_SIZE}" ]; then
-    if [ -z "${SD_SIZE}" ]; then
-	echo "Error: \$IMAGE_SIZE not set."
-	exit 1
-    fi
-    echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
-    IMAGE_SIZE=${SD_SIZE}
+if [ -z "$BOARD" ] && [ -z "$CONFIGFILE" ]; then
+    crochet_usage
+fi
+if [ -n "$BOARD" ]; then
+    board_setup $BOARD
+fi
+if [ -n "$CONFIGFILE" ]; then
+    load_config $CONFIGFILE
 fi
 
-# Initialize the work directory, clean out old logs.
-mkdir -p ${WORKDIR}
-rm -f ${WORKDIR}/*.log
+#
+# What to do when things go wrong.
+#
+handle_trap ( ) {
+    disk_unmount_all
+    exit 2
+}
+trap handle_trap INT QUIT KILL EXIT
 
 #
-# Now we can build the system.
+# Run the strategy and actually do all of the work.
 #
-board_check_prerequisites
-freebsd_buildworld
-freebsd_buildkernel
-board_build_bootloader
+run_strategy
 
-#
-# Create the image, partition it, and mount the partitions.
-#
-board_create_image ${IMG} ${IMAGE_SIZE}
-board_partition_image
-board_mount_partitions
-
-#
-# Populate the partitions and run the user customization routines.
-#
-board_populate_boot_partition
-board_populate_freebsd_partition
-
-if cd ${BOARD_BOOT_MOUNTPOINT} >/dev/null 2>&1; then
-    customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
-else
-    echo "No separate boot partition; skipping customize_boot_partition."
-fi
-if cd ${BOARD_FREEBSD_MOUNTPOINT}; then
-    customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
-else
-    echo "This is bad: there is no FreeBSD partition."
-    exit 1
-fi
-cd ${TOPDIR}
-
-# Unmount all the partitions, clean up the MD node, etc.
-disk_unmount_all
-
-# Some people might need to play games with partitions after they're
-# unmounted.  (E.g., NanoBSD-style duplicate partitions or tunefs.)
-board_post_unmount ${IMG} # For board to override
-customize_post_unmount ${IMG} # For config.sh to override
-
-#
-# We have a finished image; explain what to do with it.
-#
-board_show_message
 date
