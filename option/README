@@ -1,0 +1,28 @@
+Crochet supports 'options' that can be enabled from
+the user configuration as
+
+   option Example arg1 arg2
+
+Options can modify the final image in a wide variety of ways: They can
+alter a variety of internal configuration that affects how FreeBSD
+work or kernel is built or installed.  They can add, remove, or modify
+content in the final built image.
+
+Generally speaking, options that affect the installed system take
+effect after the basic system is installed and customized by the board
+configuration.
+
+Options can take arguments and it often makes sense to invoke
+the same option multiple times with different arguments.
+For example:
+   option Package apache
+   option Package mysql
+   option Package php
+
+(The 'option Package' has not yet been fully implemented; it's
+in the works.)
+
+If you're interested in adding a new option, look at
+the existing options, especially option/Example/setup.sh
+which has a lengthy description of how options work and
+how to add one.
