@@ -74,6 +74,7 @@ strategy_add $PHASE_BUILD_OTHER videocore_user_build
 
 # cwd: DESTDIR
 videocore_user_install ( ) {
+    echo "Installing VideoCore UserLand library"
     cd ${FREEBSD_SRC}
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     _VC_BUILDDIR=${RPI_VC_USER_SRC}/build/arm-freebsd/release/
@@ -84,14 +85,18 @@ videocore_user_install ( ) {
 }
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install
 
+# TODO: Add a check for gmake
+
 # hello_triangle demo, not really necessary
+# TODO: Fix this.
 videocore_user_install_demo ( ) {
+    echo "Installing VideoCore UserLand demo program"
     cd ${FREEBSD_SRC}
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     DESTDIR=${BOARD_FREEBSD_MOUNTPOINT}
 
     cd ${RPI_VC_USER_SRC}/host_applications/linux/apps/hello_pi/hello_triangle
-    eval $buildenv SDKSTAGE=${DESTDIR} gmake
+    eval $buildenv SDKSTAGE=${DESTDIR} /usr/local/bin/gmake
     cp hello_triangle.bin *.raw ${DESTDIR}/root
 }
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install_demo
+#strategy_add $PHASE_FREEBSD_BOARD_INSTALL videocore_user_install_demo
