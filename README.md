@@ -50,6 +50,12 @@ Using the script to build an image consists of a few steps:
    compile everything and build the disk image.  This part of the
    process can take several hours.
 
+   Shortcut:  If you only want the most basic build for a board,
+   you can use this command without creating a config file:
+    $ sudo /bin/sh crochet.sh -b <boardname>
+   However, if you want to tweak the build in any way, you will
+   need to create a config file.
+
 4. COPY the image to a suitable device (SD card, disk drive, etc)
 
    The script will suggest a 'dd' command to do this.
@@ -72,7 +78,8 @@ be improved:
   supported.  Look at board/NewBoardExample for explanations
   for adding support for a new board.
 
-* Non-ARM support.  The GenericI386 target proves this is possible.
+* Non-ARM support.  The GenericI386 board definition
+  proves this is possible.
 
 * Out-of-tree kernel configuration.  Right now, these scripts assume
   kernel configuration files are in the FreeBSD source tree.  I don't
