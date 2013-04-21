@@ -87,8 +87,8 @@ PRIORITY=100
 #    strategy_add $PHASE_X foofunc fooarg1 fooarg2
 #
 # To override PRIORITY (lower is earlier; default is 100):
-#    PRIORITY=70 strategy_add $PHASE_X addfrogs earlyfrogs
-#    PRIORITY=200 strategy_add $PHASE_X addfrogs latefrogs
+#    PRIORITY=70 strategy_add $PHASE_INSTALL_FROGS addfrogs earlyfrogs
+#    PRIORITY=200 strategy_add $PHASE_INSTALL_FROGS addfrogs latefrogs
 #
 # If phase is one of the special LWW phases, then only the last
 # function registered for that phase will actually be run.  Otherwise,
