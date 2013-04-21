@@ -55,6 +55,7 @@ PHASE_BOOT_INSTALL=510
 PHASE_BOOT_DONE=599
 
 # PHASE_FREEBSD items run with cwd set to root of freebsd filesystem
+# TODO: The ordering here doesn't seem quite right.
 PHASE_FREEBSD_START=700
 # Basic freebsd installworld, which is registered in lib/board.sh but can be overridden
 PHASE_FREEBSD_INSTALLWORLD_LWW=711
