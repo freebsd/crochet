@@ -3,7 +3,7 @@ Crochet builds bootable FreeBSD images for a number of popular boards.
 This tool was formerly known as "freebsd-beaglebone" or
 "beaglebsd" as the original work was done for BeagleBone.
 But it now supports more boards and should easily extend
-to support many more (including non-ARM systems).
+to support many more.
 
 ***********************************************************
 
@@ -73,10 +73,11 @@ There are still plenty of ways this script could
 be improved:
 
 * More boards.  Currently, it supports Beaglebone, RaspberryPi,
-  PandaBoard, ZedBoard, and a few others.  There are a lot of
-  other boards with similar concerns that could easily be
-  supported.  Look at board/NewBoardExample for explanations
-  for adding support for a new board.
+  PandaBoard reasonably well and there is experimental support
+  for a few others.  There are a lot of other boards with
+  similar concerns that could easily be supported.  Look at
+  board/NewBoardExample for explanations for adding support
+  for a new board.
 
 * Non-ARM support.  The GenericI386 board definition
   proves this is possible.
@@ -87,21 +88,18 @@ be improved:
   include a tweaked kernel configuration as part of a board
   definition.
 
-* Package Installation.  I would like to be able to put a bunch of
-  packages into board/NAME/packages and have them installed onto the
-  image.  The nanobsd technique of using chroot won't work for
-  cross-compiling.  Fortunately, the new pkgng tools do (mostly)
-  support this; there are just a few minor bugs and small features
-  needed for this to work: Ask on one of the mailing lists if you'd
-  like to help extend pkgng to fully handle cross-architecture pkg
-  installs.
+* Package Installation.  I would like to support
+     option Package <name>
+  for installing a package from a pkgng repository.  Fortunately, the
+  new pkgng tools (mostly) provide the necessary support; there are
+  just a few minor bugs and small features needed for this to work
+  really well: Ask on one of the mailing lists if you'd like to help
+  extend pkgng to fully handle cross-architecture pkg installs.
 
 * Swap.  The script should allow you to specify a swap size and
-  automatically adjust the disk layout accordingly.  For now, board
-  definitions are mostly creating swap files in the FreeBSD
-  partition, which is easy and seems to work well enough.
-  (Complicating factor: For several reasons, I would prefer a swap
-  partition to precede the FreeBSD partition on the disk.)
+  automatically adjust the disk layout accordingly.  For now, we
+  support creating swap files in the FreeBSD partition, which is easy
+  and seems to work well enough.
 
 * Support for read-only root and other more complex partitioning
   approaches.
