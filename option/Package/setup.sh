@@ -1,9 +1,11 @@
-# Install a package
+# Install one or more packages
 #
 # Usage:
-#  option Package emacs-nox11
+#  option Package apache mysql php
+
 # Make sure package database gets initialized.
 option PackageInit
 
-strategy_add $PHASE_FREEBSD_OPTION_INSTALL pkg -c ${BOARD_FREEBSD_MOUNTPOINT} -y $1
-
+for p in $@; do
+    strategy_add $PHASE_FREEBSD_OPTION_INSTALL pkg -c ${BOARD_FREEBSD_MOUNTPOINT} -y $p
+done
