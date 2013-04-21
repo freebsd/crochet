@@ -11,9 +11,6 @@ PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_B
 # Copy overlay files early in the user customization phase.
 # Typically, people want to copy static files and then
 # tweak them afterwards.
-#
-# TODO: The ordering here doesn't seem quite right.
-# E.g., boards might want to "add one item to fstab"
 customize_overlay_files ( ) {
     if [ -d ${WORKDIR}/overlay ]; then
 	echo "Overlaying files from ${WORKDIR}/overlay"
