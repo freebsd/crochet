@@ -9,7 +9,7 @@ WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
 
-# Initialize the work directory, clean out old logs and strategies.
+# Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
@@ -78,8 +78,8 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL EXIT
 
 #
-# Run the strategy and actually do all of the work.
+# Run the strategy to do all of the work.
 #
 run_strategy
 
-date
+echo 'Finished at '`date`
