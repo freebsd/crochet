@@ -10,6 +10,13 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 #
 # Untested, since I don't have a ZedBoard.
 #
+# CAUTION: Right now, this is a pretty poor example of a Crochet board
+# definition.  The following issues need to be addressed:
+#   * ubldr should be built from source
+#   * U-Boot should be built from source
+#   * 4MB binaries should not be checked into this project
+#   * The DTB should be compiled from the DTS in the FreeBSD tree
+#
 
 # ZedBoard requires a FAT partition to hold the boot loader bits.
 zedboard_partition_image ( ) {
