@@ -25,8 +25,8 @@ export MAKEOBJDIRPREFIX
 SRCCONF=/dev/null
 __MAKE_CONF=/dev/null
 
-WORLDJOBS=4
-KERNJOBS=4
+WORLDJOBS=1
+KERNJOBS=1
 
 freebsd_download_instructions ( ) {
     echo
@@ -58,18 +58,45 @@ freebsd_dtc_test ( ) {
     fi
 }
 
-# freebsd_src_test: Check FreeBSD src tree
+# freebsd_src_test: Check that this looks like a FreeBSD src tree.
 #
-# $1: Name of kernel configuration
+# $1: Name of kernel configuration we expect
 #
 freebsd_src_test ( ) {
-    # TODO: check that it's a FreeBSD source tree first
-    if [ \! -f "$FREEBSD_SRC/sys/arm/conf/$1" ]; then
-	echo "Didn't find $FREEBSD_SRC/sys/arm/conf/$1"
-	shift
-	# TODO: Change the message here to indicate that
-	# the kernel config wasn't found.
-	freebsd_download_instructions "$@"
+    # FreeBSD source tree has certain files:
+    for f in COPYRIGHT Makefile Makefile.inc1 UPDATING; do
+	if [ \! -f "$FREEBSD_SRC/$f" ]; then
+	    echo "This does not look like a FreeBSD source tree."
+	    echo "Did not find: $FREEBSD_SRC/$f"
+	    shift; freebsd_download_instructions "$@"
+	    exit 1
+	fi
+    done
+    # FreeBSD source tree has certain directories:
+    for d in bin usr.bin usr.sbin contrib gnu cddl sys sys/arm sys/i386; do
+	if [ \! -d "$FREEBSD_SRC/$d" ]; then
+	    echo "This does not look like a FreeBSD source tree."
+	    echo "Did not find: $FREEBSD_SRC/$d"
+	    shift; freebsd_download_instructions "$@"
+	    exit 1
+	fi
+    done
+    # Make sure it has the config file we expect under the appropriate arch:
+    case ${TARGET_ARCH} in
+	arm*) ARCH=arm
+	    ;;
+	mips*) ARCH=mips
+	    ;;
+	pc98) ARCH=i386
+	    ;;
+	powerpc*) ARCH=powerpc
+	    ;;
+	*) ARCH=${TARGET_ARCH}
+	    ;;
+    esac
+    if [ \! -f "$FREEBSD_SRC/sys/$ARCH/conf/$1" ]; then
+	echo "Didn't find $FREEBSD_SRC/sys/$ARCH/conf/$1"
+	shift; freebsd_download_instructions "$@"
 	exit 1
     fi
     echo "Found suitable FreeBSD source tree in:"
