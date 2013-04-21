@@ -25,7 +25,7 @@ package_test ( ) {
     if pkg -v >/dev/null 2>&1; then
 	true
     else
-	echo "pkg not available"
+	echo "pkg not available on the build system"
 	exit 1
     fi
 
@@ -41,6 +41,7 @@ package_init ( ) {
 # Only register the package init functions once.
 if [ -z "$_PACKAGE_INIT" ]; then
     strategy_add $PHASE_CHECK package_test
-    strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init ${BOARD_FREEBSD_MOUNTPOINT}
+    # Ensure this happens before any "option Package"
+    PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init ${BOARD_FREEBSD_MOUNTPOINT}
     _PACKAGE_INIT=t
 fi
