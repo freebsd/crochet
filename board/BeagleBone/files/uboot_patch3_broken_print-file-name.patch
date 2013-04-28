@@ -1,0 +1,18 @@
+The -print-file-name=include option is broken on many FreeBSD
+versions.  This option probably works with GCC or Clang from
+ports but is broken in base gcc in FreeBSD-9 and earlier
+and broken in base clang.
+
+diff --git a/config.mk b/config.mk
+index 1fd109f..b878bb4 100644
+--- a/config.mk
++++ b/config.mk
+@@ -199,7 +199,7 @@ OPTFLAGS= -Os #-fomit-frame-pointer
+ 
+ OBJCFLAGS += --gap-fill=0xff
+ 
+-gccincdir := $(shell $(CC) -print-file-name=include)
++gccincdir := /usr/include
+ 
+ CPPFLAGS := $(DBGFLAGS) $(OPTFLAGS) $(RELFLAGS)		\
+ 	-D__KERNEL__

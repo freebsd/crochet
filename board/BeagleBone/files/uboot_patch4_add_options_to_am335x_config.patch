@@ -1,0 +1,17 @@
+diff --git a/include/configs/am335x_evm.h b/include/configs/am335x_evm.h
+index ef00306..ee16dc7 100644
+--- a/include/configs/am335x_evm.h
++++ b/include/configs/am335x_evm.h
+@@ -20,6 +20,12 @@
+ 
+ #include <asm/arch/omap.h>
+ 
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_CMD_ELF
++#define CONFIG_API
++#define CONFIG_SYS_MMC_MAX_DEVICE 2
++#endif
++
+ #define CONFIG_DMA_COHERENT
+ #define CONFIG_DMA_COHERENT_SIZE	(1 << 20)
+ 
