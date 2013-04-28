@@ -1,5 +1,5 @@
 KERNCONF=BEAGLEBONE
-BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-beaglebone-freebsd
+BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2013.04
 IMAGE_SIZE=$((1000 * 1000 * 1000))
 
 #
@@ -21,23 +21,18 @@ strategy_add $PHASE_MOUNT_LWW beaglebone_mount_partitions
 #
 # BeagleBone uses U-Boot.
 #
-# I used to use the Arago project sources directly, but those
-# change quickly and I got tired of chasing patches.  If you want
-# to try them:
-# $ git clone git://arago-project.org/git/projects/u-boot-am33x.git ${BEAGLEBONE_UBOOT_SRC}
-
 beaglebone_check_uboot ( ) {
     uboot_test \
 	BEAGLEBONE_UBOOT_SRC \
 	"$BEAGLEBONE_UBOOT_SRC/board/ti/am335x/Makefile" \
-	"git clone https://github.com/kientzle/u-boot-beaglebone-freebsd.git ${BEAGLEBONE_UBOOT_SRC}"
+	"ftp ftp://ftp.denx.de/pub/u-boot/u-boot-2013.04.tar.bz2" \
+	"tar xf u-boot-2013.04.tar.bz2"
 }
 strategy_add $PHASE_CHECK beaglebone_check_uboot
 # We use freebsd_install_fdt below, so make sure we have dtc installed.
 strategy_add $PHASE_CHECK freebsd_dtc_test
 
-# If you want to use the Arago sources, you'll need to patch them.
-#uboot_patch ${BOARDDIR}/files/uboot_*.patch
+strategy_add $PHASE_BUILD_OTHER uboot_patch ${BEAGLEBONE_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
 strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_evm_config
 strategy_add $PHASE_BUILD_OTHER uboot_build $BEAGLEBONE_UBOOT_SRC
 
@@ -51,6 +46,9 @@ beaglebone_uboot_install ( ) {
     cp ${BOARDDIR}/files/uEnv.txt bb-uEnv.txt
     freebsd_install_fdt beaglebone.dts bbone.dts
     freebsd_install_fdt beaglebone.dts bbone.dtb
+    # TODO: Need real FDT for BeagleBone Black
+    freebsd_install_fdt beaglebone.dts bboneblk.dts
+    freebsd_install_fdt beaglebone.dts bboneblk.dtb
 }
 strategy_add $PHASE_BOOT_INSTALL beaglebone_uboot_install
 
@@ -59,12 +57,10 @@ strategy_add $PHASE_BOOT_INSTALL beaglebone_uboot_install
 #
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr bbubldr
-# ubldr help file goes on the UFS partition.
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
-
-# Make the FAT boot partition accessible on the running system.
-# See overlay/etc/fstab
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
+# overlay/etc/fstab mounts the FAT partition at /boot/msdos
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
+# ubldr help file goes on the UFS partition (after boot dir exists)
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot

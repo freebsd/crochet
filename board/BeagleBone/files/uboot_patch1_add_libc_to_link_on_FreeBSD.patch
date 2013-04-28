@@ -1,3 +1,7 @@
+Explanation:  FreeBSD/ARM has a bunch of numeric support routines
+(double-precision mod, for example) in libc instead of libcompiler_rt
+or libgcc.  So freestanding programs have to be linked against libc.
+
 diff --git a/Makefile b/Makefile
 index 99b9278..8395284 100644
 --- a/Makefile
