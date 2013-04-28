@@ -40,7 +40,7 @@ strategy_add $PHASE_BOOT_INSTALL cp ${BOARDDIR}/bootfiles/* .
 #strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 #strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 
-# ubldr help file goes on the UFS partition.
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+# ubldr help file goes on the UFS partition (after boot dir is created)
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
