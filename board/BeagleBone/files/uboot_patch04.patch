@@ -1,6 +1,3 @@
-I'm not sure I understand why this is required.  But the U-Boot
-build breaks without it.
-
 diff --git a/examples/api/Makefile b/examples/api/Makefile
 index bad05af..394585c 100644
 --- a/examples/api/Makefile
