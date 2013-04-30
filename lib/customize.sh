@@ -5,6 +5,7 @@
 #
 
 # Run end-user customization late in the phase.
+# Note that PHASE_BOOT_INSTALL gets cwd set to boot mountpoint automatically.
 customize_boot_partition ( ) { }
 PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
 
@@ -22,6 +23,7 @@ PRIORITY=50 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_overlay_fil
 # Run the shell hook late.  This means that functions
 # explicitly registered by users calling strategy_add
 # will run before this.
+# Note that PHASE_FREEBSD_* gets cwd set to freebsd mountpoint automatically.
 customize_freebsd_partition ( ) { }
 PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
 
