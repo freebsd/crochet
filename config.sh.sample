@@ -138,26 +138,37 @@
 # to really shorten your build/test cycles:
 #
 
-# Extra arguments for world.
+# Extra arguments for FreeBSD build stages.
 #
 # Each board definition specifies certain options for the world and
 # kernel builds.  Note that these are recorded in ${WORKDIR} when
 # Crochet runs a build; subsequent Crochet runs will skip the
 # corresponding build if the options are unchanged.
 #
-# Passed to both buildworld and installworld.
-# FREEBSD_WORLD_EXTRA_ARGS=""
-# Passed to only one:
-# FREEBSD_BUILDWORLD_EXTRA_ARGS="-DNOCLEAN"
-# FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
-
-# Extra arguments for kernel.
+# You can add your own options to any single build phase:
 #
-# Passed to both buildkernel and installkernel.
-# FREEBSD_KERNEL_EXTRA_ARGS=""
-# Passed to only one:
-# FREEBSD_BUILDKERNEL_EXTRA_ARGS="-DNOCLEAN"
+# FREEBSD_BUILDWORLD_EXTRA_ARGS=""
+# FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
+# FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
 # FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
+
+# You can specify options for both buildworld and installworld:
+# FREEBSD_WORLD_EXTRA_ARGS=""
+
+# You can specify options for both buildkernel and installkernel.
+# FREEBSD_KERNEL_EXTRA_ARGS=""
+
+# You can specify options used for all four of the above:
+# FREEBSD_EXTRA_ARGS=""
+
+# You can specify a custom src.conf or make.conf; the defaults are:
+# SRCCONF="/dev/null"
+# __MAKE_CONF="/dev/null"
+
+# For example, I find each of the following quite useful at times:
+# FREEBSD_EXTRA_ARGS="-DNO_CLEAN"
+# FREEBSD_KERNEL_EXTRA_ARGS="-DKERNFAST"
+
 
 
 # OVERLAY FILES
@@ -173,7 +184,7 @@
 
 # Adding Strategy Items
 #
-# XXX explain how to use strategy_add and why you might want to XXX
+# XXX explain how to use strategy_add directly and why you might want to XXX
 #
 
 
@@ -196,7 +207,7 @@
 #
 # WARNING: Unlike some other system-building scripts, these do *not*
 # run in a chroot or jail.  (It can't because we're cross-building.)
-# For example, if you want to add an account, be sure to refer to
+# For example, if you want to add an account, be sure to modify
 # etc/passwd and not /etc/passwd!
 #
 # Some useful shell variables:
