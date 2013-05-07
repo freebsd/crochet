@@ -316,7 +316,7 @@ _freebsd_install_usr_src ( ) {
 }
 
 freebsd_install_usr_src ( ) {
-    _freebsd_install_usr_src ${UFS_MOUNT}
+    _freebsd_install_usr_src $1
 }
 
 # freebsd_install_usr_ports:  Download and install
@@ -333,7 +333,7 @@ _freebsd_install_usr_ports ( ) {
 }
 
 freebsd_install_usr_ports ( ) {
-    _freebsd_install_usr_ports ${UFS_MOUNT}
+    _freebsd_install_usr_ports $1
 }
 
 
