@@ -11,6 +11,10 @@ FREEBSD_KERNEL_EXTRA_ARGS=""
 FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
 FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
 
+# Make non-empty to override the usual build-avoidance
+FREEBSD_FORCE_BUILDKERNEL=""
+FREEBSD_FORCE_BUILDWORLD=""
+
 # Hooks for board setup
 FREEBSD_WORLD_BOARD_ARGS=""
 FREEBSD_BUILDWORLD_BOARD_ARGS=""
@@ -161,6 +165,9 @@ _freebsd_build ( ) {
 freebsd_buildworld ( ) {
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
     echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${TARGET_ARCH}.sh
+    if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
+	rm -f ${WORKDIR}/_.built-world.${TARGET_ARCH}
+    fi
     _freebsd_build world ${TARGET_ARCH}
 }
 strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
@@ -173,6 +180,9 @@ strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 freebsd_buildkernel ( ) {
     _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} KERNCONF=${KERNCONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_KERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS}"
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${KERNCONF}.sh
+    if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
+	rm -f ${WORKDIR}/_.built-kernel.${KERNCONF}
+    fi
     _freebsd_build kernel ${KERNCONF}
 }
 strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
