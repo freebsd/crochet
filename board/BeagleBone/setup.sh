@@ -46,9 +46,8 @@ beaglebone_uboot_install ( ) {
     cp ${BOARDDIR}/files/uEnv.txt bb-uEnv.txt
     freebsd_install_fdt beaglebone.dts bbone.dts
     freebsd_install_fdt beaglebone.dts bbone.dtb
-    # TODO: Need real FDT for BeagleBone Black
-    freebsd_install_fdt beaglebone.dts bboneblk.dts
-    freebsd_install_fdt beaglebone.dts bboneblk.dtb
+    freebsd_install_fdt beaglebone-black.dts bboneblk.dts
+    freebsd_install_fdt beaglebone-black.dts bboneblk.dtb
 }
 strategy_add $PHASE_BOOT_INSTALL beaglebone_uboot_install
 
