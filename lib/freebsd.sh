@@ -352,8 +352,8 @@ freebsd_install_usr_ports ( ) {
 #
 # If $1 and $2 have different extensions (".dts" vs. ".dtb"),
 # the dtc compiler will be used to translate formats.  If
-# $2 is a directory or the extensions are the same, this
-# devolves into a 'cp'.
+# $2 is a directory or the extensions are the same, we still
+# run it through dtc so that dtsi includes get expanded.
 #
 freebsd_install_fdt ( ) (
     _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
@@ -369,7 +369,7 @@ freebsd_install_fdt ( ) (
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			(cd $_FDTDIR; cat $1) > $2
+			(cd $_FDTDIR; cat $1) > $2/`basename $1`
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1
@@ -380,14 +380,14 @@ freebsd_install_fdt ( ) (
 	*.dts)
 	    case $2 in
 		*.dts)
-		    (cd $_FDTDIR; cat $1) > $2
+		    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2
 		    ;;
 		*.dtb)
 		    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dtb -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
-			(cd $_FDTDIR; cat $1) > $2
+			(cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2/`basename $1`
 		    else
 			echo "Can't compile $1 to $2"
 			exit 1
