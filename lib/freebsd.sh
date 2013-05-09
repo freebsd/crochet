@@ -347,8 +347,8 @@ freebsd_install_usr_ports ( ) {
 }
 
 
-# $1: name of dts or dtb file
-# $2: destination dts or dtb file or dir
+# $1: name of dts or dtb file, relative to sys/boot/fdt/dts
+# $2: destination dts or dtb file or dir, relative to cwd
 #
 # If $1 and $2 have different extensions (".dts" vs. ".dtb"),
 # the dtc compiler will be used to translate formats.  If
@@ -357,6 +357,7 @@ freebsd_install_usr_ports ( ) {
 #
 freebsd_install_fdt ( ) (
     _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
+    buildenv=`cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     case $1 in
 	*.dtb)
 	    case $2 in
@@ -364,7 +365,7 @@ freebsd_install_fdt ( ) (
 		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dts)
-		    (cd $_FDTDIR; dtc -I dtb -O dts -p 8192 $1) > $2
+		    (cd $_FDTDIR; eval $buildenv dtc -I dtb -O dts -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
@@ -382,7 +383,7 @@ freebsd_install_fdt ( ) (
 		    (cd $_FDTDIR; cat $1) > $2
 		    ;;
 		*.dtb)
-		    (cd $_FDTDIR; dtc -I dts -O dtb -p 8192 $1) > $2
+		    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dtb -p 8192 $1) > $2
 		    ;;
 		*)
 		    if [ -d $2 ]; then
