@@ -25,7 +25,7 @@ generic_i386_build_mbr ( ) {
 }
 strategy_add $PHASE_BUILD_OTHER generic_i386_build_mbr
 
-i386_build_boot2 ( ) {
+generic_i386_build_boot2 ( ) {
     echo "Building Boot2"
     cd ${FREEBSD_SRC}/sys/boot/i386/boot2
     make TARGET_ARCH=i386 > ${WORKDIR}/_.i386.boot2.log || exit 1
@@ -33,7 +33,7 @@ i386_build_boot2 ( ) {
 }
 strategy_add $PHASE_BUILD_OTHER generic_i386_build_boot2
 
-i386_build_loader ( ) {
+generic_i386_build_loader ( ) {
     echo "Building Loader"
     cd ${FREEBSD_SRC}/sys/boot/i386/loader
     make TARGET_ARCH=i386 > ${WORKDIR}/_.i386_loader.log || exit 1
