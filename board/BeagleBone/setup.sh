@@ -29,8 +29,6 @@ beaglebone_check_uboot ( ) {
 	"tar xf u-boot-2013.04.tar.bz2"
 }
 strategy_add $PHASE_CHECK beaglebone_check_uboot
-# We use freebsd_install_fdt below, so make sure we have dtc installed.
-strategy_add $PHASE_CHECK freebsd_dtc_test
 
 strategy_add $PHASE_BUILD_OTHER uboot_patch ${BEAGLEBONE_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
 strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_evm_config
