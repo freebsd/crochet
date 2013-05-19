@@ -1,5 +1,5 @@
 #
-# Add necessary bits for the image to run under bhyve.
+# Add necessary bits for the image to run as a guest under bhyve.
 #
 
 bhyve_loader_conf ( ) {
@@ -19,17 +19,17 @@ smbios.bios.vendor="BHYVE"
 
 EOF
 }
-strategy_add $PHASE_OPTION_INSTALL bhyve_loader_conf
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL bhyve_loader_conf
 
 bhyve_etc_ttys ( ) {
     cat >> etc/ttys <<EOF
 console "/usr/libexec/getty std.9600"   vt100   on   secure
 EOF
 }
-strategy_add $PHASE_OPTION_INSTALL bhyve_etc_ttys
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL bhyve_etc_ttys
 
 bhyve_helper_scripts ( ) {
     cp ${OPTIONDIR}/bhyve-*.sh ${WORKDIR}
     # TODO: Customize the scripts
 }
-strategy_add $PHASE_OPTION_INSTALL bhyve_helper_scripts
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL bhyve_helper_scripts
