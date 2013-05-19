@@ -130,6 +130,7 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # each separate world would end up in a separate directory.
 #
 _freebsd_build ( ) {
+    LOGFILE=${WORKDIR}/_.build$1.$2.log
     if diff ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2 >/dev/null 2>&1
     then
 	echo "Using FreeBSD $2 $1 from previous build"
@@ -137,7 +138,7 @@ _freebsd_build ( ) {
     fi
 
     echo "Building FreeBSD $2 $1 at "`date`
-    echo "    (Logging to ${WORKDIR}/_.build$1.$2.log)"
+    echo "    (Logging to ${LOGFILE})"
 
     if [ -f ${WORKDIR}/_.built-$1.$2 ]
     then
@@ -148,12 +149,14 @@ _freebsd_build ( ) {
     fi
 
     cd $FREEBSD_SRC
-    if /bin/sh -e ${WORKDIR}/_.build$1.$2.sh > ${WORKDIR}/_.build$1.$2.log 2>&1
+    if /bin/sh -e ${WORKDIR}/_.build$1.$2.sh > ${LOGFILE} 2>&1
     then
 	mv ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2
     else
 	echo "Failed to build FreeBSD $2 $1."
-	echo "Log in ${WORKDIR}/_.build$1.$2.log"
+	echo "Log in ${LOGFILE}"
+	echo
+	tail ${LOGFILE}
 	exit 1
     fi
 }
@@ -164,11 +167,12 @@ _freebsd_build ( ) {
 #
 freebsd_buildworld ( ) {
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
-    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${TARGET_ARCH}.sh
+    CONF=${TARGET_ARCH}
+    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
-	rm -f ${WORKDIR}/_.built-world.${TARGET_ARCH}
+	rm -f ${WORKDIR}/_.built-world.${CONF}
     fi
-    _freebsd_build world ${TARGET_ARCH}
+    _freebsd_build world ${CONF}
 }
 strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 
@@ -179,11 +183,12 @@ strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 #
 freebsd_buildkernel ( ) {
     _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} KERNCONF=${KERNCONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_KERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS}"
-    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${KERNCONF}.sh
+    CONF=${TARGET_ARCH}-${KERNCONF}
+    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
-	rm -f ${WORKDIR}/_.built-kernel.${KERNCONF}
+	rm -f ${WORKDIR}/_.built-kernel.${CONF}
     fi
-    _freebsd_build kernel ${KERNCONF}
+    _freebsd_build kernel ${CONF}
 }
 strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
 
@@ -194,32 +199,33 @@ strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
 #
 freebsd_installworld ( ) {
     cd $FREEBSD_SRC
+    CONF=${TARGET_ARCH}
     echo "Installing FreeBSD world at "`date`
     echo "    Destination: $1"
-    if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${TARGET_ARCH}.log 2>&1
+    if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${CONF}.log 2>&1
     then
 	# success
     else
 	echo "Installworld failed."
-	echo "    Log: ${WORKDIR}/_.installworld.${TARGET_ARCH}.log"
+	echo "    Log: ${WORKDIR}/_.installworld.${CONF}.log"
 	exit 1
     fi
 
-    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${TARGET_ARCH}.log 2>&1
+    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${CONF}.log 2>&1
     then
 	# success
     else
 	echo "distrib-dirs failed"
-	echo "    Log: ${WORKDIR}/_.distrib-dirs.${TARGET_ARCH}.log"
+	echo "    Log: ${WORKDIR}/_.distrib-dirs.${CONF}.log"
 	exit 1
     fi
 
-    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${TARGET_ARCH}.log 2>&1
+    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${CONF}.log 2>&1
     then
 	# success
     else
 	echo "distribution failed"
-	echo "    Log: ${WORKDIR}/_.distribution.${TARGET_ARCH}.log"
+	echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
 	exit 1
     fi
 }
@@ -234,63 +240,69 @@ freebsd_installkernel ( ) {
 	cd $1
     fi
     DESTDIR=`pwd`
+    CONF=${TARGET_ARCH}-${KERNCONF}
     cd $FREEBSD_SRC
     echo "Installing FreeBSD kernel at "`date`
     echo "    Destination: $DESTDIR"
-    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$DESTDIR installkernel > ${WORKDIR}/_.installkernel.${KERNCONF}.sh
-    if /bin/sh -e ${WORKDIR}/_.installkernel.${KERNCONF}.sh > ${WORKDIR}/_.installkernel.${KERNCONF}.log 2>&1
+    echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$DESTDIR installkernel > ${WORKDIR}/_.installkernel.${CONF}.sh
+    if /bin/sh -e ${WORKDIR}/_.installkernel.${CONF}.sh > ${WORKDIR}/_.installkernel.${CONF}.log 2>&1
     then
 	# success
     else
 	echo "installkernel failed"
-	echo "    Log: ${WORKDIR}/_.installkernel.${KERNCONF}.log"
+	echo "    Log: ${WORKDIR}/_.installkernel.${CONF}.log"
 	exit 1
     fi
-
 }
 
 # freebsd_ubldr_build:  Build the ubldr loader program.
-# Note: Assumes world is already built.
+# Note: Assumes world is already built.  Since ubldr
+# varies slightly between systems, we identify the ubldr
+# by both TARGET_ARCH and KERNCONF so that ubldr builds
+# for different systems won't get confused.
+# TODO: Consider using TARGET_ARCH with $@ instead of
+# KERNCONF to identify separate builds.
 #
 # $@: make arguments for building
 #
-# TODO: Add $1 argument as a directory to install to (instead of
-# work/ubldr/) so we can juggle multiple ubldrs compiled with
-# different options.
-#
 freebsd_ubldr_build ( ) {
     cd ${FREEBSD_SRC}
+    CONF=${TARGET_ARCH}-${KERNCONF}
+    LOGFILE=${WORKDIR}/_.ubldr.${CONF}.build.log
     ubldr_makefiles=`pwd`/share/mk
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
 
-    echo $buildenv make "$@" -m $ubldr_makefiles all > ${WORKDIR}/_.ubldr.sh
+    # Record the build command we plan to use.
+    echo $buildenv make "$@" -m $ubldr_makefiles all > ${WORKDIR}/_.ubldr.${CONF}.sh
 
-    if diff ${WORKDIR}/_.ubldr.built ${WORKDIR}/_.ubldr.sh > /dev/null 2>&1
+    # If the command is unchanged, we won't rebuild.
+    if diff ${WORKDIR}/_.ubldr.${CONF}.built ${WORKDIR}/_.ubldr.${CONF}.sh > /dev/null 2>&1
     then
 	echo "Using ubldr from previous build"
 	return 0
     fi
 
-    echo "Building FreeBSD $TARGET_ARCH ubldr at "`date`
-    echo "    (Logging to ${WORKDIR}/_.ubldr.build.log)"
-    rm -rf ${WORKDIR}/ubldr
-    mkdir -p ${WORKDIR}/ubldr
+    echo "Building FreeBSD $CONF ubldr at "`date`
+    echo "    (Logging to ${LOGFILE})"
+    rm -rf ${WORKDIR}/ubldr-${CONF}
+    mkdir -p ${WORKDIR}/ubldr-${CONF}
 
     cd sys/boot
-    eval $buildenv make -m $ubldr_makefiles obj > ${WORKDIR}/_.ubldr.build.log 2>&1
-    eval $buildenv make -m $ubldr_makefiles clean >> ${WORKDIR}/_.ubldr.build.log 2>&1
-    eval $buildenv make -m $ubldr_makefiles depend >> ${WORKDIR}/_.ubldr.build.log 2>&1
-    if /bin/sh -e ${WORKDIR}/_.ubldr.sh >> ${WORKDIR}/_.ubldr.build.log 2>&1
+    eval $buildenv make "$@" -m $ubldr_makefiles obj > ${LOGFILE} 2>&1
+    eval $buildenv make "$@" -m $ubldr_makefiles clean >> ${LOGFILE} 2>&1
+    eval $buildenv make "$@" -m $ubldr_makefiles depend >> ${LOGFILE} 2>&1
+    if /bin/sh -e ${WORKDIR}/_.ubldr.${CONF}.sh >> ${LOGFILE} 2>&1
     then
-	mv ${WORKDIR}/_.ubldr.sh ${WORKDIR}/_.ubldr.built
+	mv ${WORKDIR}/_.ubldr.${CONF}.sh ${WORKDIR}/_.ubldr.${CONF}.built
 	cd arm/uboot
-	eval $buildenv make DESTDIR=${WORKDIR}/ubldr/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${WORKDIR}/_.ubldr.build.log || exit 1
+	eval $buildenv make "$@" DESTDIR=${WORKDIR}/ubldr-${CONF}/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
     else
 	echo "Failed to build FreeBSD ubldr"
-	echo "  Log in ${WORKDIR}/_.ubldr.build.log"
+	echo "  Log in ${LOGFILE}"
+	echo
+	tail ${LOGFILE}
 	exit 1
     fi
-
 }
 
 # freebsd_ubldr_copy:  Copy the compiled ubldr files
@@ -305,12 +317,14 @@ freebsd_ubldr_copy ( ) {
 
 freebsd_ubldr_copy_ubldr ( ) {
     echo "Installing ubldr"
-    cp ${WORKDIR}/ubldr/ubldr $1 || exit 1
+    CONF=${TARGET_ARCH}-${KERNCONF}
+    cp ${WORKDIR}/ubldr-${CONF}/ubldr $1 || exit 1
 }
 
 freebsd_ubldr_copy_ubldr_help ( ) {
     echo "Installing ubldr help file"
-    cp ${WORKDIR}/ubldr/loader.help $1 || exit 1
+    CONF=${TARGET_ARCH}-${KERNCONF}
+    cp ${WORKDIR}/ubldr-${CONF}/loader.help $1 || exit 1
 }
 
 # freebsd_install_usr_src:  Copy FREEBSD_SRC tree
