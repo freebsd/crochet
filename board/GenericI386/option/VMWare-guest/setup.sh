@@ -2,6 +2,9 @@
 # Creates a suitable .vmdk description so the
 # resulting image can be booted directly in VMWare.
 #
+# Good information about VMWare VMX files:
+#   http://sanbarrow.com/vmx.html
+
 
 #
 # For a VMWare image, we want to put the disk image
@@ -25,11 +28,14 @@ vmware_config ( ) {
 strategy_add $PHASE_POST_CONFIG vmware_config
 
 #
-# After installing world and kernel, adjust a few things
-# to work better on VMWare
+# After the GenericI386 board definition has installed
+# world and kernel, we can adjust a few things
+# to work better on VMWare.
 #
 vmware_tweak_install ( ) {
-    # TODO: Add some stuff to etc/rc.conf?
+    # Add some stuff to etc/rc.conf
+    echo 'ifconfig_em0="DHCP"' >> etc/rc.conf
+    
     # TODO: Load VMWare-relevant modules in loader.conf?
 }
 
