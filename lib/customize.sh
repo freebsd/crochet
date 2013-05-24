@@ -6,8 +6,14 @@
 
 # Run end-user customization late in the phase.
 # Note that PHASE_BOOT_INSTALL gets cwd set to boot mountpoint automatically.
-customize_boot_partition ( ) { }
-PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+
+# COMMENTED OUT: On systems that don't use a boot partition, this
+# breaks things.  I haven't figured out a really good workaround;
+# people might just have to use strategy_add directly if they want to
+# do any boot-partition customization.
+
+#customize_boot_partition ( ) { }
+#PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
 
 # Copy overlay files early in the user customization phase.
 # Typically, people want to copy static files and then
