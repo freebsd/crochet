@@ -6,23 +6,20 @@
 #
 # FreeBSD-i386.pvm/
 #  +- config.pvs
-#  +- Disk-0.hdd/
+#  +- Disk0.hdd/
 #      +- DiskDescriptor.xml
-#      +- Disk-0.hdd
+#      +- Disk0.hdd.{UUID}.hds
 #
 # More documentation:
 # http://www.parallels.com/fileadmin/parallels/documents/support/pdfm/Parallels_Desktop_Advanced_VM_Configuration.pdf
 
 #
-# BROKEN
+# I believe this is BROKEN.
 #
-# This was copied from the VMWare-guest configuration and
-# I started to copy-and-paste information from the above
-# docs, but it's not finished.
-# 
-#echo Parallels-guest option is broken.
-#echo if you fix it, please send patches.
-#exit 1
+# It generates a .pvm directory that looks a lot like
+# the .pvm for a VM that actually works, but Parallels
+# complains that it can't find the HD files.  If you
+# figure out the issue, please let me know.
 
 strategy_add $PHASE_FREEBSD_OPTION_INSTALL parallels_tweak_install
 strategy_add $PHASE_POST_UNMOUNT parallels_guest_build_vm ${IMG}
@@ -53,7 +50,7 @@ parallels_guest_build_vm ( ) {
     IMGBASE=`basename ${IMG} | sed -e s/\.[^.]*$//`
 
     VMDIR=${IMGDIR}/${IMGBASE}.pvm
-    DISKDIR=${VMDIR}/Disk-0.hdd
+    DISKDIR=${VMDIR}/Disk0.hdd
     mkdir -p ${DISKDIR}
 
     # Compute the appropriate MBR geometry for this image
@@ -66,11 +63,11 @@ parallels_guest_build_vm ( ) {
 	dd of=${IMG} if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
     fi
 
-    mv ${IMG} ${DISKDIR}
 
     # Write DiskDescriptor.xml
     DISKUID=`uuidgen`
     SEGMENTUID=`uuidgen`
+    mv ${IMG} ${DISKDIR}/Disk0.hdd.{${SEGMENTUID}}.hds
     cat >${DISKDIR}/DiskDescriptor.xml <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <Parallels_disk_image Version="1.0">
@@ -114,6 +111,7 @@ EOF
 
     # Write the config.pvs machine description file.
     VMUUID=`uuidgen`
+    SRCVMUUID=`uuidgen`
     cat >${VMDIR}/config.pvs <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <ParallelsVirtualMachine schemaVersion="1.0" dyn_lists="VirtualAppliance 0">
@@ -121,7 +119,7 @@ EOF
    <ValidRc>0</ValidRc>
    <Identification dyn_lists="">
       <VmUuid>{${VMUUID}}</VmUuid>
-      <SourceVmUuid>{00000000-0000-0000-0000-000000000000}</SourceVmUuid>
+      <SourceVmUuid>{${SRCVMUUID}}</SourceVmUuid>
       <LinkedVmUuid></LinkedVmUuid>
       <VmName>FreeBSD-i386-GENERIC</VmName>
       <ServerUuid>{51f7899f-756d-425a-a374-2e97ad5664ba}</ServerUuid>
