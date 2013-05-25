@@ -80,6 +80,7 @@ EOF
     # Write the VMX machine description file.
     cat >$1/$2.vmx <<EOF
 config.version = "8"
+displayName = "$2"
 ethernet0.connectionType = "nat"
 ethernet0.present= "true"
 ethernet0.startConnected = "true"
