@@ -1,4 +1,12 @@
-Crochet builds bootable FreeBSD images for a number of popular boards.
+Crochet is a tool for building bootable FreeBSD images.
+
+It can currently build images for:
+* BeagleBone
+* RaspberryPi
+* PandaBoard
+* ZedBoard
+* generic x86 systems.
+* VMWare
 
 This tool was formerly known as "freebsd-beaglebone" or
 "beaglebsd" as the original work was done for BeagleBone.
@@ -14,7 +22,7 @@ The crochet.sh script can build a complete bootable
 FreeBSD image ready to be copied to a suitable device
 (e.g., SDHC card, Compact Flash card, disk drive, etc.).
 The script runs on FreeBSD-CURRENT, though some people
-have had success running it on FreeBSD 9-STABLE.
+have reported success running it on FreeBSD 9-STABLE.
 
 Using the script to build an image consists of a few steps:
 
@@ -72,15 +80,11 @@ PROJECTS
 There are still plenty of ways this script could
 be improved:
 
-* More boards.  Currently, it supports Beaglebone, RaspberryPi,
-  PandaBoard reasonably well and there is experimental support
-  for a few others.  There are a lot of other boards with
-  similar concerns that could easily be supported.  Look at
-  board/NewBoardExample for explanations for adding support
+* More boards.  Crochet should be able to support any board for
+  which the FreeBSD source tree can build a working kernel.
+  The hardest part is working out the various boot pieces required.
+  Look at board/NewBoardExample for explanations for adding support
   for a new board.
-
-* Non-ARM support.  The GenericI386 board definition
-  proves this is possible.
 
 * Out-of-tree kernel configuration.  Right now, these scripts assume
   kernel configuration files are in the FreeBSD source tree.  I don't
@@ -88,13 +92,15 @@ be improved:
   include a tweaked kernel configuration as part of a board
   definition.
 
-* Package Installation.  I would like to support
-     option Package <name>
-  for installing a package from a pkgng repository.  Fortunately, the
-  new pkgng tools (mostly) provide the necessary support; there are
-  just a few minor bugs and small features needed for this to work
-  really well: Ask on one of the mailing lists if you'd like to help
-  extend pkgng to fully handle cross-architecture pkg installs.
+* Package Installation.  Pkgng packages can be installed using
+    option PackageInit <repository>
+    option Package <name>
+  assuming you have a suitable pkgng repository.  Cross-installs
+  mostly work; there are a few minor bugs in the pkgng tools that
+  are being actively worked on.
+
+  It should be possible to support pkg_add for same-architecture
+  installs, though this requires tricky chroot games to get right.
 
 * Swap.  The script should allow you to specify a swap size and
   automatically adjust the disk layout accordingly.  For now, we
@@ -106,3 +112,8 @@ be improved:
 
 * NanoBSD-style split-partition support.  Ideally, this would be a
   "mix in" capability that users could request with any board.
+
+* Improved support for virtual environments.  The VMWare-guest option
+  demonstrates how to do this.  It should be relatively
+  straightforward to add support for directly building Parallels,
+  VirtualBox, or standard OVF VM images.
