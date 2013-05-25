@@ -1,6 +1,6 @@
 TARGET_ARCH=i386
 KERNCONF=GENERIC
-IMAGE_SIZE=$((1000 * 1000 * 1000))
+IMAGE_SIZE=$((600 * 1000 * 1000))
 
 #
 # Builds a basic i386 image.
