@@ -25,9 +25,8 @@ board_setup ( ) {
 	exit 1
     fi
     BOARDDIRS="$BOARDDIRS $BOARDDIR"
+    echo "Board: $1"
     . $BOARDDIR/setup.sh
-
-    echo "Imported board setup for $1"
 
     IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
     PRIORITY=20 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_overlay_files $BOARDDIR

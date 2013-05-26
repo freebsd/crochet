@@ -27,7 +27,7 @@ option ( ) {
     for d in $BOARDDIRS ${TOPDIR}; do
 	OPTIONDIR=$d/option/${OPTION}
 	if [ -e ${OPTIONDIR}/setup.sh ]; then
-	    echo "Importing option: $OPTION $@"
+	    echo "Option: $OPTION $@"
 	    . $OPTIONDIR/setup.sh "$@"
 	    OPTION=
 	    OPTIONDIR=
