@@ -1,15 +1,22 @@
 #
 # Build a virtual machine that can be booted directly in VMWare.
 #
+# Usage:
+#  option VMWare-guest [args]
+#
+# -n machine-name -- name of Virtual machine
+# -p full-path-to-machine-dir  -- Full path of base dir
+#      for new VM; e.g., /usr/vms/MyTestVm.vmwarevm
+#
 
 # Wait until after config is complete to register steps that
 # require config variables such as ${IMG}.
 #
-vmware_guest_config ( ) {
+vmware_guest_post_config ( ) {
     strategy_add $PHASE_FREEBSD_OPTION_INSTALL vmware_guest_tweak_install
-    strategy_add $PHASE_POST_UNMOUNT vmware_guest_build_vm  ${IMG}
+    strategy_add $PHASE_POST_UNMOUNT vmware_guest_build_vm  ${IMG} "$@"
 }
-strategy_add $PHASE_POST_CONFIG vmware_guest_config
+strategy_add $PHASE_POST_CONFIG vmware_guest_post_config "$@"
 
 #
 # After the GenericI386 board definition has installed
@@ -36,15 +43,44 @@ vmware_guest_tweak_install ( ) {
 # http://sanbarrow.com/vmx.html
 #
 # $1 = full path of image
+# $@ = args passed to option
 #
 vmware_guest_build_vm ( ) {
     echo "Building VMWare VM"
-    IMGBASE=`basename $1 | sed -e s/\.[^.]*$//`
+    IMG=$1; shift
 
-    VMDIR=${WORKDIR}/${IMGBASE}.vmwarevm
-    mkdir -p ${VMDIR}
-    rm -rf ${VMDIR}/*
-    strategy_add $PHASE_GOODBYE_LWW vmware_guest_goodbye ${VMDIR}
+    args=`getopt n:p: $*`
+    set -- $args
+    while true; do
+	case "$1" in
+	    -n)
+		IMGBASE="$2"
+		shift; shift
+		;;
+	    -p)
+		VMDIR="$2"
+		shift; shift
+		;;
+	    --)
+		shift; break
+		;;
+	esac
+    done
+
+
+    if [ -z "${IMGBASE}" ]; then
+	IMGBASE=`basename ${IMG} | sed -e s/\.[^.]*$//`
+    fi
+    echo "  VMWare guest base name: $IMGBASE"
+    if [ -z "${VMDIR}" ]; then
+	VMDIR="${WORKDIR}/${IMGBASE}.vmwarevm"
+    fi
+    echo "  VMWare machine base directory:"
+    echo "     $VMDIR"
+
+    mkdir -p "${VMDIR}"
+    rm -rf "${VMDIR}"/*
+    strategy_add $PHASE_GOODBYE_LWW vmware_guest_goodbye "${VMDIR}"
 
     # Compute the appropriate MBR geometry for this image
     CYLINDERS=$(( ($IMAGE_SIZE + 512 * 63 * 16 - 1) / 512 / 63 / 16 ))
@@ -53,13 +89,13 @@ vmware_guest_build_vm ( ) {
     # If the image isn't an exact multiple of the cylinder size, pad it.
     PADDED_SIZE=$(( $CYLINDERS * 512 * 16 * 63 ))
     if [ $PADDED_SIZE -gt $IMAGE_SIZE ]; then
-	dd of=$1 if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
+	dd of=${IMG} if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
     fi
 
     # Write the VMDK disk description file.
     # This is almost straight from an example in the VMWare docs.
-    mv $1 ${VMDIR}/Disk0.hdd
-    cat >${VMDIR}/Disk0.vmdk <<EOF
+    mv ${IMG} "${VMDIR}/Disk0.hdd"
+    cat >"${VMDIR}/Disk0.vmdk" <<EOF
 # Disk DescriptorFile
 version=1
 CID=fffffffe
@@ -75,7 +111,7 @@ ddb.geometry.cylinders = "${CYLINDERS}"
 EOF
 
     # Write the VMX machine description file.
-    cat >${VMDIR}/VirtualMachine.vmx <<EOF
+    cat >"${VMDIR}/VirtualMachine.vmx" <<EOF
 config.version = "8"
 virtualHW.version = "7"
 displayName = "${IMGBASE}"
