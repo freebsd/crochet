@@ -33,7 +33,7 @@ vmware_guest_tweak_install ( ) {
 # Build the VMWare virtual machine directory:
 #   FreeBSD-i386-GENERIC.vmwarevm/
 #    +- VirtualMachine.vmx - Machine description
-#    +- Disk0.vmdk - Disk descriptor
+#    +- Disk0.vmdk - Disk description
 #    +- Disk0.hdd - Disk image
 #
 # VMWare's Documentation for VMDK format:
@@ -92,13 +92,24 @@ vmware_guest_build_vm ( ) {
 	dd of=${IMG} if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
     fi
 
+    # Move the image into the VMWare VM directory
+    # TODO: Should this copy instead of move?  Optionally copy?
+    # TODO: Break the image into 2GB pieces and update the VMDK
+    # descriptor appropriately.
+    # TODO: Find or write a tool to convert the flat image
+    # into a compressed sparse image, per VMWare docs:
+    #
+    # http://www.vmware.com/support/developer/vddk/vmdk_50_technote.pdf?src=vmdk
+    #
+    mv ${IMG} "${VMDIR}/Disk0.hdd"
+
     # Write the VMDK disk description file.
     # This is almost straight from an example in the VMWare docs.
-    mv ${IMG} "${VMDIR}/Disk0.hdd"
+    cid=`jot -r -w '%x' 1 0 4294967294`
     cat >"${VMDIR}/Disk0.vmdk" <<EOF
 # Disk DescriptorFile
 version=1
-CID=fffffffe
+CID=${cid}
 parentCID=ffffffff
 createType="monolithicFlat"
 # Extent description
@@ -111,6 +122,9 @@ ddb.geometry.cylinders = "${CYLINDERS}"
 EOF
 
     # Write the VMX machine description file.
+    # TODO: Should we provide options for some of
+    # this?  Or is it enough for people to open
+    # the VM in VMWare and adjust it themselves?
     cat >"${VMDIR}/VirtualMachine.vmx" <<EOF
 config.version = "8"
 virtualHW.version = "7"
