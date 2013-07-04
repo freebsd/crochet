@@ -6,11 +6,8 @@
 BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
 BOARD_BOOT_MOUNTPOINT=${WORKDIR}/_.mount.boot
 
-# Default is to install world but not
-# populate /usr/src and /usr/ports
+# Default is to install world ...
 FREEBSD_INSTALL_WORLD=y
-FREEBSD_INSTALL_USR_SRC=
-FREEBSD_INSTALL_USR_PORTS=
 
 # List of all board dirs.
 BOARDDIRS=""
