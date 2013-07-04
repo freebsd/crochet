@@ -77,8 +77,8 @@ raspberry_pi_populate_boot_partition ( ) {
     # RPi boot loader loads initial device tree file
     # Ubldr customizes this and passes it to the kernel.
     # (See overlay/boot/loader.rc)
-    freebsd_install_fdt bcm2835-rpi-b.dts rpi-b.dtb
-    echo "device_tree=rpi-b.dtb" >> config.txt
+    freebsd_install_fdt rpi.dts rpi.dtb
+    echo "device_tree=rpi.dtb" >> config.txt
     echo "device_tree_address=0x100" >> config.txt
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
