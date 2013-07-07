@@ -1,7 +1,5 @@
-diff --git a/include/configs/am335x_evm.h b/include/configs/am335x_evm.h
-index ef00306..ee16dc7 100644
---- a/include/configs/am335x_evm.h
-+++ b/include/configs/am335x_evm.h
+--- include/configs/am335x_evm.h.orig	2013-04-19 07:25:43.000000000 -0700
++++ include/configs/am335x_evm.h	2013-07-06 17:48:09.831315602 -0700
 @@ -20,6 +20,12 @@
  
  #include <asm/arch/omap.h>
@@ -175,17 +173,7 @@ index ef00306..ee16dc7 100644
  #define CONFIG_SPL_MMC_SUPPORT
  #define CONFIG_SPL_FAT_SUPPORT
  #define CONFIG_SPL_I2C_SUPPORT
-@@ -323,51 +246,16 @@
- #define CONFIG_SPL_LIBGENERIC_SUPPORT
- #define CONFIG_SPL_SERIAL_SUPPORT
- #define CONFIG_SPL_GPIO_SUPPORT
- #define CONFIG_SPL_YMODEM_SUPPORT
--#define CONFIG_SPL_NET_SUPPORT
--#define CONFIG_SPL_NET_VCI_STRING	"AM335x U-Boot SPL"
--#define CONFIG_SPL_ETH_SUPPORT
- #define CONFIG_SPL_SPI_SUPPORT
- #define CONFIG_SPL_SPI_FLASH_SUPPORT
- #define CONFIG_SPL_SPI_LOAD
+@@ -333,41 +256,9 @@
  #define CONFIG_SPL_SPI_BUS		0
  #define CONFIG_SPL_SPI_CS		0
  #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x80000
@@ -227,7 +215,7 @@ index ef00306..ee16dc7 100644
  /*
   * 1MB into the SDRAM to allow for SPL's bss at the beginning of SDRAM
   * 64 bytes before this address should be set aside for u-boot.img's
-@@ -462,7 +349,7 @@
+@@ -462,7 +353,7 @@
  #define CONFIG_PHY_ADDR			0
  #define CONFIG_PHY_SMSC
  
