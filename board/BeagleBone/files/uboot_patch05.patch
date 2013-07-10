@@ -1,5 +1,5 @@
---- include/configs/am335x_evm.h.orig	2013-04-19 07:25:43.000000000 -0700
-+++ include/configs/am335x_evm.h	2013-07-06 17:48:09.831315602 -0700
+--- a/include/configs/am335x_evm.h.orig	2013-04-19 07:25:43.000000000 -0700
++++ b/include/configs/am335x_evm.h	2013-07-06 17:48:09.831315602 -0700
 @@ -20,6 +20,12 @@
  
  #include <asm/arch/omap.h>
