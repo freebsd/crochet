@@ -260,8 +260,6 @@ freebsd_installkernel ( ) {
 # varies slightly between systems, we identify the ubldr
 # by both TARGET_ARCH and KERNCONF so that ubldr builds
 # for different systems won't get confused.
-# TODO: Consider using TARGET_ARCH with $@ instead of
-# KERNCONF to identify separate builds.
 #
 # $@: make arguments for building
 #
@@ -285,7 +283,7 @@ freebsd_ubldr_build ( ) {
     echo "Building FreeBSD $CONF ubldr at "`date`
     echo "    (Logging to ${LOGFILE})"
     rm -rf ${WORKDIR}/ubldr-${CONF}
-    mkdir -p ${WORKDIR}/ubldr-${CONF}
+    mkdir -p ${WORKDIR}/ubldr-${CONF}/boot/defaults
 
     cd sys/boot
     eval $buildenv make "$@" -m $ubldr_makefiles obj > ${LOGFILE} 2>&1
@@ -295,7 +293,7 @@ freebsd_ubldr_build ( ) {
     then
 	mv ${WORKDIR}/_.ubldr.${CONF}.sh ${WORKDIR}/_.ubldr.${CONF}.built
 	cd arm/uboot
-	eval $buildenv make "$@" DESTDIR=${WORKDIR}/ubldr-${CONF}/ BINDIR= NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
+	eval $buildenv make "$@" DESTDIR=${WORKDIR}/ubldr-${CONF}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
     else
 	echo "Failed to build FreeBSD ubldr"
 	echo "  Log in ${LOGFILE}"
@@ -311,20 +309,21 @@ freebsd_ubldr_build ( ) {
 # $1: Target directory to receive ubldr files
 #
 freebsd_ubldr_copy ( ) {
-    freebsd_ubldr_copy_ubldr $1
-    freebsd_ubldr_copy_ubldr_help $1
+    echo "Installing ubldr"
+    CONF=${TARGET_ARCH}-${KERNCONF}
+    (cd ${WORKDIR}/ubldr-${CONF}/boot; find . | cpio -pdum $1) || exit 1
 }
 
 freebsd_ubldr_copy_ubldr ( ) {
     echo "Installing ubldr"
     CONF=${TARGET_ARCH}-${KERNCONF}
-    cp ${WORKDIR}/ubldr-${CONF}/ubldr $1 || exit 1
+    cp ${WORKDIR}/ubldr-${CONF}/boot/ubldr $1 || exit 1
 }
 
 freebsd_ubldr_copy_ubldr_help ( ) {
     echo "Installing ubldr help file"
     CONF=${TARGET_ARCH}-${KERNCONF}
-    cp ${WORKDIR}/ubldr-${CONF}/loader.help $1 || exit 1
+    cp ${WORKDIR}/ubldr-${CONF}/boot/loader.help $1 || exit 1
 }
 
 # freebsd_install_usr_src:  Copy FREEBSD_SRC tree

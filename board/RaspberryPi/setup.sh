@@ -87,7 +87,7 @@ raspberry_pi_populate_boot_partition ( ) {
     cp ${RPI_FIRMWARE_SRC}/boot/uEnv.txt .
 
     # Install ubldr to FAT partition
-    freebsd_ubldr_copy .
+    freebsd_ubldr_copy_ubldr .
 
     # XXX For production use, we could boot faster by
     # bypassing u-boot and ubldr.  That requires the kernel
@@ -107,4 +107,4 @@ strategy_add $PHASE_BOOT_INSTALL raspberry_pi_populate_boot_partition
 
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr boot
