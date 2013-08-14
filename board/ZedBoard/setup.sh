@@ -25,6 +25,7 @@ strategy_add $PHASE_MOUNT_LWW zedboard_mount_partitions
 
 # TODO: Build U-Boot from source.
 strategy_add $PHASE_BOOT_INSTALL cp ${BOARDDIR}/bootfiles/* .
+strategy_add $PHASE_BOOT_INSTALL gunzip BOOT.BIN.gz
 
 # Build and install ubldr from source
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x80000
@@ -32,7 +33,7 @@ strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 
 # Install the FDT files on the boot partition
 strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts zedboard.dts
-strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts zedboard.dtb
+strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts board.dtb
 
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
