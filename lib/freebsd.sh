@@ -228,6 +228,9 @@ freebsd_installworld ( ) {
 	echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
 	exit 1
     fi
+
+    # Touch up /etc/src.conf so that native "make buildkernel" will DTRT:
+    echo "KERNCONF=${KERNCONF}" >> $1/etc/src.conf
 }
 
 # freebsd_installkernel: Install FreeBSD kernel to image
