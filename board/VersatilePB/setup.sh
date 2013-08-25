@@ -28,7 +28,7 @@ versatilepb_build_flash_image ( ) {
 
     dd of=$VERSATILEPB_FLASH bs=1M count=4 if=/dev/zero
     dd of=$VERSATILEPB_FLASH bs=1 conv=notrunc if=${WORKDIR}/first_commands
-    dd of=$VERSATILEPB_FLASH bs=64k oseek=15 conv=notrunc if=${WORKDIR}/boot/kernel/kernel.bin
+    dd of=$VERSATILEPB_FLASH bs=64k oseek=15 conv=notrunc if=${WORKDIR}/_.kernel.bin/boot/kernel/kernel.bin
 }
 strategy_add $PHASE_BUILD_OTHER versatilepb_build_flash_image
 
