@@ -314,7 +314,7 @@ freebsd_ubldr_build ( ) {
 freebsd_ubldr_copy ( ) {
     echo "Installing ubldr"
     CONF=${TARGET_ARCH}-${KERNCONF}
-    (cd ${WORKDIR}/ubldr-${CONF}/boot; find . | cpio -pdum $1) || exit 1
+    (cd ${WORKDIR}/ubldr-${CONF}/boot && find . | cpio -pdum $1) || exit 1
 }
 
 freebsd_ubldr_copy_ubldr ( ) {
