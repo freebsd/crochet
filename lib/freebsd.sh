@@ -41,7 +41,7 @@ freebsd_download_instructions ( ) {
         echo "$l"
     done
     echo
-    echo "Set \$FREEBSD_SRC in config.sh if you have the sources in a different directory."
+    echo "Set \$FREEBSD_SRC in ${CONFIGFILE:-the -c <config file>} if you have the sources in a different directory."
     echo "Run this script again after you have the sources installed."
     exit 1
 }
