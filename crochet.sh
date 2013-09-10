@@ -13,15 +13,6 @@ BOARD=
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
-# Load utility libraries.
-. ${LIBDIR}/strategy.sh  # Must go first
-. ${LIBDIR}/board.sh
-. ${LIBDIR}/config.sh
-. ${LIBDIR}/customize.sh
-. ${LIBDIR}/disk.sh
-. ${LIBDIR}/freebsd.sh
-. ${LIBDIR}/uboot.sh
-
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
     echo " -b <board>: Load standard configuration for board"
@@ -54,6 +45,15 @@ while true; do
 	    crochet_usage
     esac
 done
+
+# Load utility libraries.
+. ${LIBDIR}/strategy.sh  # Must go first
+. ${LIBDIR}/board.sh
+. ${LIBDIR}/config.sh
+. ${LIBDIR}/customize.sh
+. ${LIBDIR}/disk.sh
+. ${LIBDIR}/freebsd.sh
+. ${LIBDIR}/uboot.sh
 
 #
 # Load user configuration:  This builds the strategy.
