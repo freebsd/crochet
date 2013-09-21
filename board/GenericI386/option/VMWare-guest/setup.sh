@@ -127,19 +127,25 @@ EOF
     # the VM in VMWare and adjust it themselves?
     cat >"${VMDIR}/VirtualMachine.vmx" <<EOF
 config.version = "8"
-virtualHW.version = "7"
+virtualHW.version = "10"
 displayName = "${IMGBASE}"
 ethernet0.connectionType = "nat"
 ethernet0.present= "true"
 ethernet0.startConnected = "true"
 ethernet0.virtualDev = "e1000"
-floppy0.present = "FALSE"
 guestOS = "freebsd"
 ide0:0.filename = "Disk0.vmdk"
 ide0:0.present = "TRUE"
 memsize = "512"
 tools.syncTime = "TRUE"
 uuid.action = "create"
+usb.present = "TRUE"
+ehci.present = "TRUE"
+ehci.pciSlotNumber = "0"
+isolation.tools.dnd.disable = "TRUE"
+isolation.tools.copy.disable = "TRUE"
+isolation.tools.paste.disable = "TRUE"
+floppy0.present = "FALSE"
 EOF
 }
 
