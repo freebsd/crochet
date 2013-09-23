@@ -32,28 +32,28 @@ options 	INET			# InterNETworking
 options 	INET6			# IPv6 communications protocols
 options 	TCP_OFFLOAD		# TCP offload
 options 	SCTP			# Stream Control Transmission Protocol
-options 	FFS			# Berkeley Fast Filesystem
+#options 	FFS			# Berkeley Fast Filesystem
 options 	SOFTUPDATES		# Enable FFS soft updates support
-options 	UFS_ACL			# Support for access control lists
-options 	UFS_DIRHASH		# Improve performance on big directories
-options 	UFS_GJOURNAL		# Enable gjournal-based UFS journaling
-options 	QUOTA			# Enable disk quotas for UFS
+#options 	UFS_ACL			# Support for access control lists
+#options 	UFS_DIRHASH		# Improve performance on big directories
+#options 	UFS_GJOURNAL		# Enable gjournal-based UFS journaling
+#options 	QUOTA			# Enable disk quotas for UFS
 options 	MD_ROOT			# MD is a potential root device
-options 	NFSCL			# New Network Filesystem Client
-options 	NFSD			# New Network Filesystem Server
-options 	NFSLOCKD		# Network Lock Manager
-options 	NFS_ROOT		# NFS usable as /, requires NFSCL
+#options 	NFSCL			# New Network Filesystem Client
+#options 	NFSD			# New Network Filesystem Server
+#options 	NFSLOCKD		# Network Lock Manager
+#options 	NFS_ROOT		# NFS usable as /, requires NFSCL
 options 	MSDOSFS			# MSDOS Filesystem
-options 	CD9660			# ISO 9660 Filesystem
+#options 	CD9660			# ISO 9660 Filesystem
 options 	PROCFS			# Process filesystem (requires PSEUDOFS)
 options 	PSEUDOFS		# Pseudo-filesystem framework
 options 	GEOM_PART_GPT		# GUID Partition Tables.
 options 	GEOM_RAID		# Soft RAID functionality.
 options 	GEOM_LABEL		# Provides labelization
-options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
-options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
-options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
-options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
+#options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+#options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
+#options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
+#options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
 options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
 options 	KTRACE			# ktrace(1) support
 options 	STACK			# stack(9) support
@@ -72,7 +72,7 @@ options 	MAC			# TrustedBSD MAC Framework
 options 	KDTRACE_HOOKS		# Kernel DTrace hooks
 options 	DDB_CTF			# Kernel ELF linker loads CTF data
 options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
-options 	XENHVM			# Include Xen support
+#options 	XENHVM			# Include Xen support
 
 # Debugging support.  Always need this:
 options 	KDB			# Enable kernel debugger support.
@@ -95,7 +95,7 @@ device		apic			# I/O APIC
 device		cpufreq
 
 # Bus support.
-device		acpi
+#device		acpi
 device		eisa
 device		pci
 
@@ -108,7 +108,7 @@ options         SC_PIXEL_MODE   # add support for the raster text mode
 
 # ATA controllers
 #device		ahci		# AHCI-compatible SATA controllers
-#device		ata		# Legacy ATA/SATA controllers
+device		ata		# Legacy ATA/SATA controllers		
 #options 	ATA_STATIC_ID	# Static device numbering
 
 # Power management support (see NOTES for more options)
