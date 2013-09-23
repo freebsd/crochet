@@ -17,6 +17,7 @@
 # board_setup RaspberryPi
 # board_setup VersatilePB
 # board_setup ZedBoard
+# board_setup Soekris
 
 # Don't see your board here?  board/NewBoardExample has details for
 # how to add a new board definition.  If you need help, ask.  If you
