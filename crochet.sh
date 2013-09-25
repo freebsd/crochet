@@ -87,6 +87,7 @@ fi
 #
 handle_trap ( ) {
     disk_unmount_all
+    email_status "" "Crochet build failed"
     exit 2
 }
 trap handle_trap INT QUIT KILL EXIT
@@ -108,7 +109,7 @@ run_strategy
 #
 # we're done
 #
-email_status "Crochet build finished"
+email_status "" "Crochet build finished"
 
-echo "" 'Finished at '`date`
+echo 'Finished at '`date`
 
