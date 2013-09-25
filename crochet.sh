@@ -87,7 +87,7 @@ fi
 #
 handle_trap ( ) {
     disk_unmount_all
-    email_status "${TOPDIR}" "Crochet build failed"
+    email_status "${TOPDIR} ${FREEBSD_SRC}" "Crochet build failed"
     exit 2
 }
 trap handle_trap INT QUIT KILL EXIT
@@ -99,7 +99,7 @@ fi
 #
 # we're starting
 #
-email_status "${TOPDIR}" "Crochet build commenced"
+email_status "${TOPDIR} ${FREEBSD_SRC}" "Crochet build commenced"
 
 #
 # Run the strategy to do all of the work.
@@ -109,7 +109,7 @@ run_strategy
 #
 # we're done
 #
-email_status "${TOPDIR}" "Crochet build finished"
+email_status "${TOPDIR} ${FREEBSD_SRC}" "Crochet build finished"
 
 echo 'Finished at '`date`
 

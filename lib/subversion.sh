@@ -1,6 +1,6 @@
 
 update_sourcetree ( ) {
     cd ${FREEBSD_SRC}
-    svn update > ${WORKDIR}/_.svnupdate.${CONF}.sh
+    svn update > ${WORKDIR}/_.svnupdate.log
     cd ${TOPDIR}
 }
