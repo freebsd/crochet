@@ -9,6 +9,7 @@ WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
 EMAIL=
+UPDATE_SOURCE=
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
@@ -23,6 +24,7 @@ rm -f ${WORKDIR}/*.log
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
 . ${LIBDIR}/email.sh
+. ${LIBDIR}/subversion.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
@@ -31,11 +33,12 @@ crochet_usage ( ) {
     echo "    only a single board_setup command.)"
     echo " -c <file>: Load configuration from file"
     echo " -e <email>: Email address to receive build status"
+    echo " -u: Update source tree"
     exit 2
 }
 
 # Parse command-line options
-args=`getopt b:c:e: $*`
+args=`getopt ub:c:e: $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -53,6 +56,10 @@ while true; do
         -e)
             EMAIL="$2"
             shift; shift
+            ;;
+        -u)
+            UPDATE_SOURCETREE=yes
+            shift
             ;;
         --)
             shift; break
@@ -83,6 +90,10 @@ handle_trap ( ) {
     exit 2
 }
 trap handle_trap INT QUIT KILL EXIT
+
+if [ -n "${UPDATE_SOURCETREE}" ]; then
+    update_sourcetree
+fi
 
 #
 # we're starting
