@@ -8,6 +8,7 @@ LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
+EMAIL=
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
@@ -21,6 +22,7 @@ rm -f ${WORKDIR}/*.log
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
+. ${LIBDIR}/email.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
@@ -28,11 +30,12 @@ crochet_usage ( ) {
     echo "    (Equivalent to loading a config file that contains"
     echo "    only a single board_setup command.)"
     echo " -c <file>: Load configuration from file"
+    echo " -e <email>: Email address to receive build status"
     exit 2
 }
 
 # Parse command-line options
-args=`getopt b:c: $*`
+args=`getopt b:c:e: $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -45,6 +48,10 @@ while true; do
 	    ;;
         -c)
             CONFIGFILE="$2"
+            shift; shift
+            ;;
+        -e)
+            EMAIL="$2"
             shift; shift
             ;;
         --)
@@ -78,8 +85,19 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL EXIT
 
 #
+# we're starting
+#
+email_status "" "Crochet build commenced"
+
+#
 # Run the strategy to do all of the work.
 #
 run_strategy
 
-echo 'Finished at '`date`
+#
+# we're done
+#
+email_status "Crochet build finished"
+
+echo "" 'Finished at '`date`
+
