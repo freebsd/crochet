@@ -1,10 +1,6 @@
 TARGET_ARCH=i386
 KERNCONF=SOEKRIS
-IMAGE_SIZE=$((600 * 1000 * 1000))
-
-#
-# Builds a basic i386 image.
-#
+IMAGE_SIZE=$((256 * 1000 * 1000))
 
 # Clean out any old i386 boot bits.
 rm -rf ${WORKDIR}/boot
