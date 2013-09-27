@@ -5,10 +5,15 @@
 # strategy list.  After configuration, the strategy list is sorted and
 # then the items are run to actually do the work.
 
-# The strategy list is kept in files under ${WORKDIR}/strategy;
-# we need to clean that out before we start.
-rm -rf ${WORKDIR}/strategy
-mkdir -p ${WORKDIR}/strategy
+# The strategy list for this run is kept in ${STRATEGYDIR}.
+# Clean out old strategies.
+STRATEGYBASE=/tmp/crochet/strategy
+mkdir -p ${STRATEGYBASE}
+find ${STRATEGYBASE} -maxdepth 1 -ctime +3 | xargs rm -rf
+# Create a new dir for this run.
+# Including timestamp in the dirname simplifies debugging.
+_DATE=`date +%Y.%m.%d.%H.%M.%S`
+STRATEGYDIR=`mktemp -d ${STRATEGYBASE}/${_DATE}-XXXXXX`
 
 # Each strategy item specifies a "phase" and a "priority".  Items are
 # run in order sorted by phase, then priority, then by the order they
@@ -115,7 +120,7 @@ strategy_add ( ) {
 
     _STRATEGY_ADD_COUNTER=$(($_STRATEGY_ADD_COUNTER + 1))
     _P=`printf '%03d%03d' ${PRIORITY} ${_STRATEGY_ADD_COUNTER}`
-    _PHASE_FILE=${WORKDIR}/strategy/${PHASE}.sh
+    _PHASE_FILE=${STRATEGYDIR}/${PHASE}.sh
     # LWW items are flagged with last digit '1'
     if [ $(($PHASE % 10)) -eq 1 ]; then
 	rm -f ${_PHASE_FILE}
@@ -123,7 +128,7 @@ strategy_add ( ) {
     cat >>${_PHASE_FILE} <<EOF
 __run $_P OPTION=$OPTION OPTIONDIR=$OPTIONDIR BOARDDIR=$BOARDDIR $@
 EOF
-    echo ${PHASE} >> ${WORKDIR}/strategy/phases.txt
+    echo ${PHASE} >> ${STRATEGYDIR}/phases.txt
 }
 
 # Run all phases.
@@ -133,10 +138,10 @@ EOF
 run_strategy ( ) {
     while true; do
 	_LAST_PHASE=$_CURRENT_PHASE
-	for P in `cat ${WORKDIR}/strategy/phases.txt | sort -n | uniq`; do
+	for P in `cat ${STRATEGYDIR}/phases.txt | sort -n | uniq`; do
 	    if [ $P -gt $_CURRENT_PHASE ]; then
 		_CURRENT_PHASE=$P
-		_PHASE_FILE=${WORKDIR}/strategy/${P}.sh
+		_PHASE_FILE=${STRATEGYDIR}/${P}.sh
 		# Sort by priority, then by insertion order.
 		sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
 		. ${_PHASE_FILE}.sorted
