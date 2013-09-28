@@ -73,6 +73,9 @@ rm -f ${WORKDIR}/*.log
 #
 handle_trap ( ) {
     disk_unmount_all
+    echo
+    echo 'ERROR: Exiting at '`date`
+    echo
     exit 2
 }
 trap handle_trap INT QUIT KILL EXIT
@@ -81,5 +84,10 @@ trap handle_trap INT QUIT KILL EXIT
 # Run the strategy to do all of the work.
 #
 run_strategy
+
+# Clear the error exit handler
+trap - INT QUIT KILL EXIT
+# Clean up
+disk_unmount_all
 
 echo 'Finished at '`date`
