@@ -13,7 +13,7 @@ soekris_partition_image ( ) {
 strategy_add $PHASE_PARTITION_LWW soekris_partition_image                                
                                                                                          
 # install the GRUB loader                                                                        
-soekris_board_install ( ) {                                                             
+soekris_board_install ( ) {
     # install GRUB
     grub_install_grub2
 }                                                                                        
