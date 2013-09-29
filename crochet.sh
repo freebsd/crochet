@@ -26,6 +26,7 @@ rm -f ${WORKDIR}/*.log
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/grub.sh
+. ${LIBDIR}/gzip.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
