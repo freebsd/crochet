@@ -41,6 +41,8 @@ board_overlay_files ( ) {
     if [ -d $1/overlay ]; then
 	echo "Overlaying board-specific files from $1/overlay"
 	(cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+    else
+	echo "Warning; no overlays found for $1"
     fi
 }
 
