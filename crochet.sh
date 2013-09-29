@@ -11,10 +11,6 @@ BOARD=
 EMAIL=
 UPDATE_SOURCE=
 
-# Initialize the work directory, clean out old logs.
-mkdir -p ${WORKDIR}
-rm -f ${WORKDIR}/*.log
-
 # Load utility libraries.
 . ${LIBDIR}/strategy.sh  # Must go first
 . ${LIBDIR}/board.sh
@@ -83,6 +79,10 @@ fi
 if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
+
+# Initialize the work directory, clean out old logs.
+mkdir -p ${WORKDIR}
+rm -f ${WORKDIR}/*.log
 
 #
 # The build config

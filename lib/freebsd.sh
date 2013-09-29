@@ -167,6 +167,9 @@ _freebsd_build ( ) {
 #
 freebsd_buildworld ( ) {
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
+    if [ -n "${TARGET_CPUTYPE}" ]; then
+	_FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
+    fi
     CONF=${TARGET_ARCH}
     echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
@@ -183,6 +186,9 @@ strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 #
 freebsd_buildkernel ( ) {
     _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} KERNCONF=${KERNCONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_KERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS}"
+    if [ -n "${TARGET_CPUTYPE}" ]; then
+	_FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
+    fi
     CONF=${TARGET_ARCH}-${KERNCONF}
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
@@ -228,6 +234,9 @@ freebsd_installworld ( ) {
 	echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
 	exit 1
     fi
+
+    # Touch up /etc/src.conf so that native "make buildkernel" will DTRT:
+    echo "KERNCONF=${KERNCONF}" >> $1/etc/src.conf
 }
 
 # freebsd_installkernel: Install FreeBSD kernel to image
@@ -266,15 +275,18 @@ freebsd_installkernel ( ) {
 freebsd_ubldr_build ( ) {
     cd ${FREEBSD_SRC}
     CONF=${TARGET_ARCH}-${KERNCONF}
-    LOGFILE=${WORKDIR}/_.ubldr.${CONF}.build.log
+    UBLDR_DIR=${WORKDIR}/ubldr-${CONF}
+    LOGFILE=${UBLDR_DIR}/_.ubldr.${CONF}.build.log
     ubldr_makefiles=`pwd`/share/mk
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
 
+    mkdir -p ${UBLDR_DIR}
+
     # Record the build command we plan to use.
-    echo $buildenv make "$@" -m $ubldr_makefiles all > ${WORKDIR}/_.ubldr.${CONF}.sh
+    echo $buildenv make "$@" -m $ubldr_makefiles all > ${UBLDR_DIR}/_.ubldr.${CONF}.sh
 
     # If the command is unchanged, we won't rebuild.
-    if diff ${WORKDIR}/_.ubldr.${CONF}.built ${WORKDIR}/_.ubldr.${CONF}.sh > /dev/null 2>&1
+    if diff ${UBLDR_DIR}/_.ubldr.${CONF}.built ${UBLDR_DIR}/_.ubldr.${CONF}.sh > /dev/null 2>&1
     then
 	echo "Using ubldr from previous build"
 	return 0
@@ -282,18 +294,18 @@ freebsd_ubldr_build ( ) {
 
     echo "Building FreeBSD $CONF ubldr at "`date`
     echo "    (Logging to ${LOGFILE})"
-    rm -rf ${WORKDIR}/ubldr-${CONF}
-    mkdir -p ${WORKDIR}/ubldr-${CONF}/boot/defaults
+    rm -rf ${UBLDR_DIR}/boot
+    mkdir -p ${UBLDR_DIR}/boot/defaults
 
     cd sys/boot
     eval $buildenv make "$@" -m $ubldr_makefiles obj > ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $ubldr_makefiles clean >> ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $ubldr_makefiles depend >> ${LOGFILE} 2>&1
-    if /bin/sh -e ${WORKDIR}/_.ubldr.${CONF}.sh >> ${LOGFILE} 2>&1
+    if /bin/sh -e ${UBLDR_DIR}/_.ubldr.${CONF}.sh >> ${LOGFILE} 2>&1
     then
-	mv ${WORKDIR}/_.ubldr.${CONF}.sh ${WORKDIR}/_.ubldr.${CONF}.built
+	mv ${UBLDR_DIR}/_.ubldr.${CONF}.sh ${UBLDR_DIR}/_.ubldr.${CONF}.built
 	cd arm/uboot
-	eval $buildenv make "$@" DESTDIR=${WORKDIR}/ubldr-${CONF}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
+	eval $buildenv make "$@" DESTDIR=${UBLDR_DIR}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
     else
 	echo "Failed to build FreeBSD ubldr"
 	echo "  Log in ${LOGFILE}"
@@ -311,7 +323,7 @@ freebsd_ubldr_build ( ) {
 freebsd_ubldr_copy ( ) {
     echo "Installing ubldr"
     CONF=${TARGET_ARCH}-${KERNCONF}
-    (cd ${WORKDIR}/ubldr-${CONF}/boot; find . | cpio -pdum $1) || exit 1
+    (cd ${WORKDIR}/ubldr-${CONF}/boot && find . | cpio -pdum $1) || exit 1
 }
 
 freebsd_ubldr_copy_ubldr ( ) {

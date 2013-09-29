@@ -54,7 +54,7 @@ vmware_guest_build_vm ( ) {
     while true; do
 	case "$1" in
 	    -n)
-		IMGBASE="$2"
+		VMNAME="$2"
 		shift; shift
 		;;
 	    -p)
@@ -68,16 +68,25 @@ vmware_guest_build_vm ( ) {
     done
 
 
-    if [ -z "${IMGBASE}" ]; then
-	IMGBASE=`basename ${IMG} | sed -e s/\.[^.]*$//`
+    if [ -z "${VMNAME}" ]; then
+	VMNAME=`basename ${IMG} | sed -e s/\.[^.]*$//`
     fi
-    echo "  VMWare guest base name: $IMGBASE"
     if [ -z "${VMDIR}" ]; then
-	VMDIR="${WORKDIR}/${IMGBASE}.vmwarevm"
+	VMDIR="${WORKDIR}/${VMNAME}.vmwarevm"
     fi
-    echo "  VMWare machine base directory:"
-    echo "     $VMDIR"
 
+    # Avoid overwriting an existing VM
+    BASEVMDIR="${VMDIR}"
+    BASEVMNAME="${VMNAME}"
+    i=1
+    while [ -d "${VMDIR}" ]; do
+	VMDIR="${BASEVMDIR}.${i}"
+	VMNAME="${BASEVMNAME}.${i}"
+    done
+
+    echo "  VMWare machine name: $VMNAME"
+    echo "  VMWare machine directory:"
+    echo "     $VMDIR"
     mkdir -p "${VMDIR}"
     rm -rf "${VMDIR}"/*
     strategy_add $PHASE_GOODBYE_LWW vmware_guest_goodbye "${VMDIR}"
@@ -127,19 +136,25 @@ EOF
     # the VM in VMWare and adjust it themselves?
     cat >"${VMDIR}/VirtualMachine.vmx" <<EOF
 config.version = "8"
-virtualHW.version = "7"
-displayName = "${IMGBASE}"
+virtualHW.version = "10"
+displayName = "${VMNAME}"
 ethernet0.connectionType = "nat"
 ethernet0.present= "true"
 ethernet0.startConnected = "true"
 ethernet0.virtualDev = "e1000"
-floppy0.present = "FALSE"
 guestOS = "freebsd"
 ide0:0.filename = "Disk0.vmdk"
 ide0:0.present = "TRUE"
 memsize = "512"
 tools.syncTime = "TRUE"
 uuid.action = "create"
+usb.present = "TRUE"
+ehci.present = "TRUE"
+ehci.pciSlotNumber = "0"
+isolation.tools.dnd.disable = "TRUE"
+isolation.tools.copy.disable = "TRUE"
+isolation.tools.paste.disable = "TRUE"
+floppy0.present = "FALSE"
 EOF
 }
 
