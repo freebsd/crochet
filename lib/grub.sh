@@ -9,18 +9,18 @@ grub_check_install() {
     fi
 }
 
-grub_install_grub2 () {                                                         
+grub_install_grub ( ) {                                                         
     echo "Installing GRUB2 to /dev/${DISK_MD} and GRUB files to ${BOARD_FREEBSD_MOUNTPOINT}/boot"
-    ${GRUB_INSTALL} --boot-directory=${BOARD_FREEBSD_MOUNTPOINT}/boot /dev/${DISK_MD} || exit 1
+    ${GRUB_INSTALL} --target=i386-pc --boot-directory=${BOARD_FREEBSD_MOUNTPOINT}/boot /dev/${DISK_MD} || exit 1
 }
 
 # configure grub
 grub_configure_grub ( ) {
     echo "Creating GRUB2 Configuration to ${BOARD_FREEBSD_MOUNTPOINT}/boot/grub/grub.cfg"
-    mkdir ${BOARD_FREEBSD_MOUNTPOINT}/boot/grub/   
-    ${GRUB_MKCONFIG} -o ${WORKDIR}/grub.cfg
-    cp ${WORKDIR}/grub.cfg.new ${BOARD_FREEBSD_MOUNTPOINT}/boot/grub/
+    ${GRUB_MKCONFIG} -o ${BOARD_FREEBSD_MOUNTPOINT}/boot/grub/grub.cfg
 }
 
-
+# grub2 documentation here 
+# https://fedoraproject.org/wiki/GRUB_2
+# http://www.gnu.org/software/grub/manual/grub.html
 
