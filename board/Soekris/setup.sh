@@ -2,39 +2,31 @@ TARGET_ARCH=i386
 KERNCONF=GENERIC
 IMAGE_SIZE=$((1024 * 1000 * 1000))
 
-# make sure we have GRUB
-strategy_add $PHASE_CHECK grub_check_install
-
 # create a MBR disk with a single UFS partition
+# based on instructions here: http://www.wonkity.com/~wblock/docs/html/disksetup.html
+#
 soekris_partition_image ( ) {
-    disk_partition_mbr
-    soekris_ufs_create
+	# the object files
+	OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}
+	echo "Object files are at: "${OBJFILES}
+	BOOTFILES=${OBJFILES}sys/boot/i386
+	echo "Boot files are at: "${BOOTFILES} 
+	
+        # basic setup
+	disk_partition_mbr
+        disk_ufs_create
+
+	# boot loader	
+	echo "Installing bootblocks"
+    	gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
+    	gpart set -a active -i 1 ${DISK_MD} || exit 1
+    	bsdlabel -B -b ${BOOTFILES}/boot2/boot ${DISK_UFS_PARTITION} || exit 1
+
+	#show the disk
+	gpart show ${DISK_MD}
 }
+
 strategy_add $PHASE_PARTITION_LWW soekris_partition_image                                
-                                                                                         
-# install the GRUB loader                                                                        
-soekris_board_install ( ) {
-    # install GRUB
-    grub_install_grub
-    # configure grub
-#    grub_configure_grub
-}                                                                                        
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL soekris_board_install                          
-
-# create a UFS partition.  We pass -b128 here to make room for the GRUB image.
-soekris_ufs_create ( ) {
-    echo "Creating the UFS partition at "`date`
-
-    _DISK_UFS_SLICE=`gpart add -b 128 -t freebsd ${DISK_MD} | sed -e 's/ .*//'` || exit 1
-    DISK_UFS_SLICE_NUMBER=`echo ${_DISK_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
-
-    gpart create -s BSD ${_DISK_UFS_SLICE}
-    DISK_UFS_PARTITION=`gpart add -t freebsd-ufs ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-
-    DISK_UFS_DEVICE=/dev/${DISK_UFS_PARTITION}
-
-    newfs ${DISK_UFS_DEVICE}
-}
                                                                                          
 # Kernel installs in UFS partition
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .

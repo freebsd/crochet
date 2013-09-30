@@ -21,7 +21,6 @@ UPDATE_SOURCE=
 . ${LIBDIR}/uboot.sh
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/subversion.sh
-. ${LIBDIR}/grub.sh
 . ${LIBDIR}/gzip.sh
 
 crochet_usage ( ) {
