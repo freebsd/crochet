@@ -1,6 +1,14 @@
 TARGET_ARCH=i386
-KERNCONF=GENERIC
+KERNCONF=SOEKRIS
 IMAGE_SIZE=$((1024 * 1000 * 1000))
+
+# copy the build config
+soekris_copy_buildconfig ( ) {
+	echo "Copying build config ${KERNCONF} to source tree"
+        cp ${BOARDDIR}/${KERNCONF} ${FREEBSD_SRC}/sys/i386/conf/
+}
+
+strategy_add $PHASE_POST_CONFIG soekris_copy_buildconfig
 
 # create a MBR disk with a single UFS partition
 # based on instructions here: http://www.wonkity.com/~wblock/docs/html/disksetup.html
