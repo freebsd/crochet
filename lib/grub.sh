@@ -10,8 +10,8 @@ grub_check_install() {
 }
 
 grub_install_grub2 () {                                                         
-    echo "Installing GRUB2 to /dev/${DISK_MD}"
-    ${GRUB_INSTALL} /dev/${DISK_MD} || exit 1
+    echo "Installing GRUB2 to /dev/${DISK_MD} and GRUB files to ${BOARD_FREEBSD_MOUNTPOINT}/boot"
+    ${GRUB_INSTALL} --boot-directory=${BOARD_FREEBSD_MOUNTPOINT}/boot /dev/${DISK_MD} || exit 1
 }
 
 # configure grub
