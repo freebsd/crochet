@@ -1,0 +1,198 @@
+#
+# GENERIC -- Generic kernel configuration file for FreeBSD/i386
+#
+# For more information on this file, please read the config(5) manual page,
+# and/or the handbook section on Kernel Configuration Files:
+#
+#    http://www.FreeBSD.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig-config.html
+#
+# The handbook is also available locally in /usr/share/doc/handbook
+# if you've installed the doc distribution, otherwise always see the
+# FreeBSD World Wide Web server (http://www.FreeBSD.org/) for the
+# latest information.
+#
+# An exhaustive list of options and more detailed explanations of the
+# device lines is also present in the ../../conf/NOTES and NOTES files.
+# If you are in doubt as to the purpose or necessity of a line, check first
+# in NOTES.
+#
+# $FreeBSD: release/8.4.0/sys/i386/conf/GENERIC 247909 2013-03-07 07:28:05Z bryanv $
+
+cpu		I486_CPU
+cpu		I586_CPU
+cpu		I686_CPU
+ident		SOEKRIS
+
+# To statically compile in device wiring instead of /boot/device.hints
+#hints		"GENERIC.hints"		# Default places to look for devices.
+
+# Use the following to compile in values accessible to the kernel
+# through getenv() (or kenv(1) in userland). The format of the file
+# is 'variable=value', see kenv(1)
+#
+# env		"GENERIC.env"
+
+makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
+
+options 	SCHED_ULE		# ULE scheduler
+options 	PREEMPTION		# Enable kernel thread preemption
+options 	INET			# InterNETworking
+options 	INET6			# IPv6 communications protocols
+options 	SCTP			# Stream Control Transmission Protocol
+options 	FFS			# Berkeley Fast Filesystem
+options 	SOFTUPDATES		# Enable FFS soft updates support
+options 	UFS_ACL			# Support for access control lists
+options 	UFS_DIRHASH		# Improve performance on big directories
+options 	UFS_GJOURNAL		# Enable gjournal-based UFS journaling
+options 	MD_ROOT			# MD is a potential root device
+options 	NFSCLIENT		# Network Filesystem Client
+options 	NFSSERVER		# Network Filesystem Server
+options 	NFSLOCKD		# Network Lock Manager
+options 	NFS_ROOT		# NFS usable as /, requires NFSCLIENT
+options 	MSDOSFS			# MSDOS Filesystem
+options 	CD9660			# ISO 9660 Filesystem
+options 	PROCFS			# Process filesystem (requires PSEUDOFS)
+options 	PSEUDOFS		# Pseudo-filesystem framework
+options 	GEOM_PART_GPT		# GUID Partition Tables.
+options 	GEOM_LABEL		# Provides labelization
+options 	COMPAT_43TTY		# BSD 4.3 TTY compat (sgtty)
+options 	COMPAT_FREEBSD4		# Compatible with FreeBSD4
+options 	COMPAT_FREEBSD5		# Compatible with FreeBSD5
+options 	COMPAT_FREEBSD6		# Compatible with FreeBSD6
+options 	COMPAT_FREEBSD7		# Compatible with FreeBSD7
+options 	SCSI_DELAY=5000		# Delay (in ms) before probing SCSI
+options 	KTRACE			# ktrace(1) support
+options 	STACK			# stack(9) support
+options 	SYSVSHM			# SYSV-style shared memory
+options 	SYSVMSG			# SYSV-style message queues
+options 	SYSVSEM			# SYSV-style semaphores
+options 	P1003_1B_SEMAPHORES	# POSIX-style semaphores
+options 	_KPOSIX_PRIORITY_SCHEDULING # POSIX P1003_1B real-time extensions
+options 	PRINTF_BUFR_SIZE=128	# Prevent printf output being interspersed.
+options 	KBD_INSTALL_CDEV	# install a CDEV entry in /dev
+options 	HWPMC_HOOKS		# Necessary kernel hooks for hwpmc(4)
+options 	AUDIT			# Security event auditing
+options 	MAC			# TrustedBSD MAC Framework
+#options 	KDTRACE_HOOKS		# Kernel DTrace hooks
+options 	INCLUDE_CONFIG_FILE     # Include this file in kernel
+
+options 	KDB			# Kernel debugger related code
+options 	KDB_TRACE		# Print a stack trace for a panic
+
+# To make an SMP kernel, the next two lines are needed
+options 	SMP			# Symmetric MultiProcessor Kernel
+device		apic			# I/O APIC
+
+# CPU frequency control
+device		cpufreq
+
+# Bus support.
+device		acpi
+device		eisa
+device		pci
+
+# ATA and ATAPI devices
+device		ata
+device		atadisk		# ATA disk drives
+device		ataraid		# ATA RAID drives
+device		atapicd		# ATAPI CDROM drives
+device		atapifd		# ATAPI floppy drives
+device		atapist		# ATAPI tape drives
+options 	ATA_STATIC_ID	# Static device numbering
+
+# atkbdc0 controls both the keyboard and the PS/2 mouse
+device		atkbdc		# AT keyboard controller
+device		atkbd		# AT keyboard
+device		psm		# PS/2 mouse
+
+device		kbdmux		# keyboard multiplexer
+
+device		vga		# VGA video card driver
+
+device		splash		# Splash screen and screen saver support
+
+# syscons is the default console driver, resembling an SCO console
+device		sc
+
+device		agp		# support several AGP chipsets
+
+# Power management support (see NOTES for more options)
+#device		apm
+# Add suspend/resume support for the i8254.
+device		pmtimer
+
+# Serial (COM) ports
+device		uart		# Generic UART driver
+
+# PCI Ethernet NICs that use the common MII bus controller code.
+# NOTE: Be sure to keep the 'device miibus' line in order to use these NICs!
+device		miibus		# MII bus support
+device		ae		# Attansic/Atheros L2 FastEthernet
+device		age		# Attansic/Atheros L1 Gigabit Ethernet
+device		alc		# Atheros AR8131/AR8132 Ethernet
+device		ale		# Atheros AR8121/AR8113/AR8114 Ethernet
+device		bce		# Broadcom BCM5706/BCM5708 Gigabit Ethernet
+device		bfe		# Broadcom BCM440x 10/100 Ethernet
+device		bge		# Broadcom BCM570xx Gigabit Ethernet
+device		cas		# Sun Cassini/Cassini+ and NS DP83065 Saturn
+device		dc		# DEC/Intel 21143 and various workalikes
+device		et		# Agere ET1310 10/100/Gigabit Ethernet
+device		fxp		# Intel EtherExpress PRO/100B (82557, 82558)
+device		gem		# Sun GEM/Sun ERI/Apple GMAC
+device		hme		# Sun HME (Happy Meal Ethernet)
+device		jme		# JMicron JMC250 Gigabit/JMC260 Fast Ethernet
+device		lge		# Level 1 LXT1001 gigabit Ethernet
+device		msk		# Marvell/SysKonnect Yukon II Gigabit Ethernet
+device		nfe		# nVidia nForce MCP on-board Ethernet
+device		nge		# NatSemi DP83820 gigabit Ethernet
+#device		nve		# nVidia nForce MCP on-board Ethernet Networking
+device		pcn		# AMD Am79C97x PCI 10/100 (precedence over 'le')
+device		re		# RealTek 8139C+/8169/8169S/8110S
+device		rl		# RealTek 8129/8139
+device		sf		# Adaptec AIC-6915 (``Starfire'')
+device		sge		# Silicon Integrated Systems SiS190/191
+device		sis		# Silicon Integrated Systems SiS 900/SiS 7016
+device		sk		# SysKonnect SK-984x & SK-982x gigabit Ethernet
+device		ste		# Sundance ST201 (D-Link DFE-550TX)
+device		stge		# Sundance/Tamarack TC9021 gigabit Ethernet
+device		tl		# Texas Instruments ThunderLAN
+device		tx		# SMC EtherPower II (83c170 ``EPIC'')
+device		vge		# VIA VT612x gigabit Ethernet
+device		vr		# VIA Rhine, Rhine II
+device		vte		# DM&P Vortex86 RDC R6040 Fast Ethernet
+device		wb		# Winbond W89C840F
+device		xl		# 3Com 3c90x (``Boomerang'', ``Cyclone'')
+
+# Pseudo devices.
+device		loop		# Network loopback
+device		random		# Entropy device
+options 	PADLOCK_RNG	# VIA Padlock RNG
+options 	RDRAND_RNG	# Intel Bull Mountain RNG
+device		ether		# Ethernet support
+device		vlan		# 802.1Q VLAN support
+device		tun		# Packet tunnel.
+device		pty		# BSD-style compatibility pseudo ttys
+device		md		# Memory "disks"
+device		gif		# IPv6 and IPv4 tunneling
+device		faith		# IPv6-to-IPv4 relaying (translation)
+device		firmware	# firmware assist module
+
+# The `bpf' device enables the Berkeley Packet Filter.
+# Be aware of the administrative consequences of enabling this!
+# Note that 'bpf' is required for DHCP.
+device		bpf		# Berkeley packet filter
+
+
+# FireWire support
+device		firewire	# FireWire bus code
+#device		sbp		# SCSI over FireWire (Requires scbus and da)
+device		fwe		# Ethernet over FireWire (non-standard!)
+device		fwip		# IP over FireWire (RFC 2734,3146)
+device		dcons		# Dumb console driver
+device		dcons_crom	# Configuration ROM for dcons
+
+device          CPU_SOEKRIS     # enables support www.soekris.com hardware
+device          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
+device          CPU_ELAN_PPS    # enables precision timestamp code
+device          CPU_ELAN_XTAL   # sets the clock crystal frequency in Hz
+device          CPU_GEODE       # is for the SC1100 Geode embedded processor - This option is necessary because the i8254 timecounter is toast.

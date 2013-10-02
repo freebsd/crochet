@@ -21,7 +21,7 @@
 cpu		I486_CPU
 cpu		I586_CPU
 cpu		I686_CPU
-ident		GENERIC
+ident		SOEKRIS
 
 makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
