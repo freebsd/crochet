@@ -87,10 +87,10 @@ device		pci
 # ATA controllers
 device		ahci		# AHCI-compatible SATA controllers
 device		ata		# Legacy ATA/SATA controllers
-options 	ATA_CAM		# Handle legacy controllers with CAM
 options 	ATA_STATIC_ID	# Static device numbering
-device		mvs		# Marvell 88SX50XX/88SX60XX/88SX70XX/SoC SATA
-device		siis		# SiliconImage SiI3124/SiI3132/SiI3531 SATA
+
+# need this bus
+device          scbus           # SCSI bus (required for ATA/SCSI)
 
 # atkbdc0 controls both the keyboard and the PS/2 mouse
 device		atkbdc		# AT keyboard controller
@@ -187,8 +187,8 @@ device		firmware	# firmware assist module
 # Note that 'bpf' is required for DHCP.
 device		bpf		# Berkeley packet filter
 
-device          CPU_SOEKRIS     # enables support www.soekris.com hardware
-device          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
-device          CPU_ELAN_PPS    # enables precision timestamp code
-device          CPU_ELAN_XTAL   # sets the clock crystal frequency in Hz
-device          CPU_GEODE       # is for the SC1100 Geode embedded processor - This option is necessary because the i8254 timecounter is toast.
+options          CPU_SOEKRIS     # enables support www.soekris.com hardware
+options          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
+options          CPU_ELAN_PPS    # enables precision timestamp code
+options          CPU_ELAN_XTAL   # sets the clock crystal frequency in Hz
+options          CPU_GEODE       # is for the SC1100 Geode embedded processor - This option is necessary because the i8254 timecounter is toast.
