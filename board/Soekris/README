@@ -1,0 +1,24 @@
+
+================================================================
+
+What is Soekris
+--------------------------------
+
+Soekris is a family of reliable, robust, superior quality communications computers
+
+ http://soekris.com/
+
+================================================================
+
+How to Boot the Soekris
+--------------------------------
+
+1. CONNECT the DB-9 serial port on the board
+   to your FreeBSD system using a serial cable
+   or serial-to-USB adapter.
+
+2. INSERT the SDHC card into your Soekris
+
+================================================================
+
+
