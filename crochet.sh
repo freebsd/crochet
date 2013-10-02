@@ -22,6 +22,7 @@ UPDATE_SOURCE=
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/gzip.sh
+. ${LIBDIR}/os.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
