@@ -316,6 +316,14 @@ device		virtio_blk	# VirtIO Block device
 device		virtio_scsi	# VirtIO SCSI device
 device		virtio_balloon	# VirtIO Memory Balloon device
 
+#pf
+device 		pf
+device 		pflog
+device 		pfsync
+
+#carp
+device		carp
+
 # SOEKRIS
 options          CPU_SOEKRIS     # enables support www.soekris.com hardware
 options          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
