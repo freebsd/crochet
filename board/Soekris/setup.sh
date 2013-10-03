@@ -26,9 +26,6 @@ strategy_add $PHASE_POST_CONFIG soekris_copy_buildconfig
 # based on instructions here: http://www.wonkity.com/~wblock/docs/html/disksetup.html
 #
 soekris_partition_image ( ) {
-	# the object files
-	OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}/
-	echo "Object files are at: "${OBJFILES}
 	BOOTFILES=${OBJFILES}sys/boot/i386
 	echo "Boot files are at: "${BOOTFILES} 
 	
