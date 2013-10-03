@@ -326,8 +326,8 @@ device		carp
 
 # SOEKRIS
 options          CPU_SOEKRIS     # enables support www.soekris.com hardware
-options          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
-options          CPU_ELAN_PPS    # enables precision timestamp code
-options          CPU_ELAN_XTAL   # sets the clock crystal frequency in Hz
+#options          CPU_ELAN        # enables support for AMDs ElanSC520 CPU
+#options          CPU_ELAN_PPS    # enables precision timestamp code
+#options          CPU_ELAN_XTAL   # sets the clock crystal frequency in Hz
 options          CPU_GEODE       # is for the SC1100 Geode embedded processor - This option is necessary because the i8254 timecounter is toast.
 
