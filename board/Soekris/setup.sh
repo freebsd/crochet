@@ -48,4 +48,6 @@ strategy_add $PHASE_PARTITION_LWW soekris_partition_image
 # Kernel installs in UFS partition
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 
+# add a "crochet" account
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_create_crochet_account
 

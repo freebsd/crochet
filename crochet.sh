@@ -23,6 +23,7 @@ UPDATE_SOURCE=
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/gzip.sh
 . ${LIBDIR}/os.sh
+. ${LIBDIR}/pw.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
@@ -98,7 +99,7 @@ handle_trap ( ) {
     email_status "${BUILDCONFIG}" "Crochet build failed"
     exit 2
 }
-trap handle_trap INT QUIT KILL EXIT
+trap handle_trap INT QUIT KILL
 
 if [ -n "${UPDATE_SOURCETREE}" ]; then
     update_sourcetree
@@ -122,5 +123,5 @@ run_strategy
 #
 email_status "${BUILDCONFIG}" "Crochet build finished"
 
-echo 'Finished at '`date`
+echo 'Finished at `date`'
 
