@@ -13,6 +13,7 @@ UPDATE_SOURCE=
 
 # Load utility libraries.
 . ${LIBDIR}/strategy.sh  # Must go first
+. ${LIBDIR}/os.sh
 . ${LIBDIR}/board.sh
 . ${LIBDIR}/config.sh
 . ${LIBDIR}/customize.sh
@@ -22,7 +23,6 @@ UPDATE_SOURCE=
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/gzip.sh
-. ${LIBDIR}/os.sh
 . ${LIBDIR}/pw.sh
 
 crochet_usage ( ) {
@@ -67,6 +67,11 @@ while true; do
 	    crochet_usage
     esac
 done
+
+#
+# set OS variables
+#
+os_determine_os_version
 
 #
 # Load user configuration:  This builds the strategy.

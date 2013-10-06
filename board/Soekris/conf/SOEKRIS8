@@ -87,7 +87,7 @@ options 	KDB_TRACE		# Print a stack trace for a panic
 device		cpufreq
 
 # Bus support.
-device		acpi
+#device		acpi
 device		eisa
 device		pci
 

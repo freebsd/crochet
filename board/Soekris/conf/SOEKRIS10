@@ -95,7 +95,7 @@ options 	MALLOC_DEBUG_MAXZONES=8	# Separate malloc(9) zones
 device		cpufreq
 
 # Bus support.
-device		acpi
+#device		acpi
 device		eisa
 device		pci
 
@@ -226,8 +226,8 @@ device		sdhci		# Generic PCI SD Host Controller
 #SOEKRIS additions
 options 	CPU_SOEKRIS
 options 	CPU_ELAN
-options 	CPU_ELAN_PPS
-options 	CPU_ELAN_XTAL=32768000
+#options 	CPU_ELAN_PPS
+#options 	CPU_ELAN_XTAL=32768000
 options 	CPU_GEODE
 
 #pf

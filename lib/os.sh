@@ -24,11 +24,6 @@ os_determine_obj_location ( ) {
     echo "Object files are at: "${OBJFILES}
 }
 
-os_setup_os_variables ( ) {
-    os_determine_os_version
-    os_determine_obj_location
-}
-
-strategy_add $PHASE_POST_CONFIG os_setup_os_variables
+strategy_add $PHASE_POST_CONFIG os_determine_obj_location 
 
 
