@@ -16,7 +16,7 @@ soekris_copy_buildconfig ( ) {
         then
             KERNEL_CONFIG_FILE="SOEKRIS10"
         fi
-	echo "Copying build config ${KERNEL_CONFIG_FILE} to source tree"
+        echo "Copying build config ${KERNEL_CONFIG_FILE} to source tree"
         cp ${BOARDDIR}/conf/${KERNEL_CONFIG_FILE} ${FREEBSD_SRC}/sys/i386/conf/${KERNCONF}
 }
 
@@ -25,22 +25,22 @@ strategy_add $PHASE_POST_CONFIG soekris_copy_buildconfig
 # create a MBR disk with a single UFS partition
 # based on instructions here: http://www.wonkity.com/~wblock/docs/html/disksetup.html
 #
-soekris_partition_image ( ) {
-	BOOTFILES=${OBJFILES}sys/boot/i386
-	echo "Boot files are at: "${BOOTFILES} 
-	
+soekris_partition_image ( ) { 
+        BOOTFILES=${OBJFILES}sys/boot/i386
+        echo "Boot files are at: "${BOOTFILES} 
+
         # basic setup
-	disk_partition_mbr
+        disk_partition_mbr
         disk_ufs_create
 
-	# boot loader	
-	echo "Installing bootblocks"
-    	gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
-    	gpart set -a active -i 1 ${DISK_MD} || exit 1
-    	bsdlabel -B -b ${BOOTFILES}/boot2/boot ${DISK_UFS_PARTITION} || exit 1
+        # boot loader	
+        echo "Installing bootblocks"
+        gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
+        gpart set -a active -i 1 ${DISK_MD} || exit 1
+        bsdlabel -B -b ${BOOTFILES}/boot2/boot ${DISK_UFS_PARTITION} || exit 1
 
-	#show the disk
-	gpart show ${DISK_MD}
+        #show the disk
+        gpart show ${DISK_MD}
 }
 
 strategy_add $PHASE_PARTITION_LWW soekris_partition_image                                
