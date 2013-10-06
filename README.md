@@ -1,12 +1,13 @@
 Crochet is a tool for building bootable FreeBSD images.
 
 It can currently build images for:
-* BeagleBone
-* RaspberryPi
-* PandaBoard
-* ZedBoard
+* [BeagleBone](http://beagleboard.org/)
+* [PandaBoard](http://pandaboard.org/)
+* [RaspberryPi](http://www.raspberrypi.org/)
+* [Soekris](http://soekris.com/)
 * generic x86 systems.
-* VMWare
+* [VMWare](http://www.vmware.com/)
+* [ZedBoard](http://www.zedboard.org/)
 
 This tool was formerly known as "freebsd-beaglebone" or
 "beaglebsd" as the original work was done for BeagleBone.
