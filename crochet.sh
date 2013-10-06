@@ -42,16 +42,16 @@ fi
 set -- $args
 while true; do
     case "$1" in
-	-b)
-	    BOARD="$2"
-	    shift; shift
-	    ;;
+        -b)
+            BOARD="$2"
+            shift; shift
+            ;;
         -c)
             CONFIGFILE="$2"
             shift; shift
             ;;
         -e)
-	    option Email "$2"
+            option Email "$2"
             shift; shift
             ;;
         -u)
@@ -61,8 +61,8 @@ while true; do
         --)
             shift; break
             ;;
-	*)
-	    crochet_usage
+        *)
+            crochet_usage
     esac
 done
 
