@@ -48,7 +48,7 @@ Using the script to build an image consists of a few steps:
 
 3. RUN crochet.sh as root
 
-   $ sudo /bin/sh crochet.sh -c <config file>
+   `$ sudo /bin/sh crochet.sh -c <config file>`
 
    The script will first check that you have any needed sources.
    If you don't, the script will tell you exactly how to obtain the
@@ -61,7 +61,7 @@ Using the script to build an image consists of a few steps:
 
    Shortcut:  If you only want the most basic build for a board,
    you can use this command without creating a config file:
-    $ sudo /bin/sh crochet.sh -b <boardname>
+    `$ sudo /bin/sh crochet.sh -b <boardname>`
    However, if you want to tweak the build in any way, you will
    need to create a config file.
 
