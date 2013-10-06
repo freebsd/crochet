@@ -2,11 +2,9 @@
 PW=/usr/sbin/pw
 
 pw_create_account ( ) {
-    if [ -n "${GZIPIMAGE}" ]; then
-        echo "Adding user $1 with password $1"
-        mkdir -p ${BOARD_FREEBSD_MOUNTPOINT}/usr/home/$1
-        $PW useradd -n $1 -s /bin/csh -g wheel -w yes -V ${BOARD_FREEBSD_MOUNTPOINT}/etc/ -d /usr/home/$1
-    fi
+    echo "Adding user $1 with password $1"
+    mkdir -p ${BOARD_FREEBSD_MOUNTPOINT}/usr/home/$1
+    $PW useradd -n $1 -s /bin/csh -g wheel -w yes -V ${BOARD_FREEBSD_MOUNTPOINT}/etc/ -d /usr/home/$1
 }
 
 # Add the specified account.
