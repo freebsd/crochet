@@ -25,9 +25,15 @@ board_setup ( ) {
     echo "Board: $1"
     . $BOARDDIR/setup.sh
 
-    IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${KERNCONF}.img
     PRIORITY=20 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_overlay_files $BOARDDIR
     BOARDDIR=
+}
+
+board_generate_image_name ( ) {
+    if [ -z "${IMG}" ]; then
+        IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}.img
+    fi
+    echo "Image name is: ${IMG}"
 }
 
 # $1 - BOARDDIR
