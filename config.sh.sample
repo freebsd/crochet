@@ -28,21 +28,6 @@
 # about configuring for your particular board.
 #
 
-#
-# email address to send build status notifications to
-#
-#option Email me@gmail.com
-
-#
-# gzip the final image
-#
-option GzipImage
-
-#
-# initial user to add to the system
-#
-#option User crochet
-
 # Suggested: option ImageSize
 #
 # Size of the disk image that will be built.  This is usually the same
@@ -92,6 +77,20 @@ option GzipImage
 # to construct small (e.g., 1GB) images that can be copied onto larger
 # (e.g., 32GB) media.  At boot, such images will automatically resize
 # to fully utilize the larger media.
+
+# option Email me@gmail.com
+#
+# Enable emailed status notifications.
+# This can also be enabled via the -e command-line flag.
+
+# option GzipImage
+#
+# Gzip the final image.
+
+# option User <username>
+#
+# Create a user account with the specified username.
+# Password will be the same as the user name.
 
 # option SwapFile
 #
