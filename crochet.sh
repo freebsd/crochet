@@ -20,10 +20,7 @@ UPDATE_SOURCE=
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/uboot.sh
-. ${LIBDIR}/email.sh
 . ${LIBDIR}/subversion.sh
-. ${LIBDIR}/gzip.sh
-. ${LIBDIR}/pw.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
