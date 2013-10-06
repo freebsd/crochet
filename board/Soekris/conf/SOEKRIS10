@@ -95,7 +95,7 @@ options 	MALLOC_DEBUG_MAXZONES=8	# Separate malloc(9) zones
 device		cpufreq
 
 # Bus support.
-#device		acpi
+device		acpi
 device		eisa
 device		pci
 
