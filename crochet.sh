@@ -10,16 +10,18 @@ CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
 
-# Load utility libraries.
-. ${LIBDIR}/strategy.sh  # Must go first
-. ${LIBDIR}/os.sh
+# Load utility libraries: strategy.sh must go first
+. ${LIBDIR}/strategy.sh
+# Rest in alphabetic order
 . ${LIBDIR}/board.sh
 . ${LIBDIR}/config.sh
 . ${LIBDIR}/customize.sh
 . ${LIBDIR}/disk.sh
+. ${LIBDIR}/email.sh
 . ${LIBDIR}/freebsd.sh
-. ${LIBDIR}/uboot.sh
+. ${LIBDIR}/os.sh
 . ${LIBDIR}/subversion.sh
+. ${LIBDIR}/uboot.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
