@@ -8,7 +8,6 @@ LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
-EMAIL=
 UPDATE_SOURCE=
 
 # Load utility libraries.
@@ -50,7 +49,7 @@ while true; do
             shift; shift
             ;;
         -e)
-            EMAIL="$2"
+	    option Email "$2"
             shift; shift
             ;;
         -u)
@@ -78,23 +77,14 @@ if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
 
-#
-# set OS variables
-#
 os_determine_os_version
- 
-#
-# generate image name
-#
 board_generate_image_name
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
 
-#
-# The build config
-#
+# Details for the email reports
 BUILDCONFIG="TOPDIR: ${TOPDIR}
 SOURCE TREE: ${FREEBSD_SRC}"
 
@@ -118,19 +108,10 @@ if [ -n "${UPDATE_SOURCETREE}" ]; then
 fi
 
 #
-# we're starting
-#
-BUILDCONFIG="TOPDIR: ${TOPDIR}
-SOURCE TREE: ${FREEBSD_SRC}"
-
-email_status "${BUILDCONFIG}" "Crochet build commenced"
-
-#
 # Run the strategy to do all of the work.
 #
+email_status "${BUILDCONFIG}" "Crochet build commenced"
 run_strategy
-
-email_status "${BUILDCONFIG}" "Crochet build finished"
 
 # Clear the error exit handler
 trap - INT QUIT KILL EXIT
@@ -138,5 +119,6 @@ trap - INT QUIT KILL EXIT
 # Clean up
 disk_unmount_all
 
+email_status "${BUILDCONFIG}" "Crochet build finished"
 echo 'Finished at '`date`
 
