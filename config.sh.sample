@@ -28,6 +28,11 @@
 # about configuring for your particular board.
 #
 
+#
+# email address to send build status notifications to
+#
+#option Email me@gmail.com
+
 # Suggested: option ImageSize
 #
 # Size of the disk image that will be built.  This is usually the same
