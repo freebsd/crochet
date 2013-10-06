@@ -8,7 +8,7 @@ It can currently build images for:
 * generic x86 systems.
 * VMWare
 * [ZedBoard](http://www.zedboard.org/)
-* 
+
 This tool was formerly known as "freebsd-beaglebone" or
 "beaglebsd" as the original work was done for BeagleBone.
 But it now supports more boards and should easily extend
