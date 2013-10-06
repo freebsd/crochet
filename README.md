@@ -6,7 +6,7 @@ It can currently build images for:
 * [RaspberryPi](http://www.raspberrypi.org/)
 * [Soekris](http://soekris.com/)
 * generic x86 systems.
-* VMWare
+* [VMWare](http://www.vmware.com/)
 * [ZedBoard](http://www.zedboard.org/)
 
 This tool was formerly known as "freebsd-beaglebone" or
