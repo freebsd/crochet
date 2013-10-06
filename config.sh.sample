@@ -33,6 +33,16 @@
 #
 #option Email me@gmail.com
 
+#
+# gzip the final image
+#
+option GzipImage
+
+#
+# initial user to add to the system
+#
+#option User crochet
+
 # Suggested: option ImageSize
 #
 # Size of the disk image that will be built.  This is usually the same
