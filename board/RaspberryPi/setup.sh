@@ -19,21 +19,21 @@ RPI_FIRMWARE_SRC=${BOARDDIR}
 
 raspberry_pi_check_uboot ( ) {
     uboot_test \
-	RPI_UBOOT_SRC \
-	"$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
-	"git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
+        RPI_UBOOT_SRC \
+        "$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
+        "git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_uboot
 
 raspberry_pi_check_bootcode ( ) {
     if [ ! -f "${RPI_FIRMWARE_SRC}/boot/bootcode.bin" ]; then
-	echo "Need Rasberry Pi closed-source boot files."
-	echo "Use the following command to fetch them:"
-	echo
-	echo " $ git clone git://github.com/raspberrypi/firmware ${RPI_FIRMWARE_SRC}"
-	echo
-	echo "Run this script again after you have the files."
-	exit 1
+        echo "Need Rasberry Pi closed-source boot files."
+        echo "Use the following command to fetch them:"
+        echo
+        echo " $ git clone git://github.com/raspberrypi/firmware ${RPI_FIRMWARE_SRC}"
+        echo
+        echo "Run this script again after you have the files."
+        exit 1
     fi
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_bootcode

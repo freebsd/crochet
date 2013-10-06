@@ -49,17 +49,17 @@ freebsd_download_instructions ( ) {
 freebsd_dtc_test ( ) {
     if dtc -v >/dev/null
     then
-	true
+        true
     else
-	echo "You need the dtc compiler installed on your system."
-	echo "Newer versions of FreeBSD have this installed by default."
-	echo "On older FreeBSD versions:"
-	echo "  $ cd /usr/src/usr.bin/dtc"
-	echo "  $ make"
-	echo "  $ make install"
-	echo ""
-	echo "Rerun this script after you install it."
-	exit 1
+        echo "You need the dtc compiler installed on your system."
+        echo "Newer versions of FreeBSD have this installed by default."
+        echo "On older FreeBSD versions:"
+        echo "  $ cd /usr/src/usr.bin/dtc"
+        echo "  $ make"
+        echo "  $ make install"
+        echo ""
+        echo "Rerun this script after you install it."
+        exit 1
     fi
 }
 
@@ -70,39 +70,39 @@ freebsd_dtc_test ( ) {
 freebsd_src_test ( ) {
     # FreeBSD source tree has certain files:
     for f in COPYRIGHT Makefile Makefile.inc1 UPDATING; do
-	if [ \! -f "$FREEBSD_SRC/$f" ]; then
-	    echo "This does not look like a FreeBSD source tree."
-	    echo "Did not find: $FREEBSD_SRC/$f"
-	    shift; freebsd_download_instructions "$@"
-	    exit 1
-	fi
+        if [ \! -f "$FREEBSD_SRC/$f" ]; then
+            echo "This does not look like a FreeBSD source tree."
+            echo "Did not find: $FREEBSD_SRC/$f"
+            shift; freebsd_download_instructions "$@"
+            exit 1
+        fi
     done
     # FreeBSD source tree has certain directories:
     for d in bin usr.bin usr.sbin contrib gnu cddl sys sys/arm sys/i386; do
-	if [ \! -d "$FREEBSD_SRC/$d" ]; then
-	    echo "This does not look like a FreeBSD source tree."
-	    echo "Did not find: $FREEBSD_SRC/$d"
-	    shift; freebsd_download_instructions "$@"
-	    exit 1
-	fi
+        if [ \! -d "$FREEBSD_SRC/$d" ]; then
+            echo "This does not look like a FreeBSD source tree."
+            echo "Did not find: $FREEBSD_SRC/$d"
+            shift; freebsd_download_instructions "$@"
+            exit 1
+        fi
     done
     # Make sure it has the config file we expect under the appropriate arch:
     case ${TARGET_ARCH} in
-	arm*) ARCH=arm
-	    ;;
-	mips*) ARCH=mips
-	    ;;
-	pc98) ARCH=i386
-	    ;;
-	powerpc*) ARCH=powerpc
-	    ;;
-	*) ARCH=${TARGET_ARCH}
-	    ;;
+        arm*) ARCH=arm
+            ;;
+        mips*) ARCH=mips
+            ;;
+        pc98) ARCH=i386
+            ;;
+        powerpc*) ARCH=powerpc
+            ;;
+        *) ARCH=${TARGET_ARCH}
+            ;;
     esac
     if [ \! -f "$FREEBSD_SRC/sys/$ARCH/conf/$1" ]; then
-	echo "Didn't find $FREEBSD_SRC/sys/$ARCH/conf/$1"
-	shift; freebsd_download_instructions "$@"
-	exit 1
+        echo "Didn't find $FREEBSD_SRC/sys/$ARCH/conf/$1"
+        shift; freebsd_download_instructions "$@"
+        exit 1
     fi
     echo "Found suitable FreeBSD source tree in:"
     echo "    $FREEBSD_SRC"
@@ -112,8 +112,8 @@ freebsd_src_test ( ) {
 # (Specialized version of freebsd_src_test for the common case.)
 freebsd_current_test ( ) {
     freebsd_src_test \
-	${KERNCONF} \
- 	" $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
+        ${KERNCONF} \
+        " $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
 }
 # TODO: Not everything requires -CURRENT; copy this into all the
 # board setups and remove it from here.
@@ -133,8 +133,8 @@ _freebsd_build ( ) {
     LOGFILE=${WORKDIR}/_.build$1.$2.log
     if diff ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2 >/dev/null 2>&1
     then
-	echo "Using FreeBSD $2 $1 from previous build"
-	return 0
+        echo "Using FreeBSD $2 $1 from previous build"
+        return 0
     fi
 
     echo "Building FreeBSD $2 $1 at "`date`
@@ -142,22 +142,22 @@ _freebsd_build ( ) {
 
     if [ -f ${WORKDIR}/_.built-$1.$2 ]
     then
-	echo " Rebuilding because previous build used different flags:"
-	echo " Old: "`cat ${WORKDIR}/_.built-$1.$2`
-	echo " new: "`cat ${WORKDIR}/_.build$1.$2.sh`
-	rm -f ${WORKDIR}/_.built-$1.$2
+        echo " Rebuilding because previous build used different flags:"
+        echo " Old: "`cat ${WORKDIR}/_.built-$1.$2`
+        echo " new: "`cat ${WORKDIR}/_.build$1.$2.sh`
+        rm -f ${WORKDIR}/_.built-$1.$2
     fi
 
     cd $FREEBSD_SRC
     if /bin/sh -e ${WORKDIR}/_.build$1.$2.sh > ${LOGFILE} 2>&1
     then
-	mv ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2
+        mv ${WORKDIR}/_.build$1.$2.sh ${WORKDIR}/_.built-$1.$2
     else
-	echo "Failed to build FreeBSD $2 $1."
-	echo "Log in ${LOGFILE}"
-	echo
-	tail ${LOGFILE}
-	exit 1
+        echo "Failed to build FreeBSD $2 $1."
+        echo "Log in ${LOGFILE}"
+        echo
+        tail ${LOGFILE}
+        exit 1
     fi
 }
 
@@ -168,12 +168,12 @@ _freebsd_build ( ) {
 freebsd_buildworld ( ) {
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
     if [ -n "${TARGET_CPUTYPE}" ]; then
-	_FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
+        _FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
     fi
     CONF=${TARGET_ARCH}
     echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
-	rm -f ${WORKDIR}/_.built-world.${CONF}
+        rm -f ${WORKDIR}/_.built-world.${CONF}
     fi
     _freebsd_build world ${CONF}
 }
@@ -187,12 +187,12 @@ strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 freebsd_buildkernel ( ) {
     _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} KERNCONF=${KERNCONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_KERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS}"
     if [ -n "${TARGET_CPUTYPE}" ]; then
-	_FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
+        _FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
     fi
     CONF=${TARGET_ARCH}-${KERNCONF}
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
-	rm -f ${WORKDIR}/_.built-kernel.${CONF}
+        rm -f ${WORKDIR}/_.built-kernel.${CONF}
     fi
     _freebsd_build kernel ${CONF}
 }
@@ -210,29 +210,29 @@ freebsd_installworld ( ) {
     echo "    Destination: $1"
     if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${CONF}.log 2>&1
     then
-	# success
+        # success
     else
-	echo "Installworld failed."
-	echo "    Log: ${WORKDIR}/_.installworld.${CONF}.log"
-	exit 1
+        echo "Installworld failed."
+        echo "    Log: ${WORKDIR}/_.installworld.${CONF}.log"
+        exit 1
     fi
 
     if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${CONF}.log 2>&1
     then
-	# success
+        # success
     else
-	echo "distrib-dirs failed"
-	echo "    Log: ${WORKDIR}/_.distrib-dirs.${CONF}.log"
-	exit 1
+        echo "distrib-dirs failed"
+        echo "    Log: ${WORKDIR}/_.distrib-dirs.${CONF}.log"
+        exit 1
     fi
 
     if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${CONF}.log 2>&1
     then
-	# success
+        # success
     else
-	echo "distribution failed"
-	echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
-	exit 1
+        echo "distribution failed"
+        echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
+        exit 1
     fi
 
     # Touch up /etc/src.conf so that native "make buildkernel" will DTRT:
@@ -246,7 +246,7 @@ freebsd_installworld ( ) {
 #
 freebsd_installkernel ( ) {
     if [ -n "$1" ]; then
-	cd $1
+        cd $1
     fi
     DESTDIR=`pwd`
     CONF=${TARGET_ARCH}-${KERNCONF}
@@ -256,11 +256,11 @@ freebsd_installkernel ( ) {
     echo make ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_INSTALLKERNEL_EXTRA_ARGS} ${FREEBSD_INSTALLKERNEL_BOARD_ARGS} DESTDIR=$DESTDIR installkernel > ${WORKDIR}/_.installkernel.${CONF}.sh
     if /bin/sh -e ${WORKDIR}/_.installkernel.${CONF}.sh > ${WORKDIR}/_.installkernel.${CONF}.log 2>&1
     then
-	# success
+        # success
     else
-	echo "installkernel failed"
-	echo "    Log: ${WORKDIR}/_.installkernel.${CONF}.log"
-	exit 1
+        echo "installkernel failed"
+        echo "    Log: ${WORKDIR}/_.installkernel.${CONF}.log"
+        exit 1
     fi
 }
 
@@ -288,8 +288,8 @@ freebsd_ubldr_build ( ) {
     # If the command is unchanged, we won't rebuild.
     if diff ${UBLDR_DIR}/_.ubldr.${CONF}.built ${UBLDR_DIR}/_.ubldr.${CONF}.sh > /dev/null 2>&1
     then
-	echo "Using ubldr from previous build"
-	return 0
+        echo "Using ubldr from previous build"
+        return 0
     fi
 
     echo "Building FreeBSD $CONF ubldr at "`date`
@@ -303,15 +303,15 @@ freebsd_ubldr_build ( ) {
     eval $buildenv make "$@" -m $ubldr_makefiles depend >> ${LOGFILE} 2>&1
     if /bin/sh -e ${UBLDR_DIR}/_.ubldr.${CONF}.sh >> ${LOGFILE} 2>&1
     then
-	mv ${UBLDR_DIR}/_.ubldr.${CONF}.sh ${UBLDR_DIR}/_.ubldr.${CONF}.built
-	cd arm/uboot
-	eval $buildenv make "$@" DESTDIR=${UBLDR_DIR}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
+        mv ${UBLDR_DIR}/_.ubldr.${CONF}.sh ${UBLDR_DIR}/_.ubldr.${CONF}.built
+        cd arm/uboot
+        eval $buildenv make "$@" DESTDIR=${UBLDR_DIR}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
     else
-	echo "Failed to build FreeBSD ubldr"
-	echo "  Log in ${LOGFILE}"
-	echo
-	tail ${LOGFILE}
-	exit 1
+        echo "Failed to build FreeBSD ubldr"
+        echo "  Log in ${LOGFILE}"
+        echo
+        tail ${LOGFILE}
+        exit 1
     fi
 }
 
@@ -384,41 +384,41 @@ freebsd_install_fdt ( ) (
     _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
     buildenv=`cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     case $1 in
-	*.dtb)
-	    case $2 in
-		*.dtb)
-		    (cd $_FDTDIR; cat $1) > $2
-		    ;;
-		*.dts)
-		    (cd $_FDTDIR; eval $buildenv dtc -I dtb -O dts -p 8192 $1) > $2
-		    ;;
-		*)
-		    if [ -d $2 ]; then
-			(cd $_FDTDIR; cat $1) > $2/`basename $1`
-		    else
-			echo "Can't compile $1 to $2"
-			exit 1
-		    fi
-		    ;;
-	    esac
-	    ;;
-	*.dts)
-	    case $2 in
-		*.dts)
-		    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2
-		    ;;
-		*.dtb)
-		    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dtb -p 8192 $1) > $2
-		    ;;
-		*)
-		    if [ -d $2 ]; then
-			(cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2/`basename $1`
-		    else
-			echo "Can't compile $1 to $2"
-			exit 1
-		    fi
-		    ;;
-	    esac
-	    ;;
+        *.dtb)
+            case $2 in
+                *.dtb)
+                    (cd $_FDTDIR; cat $1) > $2
+                    ;;
+                *.dts)
+                    (cd $_FDTDIR; eval $buildenv dtc -I dtb -O dts -p 8192 $1) > $2
+                    ;;
+                *)
+                    if [ -d $2 ]; then
+                        (cd $_FDTDIR; cat $1) > $2/`basename $1`
+                    else
+                        echo "Can't compile $1 to $2"
+                        exit 1
+                    fi
+                    ;;
+            esac
+            ;;
+        *.dts)
+            case $2 in
+                *.dts)
+                    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2
+                    ;;
+                *.dtb)
+                    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dtb -p 8192 $1) > $2
+                    ;;
+                *)
+                    if [ -d $2 ]; then
+                        (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2/`basename $1`
+                    else
+                        echo "Can't compile $1 to $2"
+                        exit 1
+                    fi
+                    ;;
+            esac
+            ;;
     esac
 )

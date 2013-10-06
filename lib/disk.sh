@@ -4,14 +4,14 @@ _DISK_MOUNTED_DIRS=""  # List of things to be unmounted when we're done
 disk_unmount_all ( ) {
     cd ${TOPDIR}
     for d in ${_DISK_MOUNTED_DIRS}; do
-	echo "Unmounting $d"
-	umount $d
-	rmdir $d
+        echo "Unmounting $d"
+        umount $d
+        rmdir $d
     done
     _DISK_MOUNTED_DIRS=""
     for d in ${_DISK_MDS}; do
-	echo "Releasing $d"
-	mdconfig -d -u  $d
+        echo "Releasing $d"
+        mdconfig -d -u  $d
     done
     _DISK_MDS=""
 }
@@ -67,17 +67,17 @@ disk_fat_create ( ) {
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2
     if [ -z ${_FAT_TYPE} ]; then
-	case $1 in
-	    *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
-		;;
-	    *m) _FAT_TYPE=16
-		;;
-	    *g) _FAT_TYPE=32
-		;;
-	esac
-	echo "Default to FAT${_FAT_TYPE} for partition size $1"
+        case $1 in
+            *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
+                ;;
+            *m) _FAT_TYPE=16
+                ;;
+            *g) _FAT_TYPE=32
+                ;;
+        esac
+        echo "Default to FAT${_FAT_TYPE} for partition size $1"
     fi
-	
+
     newfs_msdos -L "boot" -F ${_FAT_TYPE} ${DISK_FAT_DEVICE} >/dev/null
 }
 
@@ -85,19 +85,19 @@ disk_fat_create ( ) {
 disk_fat_mount ( ) {
     echo "Mounting FAT partition"
     if [ -d "$1" ]; then
-	echo "   Removing already-existing mount directory."
-	if umount $1; then
-	    if rmdir $1; then
-		echo "   Removed pre-existing mount directory; creating new one."
-	    else
-		echo "Error: Unable to remove pre-existing mount directory?"
-		echo "   $1"
-		exit 1
-	    fi
-	else
-	    echo "Error: Unable to unmount $1"
-	    exit 1
-	fi
+        echo "   Removing already-existing mount directory."
+        if umount $1; then
+            if rmdir $1; then
+                echo "   Removed pre-existing mount directory; creating new one."
+            else
+                echo "Error: Unable to remove pre-existing mount directory?"
+                echo "   $1"
+                exit 1
+            fi
+        else
+            echo "Error: Unable to unmount $1"
+            exit 1
+        fi
     fi
     mkdir $1
     mount_msdosfs ${DISK_FAT_DEVICE} $1
@@ -133,19 +133,19 @@ disk_ufs_create ( ) {
 disk_ufs_mount ( ) {
     echo "Mounting UFS partition"
     if [ -d "$1" ]; then
-	echo "   Removing already-existing mount directory."
-	if umount $1; then
-	    if rmdir $1; then
-		echo "   Removed pre-existing mount directory; creating new one."
-	    else
-		echo "Error: Unable to remove pre-existing mount directory?"
-		echo "   $1"
-		exit 1
-	    fi
-	else
-	    echo "Error: Unable to unmount $1"
-	    exit 1
-	fi
+        echo "   Removing already-existing mount directory."
+        if umount $1; then
+            if rmdir $1; then
+                echo "   Removed pre-existing mount directory; creating new one."
+            else
+                echo "Error: Unable to remove pre-existing mount directory?"
+                echo "   $1"
+                exit 1
+            fi
+        else
+            echo "Error: Unable to unmount $1"
+            exit 1
+        fi
     fi
     mkdir $1 || exit 1
     mount ${DISK_UFS_DEVICE} $1 || exit 1

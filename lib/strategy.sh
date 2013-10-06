@@ -108,13 +108,13 @@ strategy_add ( ) {
     PHASE=$1
     # Forgetting or misspelling the phase argument is a common error.
     if [ $(($PHASE + 0)) -eq 0 ]; then
-	echo "Error: Phase not specified: strategy_add $@"
-	exit 1
+        echo "Error: Phase not specified: strategy_add $@"
+        exit 1
     fi
     if [ $PHASE -le $_CURRENT_PHASE ]; then
-	echo "Error: Inserting a strategy item for a phase that has already run"
-	echo "    strategy_add $@"
-	exit 1
+        echo "Error: Inserting a strategy item for a phase that has already run"
+        echo "    strategy_add $@"
+        exit 1
     fi
     shift
 
@@ -123,7 +123,7 @@ strategy_add ( ) {
     _PHASE_FILE=${STRATEGYDIR}/${PHASE}.sh
     # LWW items are flagged with last digit '1'
     if [ $(($PHASE % 10)) -eq 1 ]; then
-	rm -f ${_PHASE_FILE}
+        rm -f ${_PHASE_FILE}
     fi
     cat >>${_PHASE_FILE} <<EOF
 __run $_P OPTION=$OPTION OPTIONDIR=$OPTIONDIR BOARDDIR=$BOARDDIR $@
@@ -137,21 +137,21 @@ EOF
 # cause new phases to become active.
 run_strategy ( ) {
     while true; do
-	_LAST_PHASE=$_CURRENT_PHASE
-	for P in `cat ${STRATEGYDIR}/phases.txt | sort -n | uniq`; do
-	    if [ $P -gt $_CURRENT_PHASE ]; then
-		_CURRENT_PHASE=$P
-		_PHASE_FILE=${STRATEGYDIR}/${P}.sh
-		# Sort by priority, then by insertion order.
-		sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
-		. ${_PHASE_FILE}.sorted
-		break
-	    fi
-	done
-	# If _CURRENT_PHASE did not progress, then we're done.
-	if [ $_LAST_PHASE -eq $_CURRENT_PHASE ]; then
-	    break
-	fi
+        _LAST_PHASE=$_CURRENT_PHASE
+        for P in `cat ${STRATEGYDIR}/phases.txt | sort -n | uniq`; do
+            if [ $P -gt $_CURRENT_PHASE ]; then
+                _CURRENT_PHASE=$P
+                _PHASE_FILE=${STRATEGYDIR}/${P}.sh
+                # Sort by priority, then by insertion order.
+                sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
+                . ${_PHASE_FILE}.sorted
+                break
+            fi
+        done
+        # If _CURRENT_PHASE did not progress, then we're done.
+        if [ $_LAST_PHASE -eq $_CURRENT_PHASE ]; then
+            break
+        fi
     done
 }
 
@@ -160,11 +160,11 @@ run_strategy ( ) {
 __run ( ) {
     # Set the cwd appropriately depending on the phase we're running.
     if [ $_CURRENT_PHASE -ge $PHASE_FREEBSD_START ] && [ $_CURRENT_PHASE -le $PHASE_FREEBSD_DONE ]; then
-	cd ${BOARD_FREEBSD_MOUNTPOINT}
+        cd ${BOARD_FREEBSD_MOUNTPOINT}
     elif [ $_CURRENT_PHASE -ge $PHASE_BOOT_START ] && [ $_CURRENT_PHASE -le $PHASE_BOOT_DONE ]; then
-	cd ${BOARD_BOOT_MOUNTPOINT}
+        cd ${BOARD_BOOT_MOUNTPOINT}
     else
-	cd ${TOPDIR}
+        cd ${TOPDIR}
     fi
     shift
     eval $@

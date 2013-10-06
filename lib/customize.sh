@@ -14,13 +14,13 @@
 install_customize_hooks ( ) {
     # If customize_boot_partition was defined, add it.
     if command -v customize_boot_partition >/dev/null 2>&1; then
-	PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
+        PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
     fi
     if command -v customize_freebsd_partition >/dev/null 2>&1; then
-	PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
+        PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
     fi
     if command -v customize_post_unmount >/dev/null 2>&1; then
-	PRIORITY=200 strategy_add $PHASE_POST_UNMOUNT customize_post_unmount
+        PRIORITY=200 strategy_add $PHASE_POST_UNMOUNT customize_post_unmount
     fi
 }
 strategy_add $PHASE_POST_CONFIG install_customize_hooks
@@ -30,8 +30,8 @@ strategy_add $PHASE_POST_CONFIG install_customize_hooks
 # tweak them afterwards.
 customize_overlay_files ( ) {
     if [ -d ${WORKDIR}/overlay ]; then
-	echo "Overlaying files from ${WORKDIR}/overlay"
-	(cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+        echo "Overlaying files from ${WORKDIR}/overlay"
+        (cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
     fi
 }
 PRIORITY=50 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_overlay_files

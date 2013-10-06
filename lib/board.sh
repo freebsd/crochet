@@ -17,9 +17,9 @@ BOARDDIRS=""
 board_setup ( ) {
     BOARDDIR=${TOPDIR}/board/$1
     if [ ! -e ${BOARDDIR}/setup.sh ]; then
-	echo "Can't setup board $1."
-	echo "No setup.sh in ${BOARDDIR}."
-	exit 1
+        echo "Can't setup board $1."
+        echo "No setup.sh in ${BOARDDIR}."
+        exit 1
     fi
     BOARDDIRS="$BOARDDIRS $BOARDDIR"
     echo "Board: $1"
@@ -45,16 +45,16 @@ board_generate_image_name ( ) {
 # If so, is there a better mechanism?
 board_overlay_files ( ) {
     if [ -d $1/overlay ]; then
-	echo "Overlaying board-specific files from $1/overlay"
-	(cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+        echo "Overlaying board-specific files from $1/overlay"
+        (cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
     fi
 }
 
 board_defined ( ) {
     if [ -z "$BOARDDIRS" ]; then
-	echo "No board setup?"
-	echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
-	exit 1
+        echo "No board setup?"
+        echo "Make sure a suitable board_setup command appears at the top of ${CONFIGFILE}"
+        exit 1
     fi
 }
 strategy_add $PHASE_POST_CONFIG board_defined
@@ -64,12 +64,12 @@ board_check_image_size_set ( ) {
     # For now, support SD_SIZE for backwards compatibility.
     # June 2013: Remove SD_SIZE support entirely.
     if [ -z "${IMAGE_SIZE}" ]; then
-	if [ -z "${SD_SIZE}" ]; then
-	    echo "Error: \$IMAGE_SIZE not set."
-	    exit 1
-	fi
-	echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
-	IMAGE_SIZE=${SD_SIZE}
+        if [ -z "${SD_SIZE}" ]; then
+            echo "Error: \$IMAGE_SIZE not set."
+            exit 1
+        fi
+        echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
+        IMAGE_SIZE=${SD_SIZE}
     fi
 }
 strategy_add $PHASE_CHECK board_check_image_size_set
@@ -94,7 +94,7 @@ strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
 board_default_installworld ( ) {
     if [ -n "$FREEBSD_INSTALL_WORLD" ]; then
-	freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
+        freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
 }
 strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_default_installworld

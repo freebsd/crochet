@@ -23,10 +23,10 @@ strategy_add $PHASE_MOUNT_LWW pandaboard_mount_partitions
 #
 pandaboard_check_prerequisites ( ) {
     uboot_test \
-	PANDABOARD_UBOOT_SRC \
-	"${PANDABOARD_UBOOT_SRC}/board/ti/panda/Makefile" \
-	"fetch ftp://ftp.denx.de/pub/u-boot/u-boot-2012.07.tar.bz2" \
-	"tar xf u-boot-2012.07.tar.bz2"
+        PANDABOARD_UBOOT_SRC \
+        "${PANDABOARD_UBOOT_SRC}/board/ti/panda/Makefile" \
+        "fetch ftp://ftp.denx.de/pub/u-boot/u-boot-2012.07.tar.bz2" \
+        "tar xf u-boot-2012.07.tar.bz2"
 }
 strategy_add $PHASE_CHECK pandaboard_check_prerequisites
 strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch

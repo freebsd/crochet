@@ -164,7 +164,7 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # generally mandatory is ${BOARD_FREEBSD_MOUNTPOINT}.  (In fact,
 # if that's all you need, you may not need to do anything here,
 # since the default mount handler does that much by itself.)
-# 
+#
 # If your board needs a separate boot partition, mount that
 # at ${BOARD_BOOT_MOUNTPOINT}.
 #
