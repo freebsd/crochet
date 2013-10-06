@@ -69,11 +69,6 @@ while true; do
 done
 
 #
-# set OS variables
-#
-os_determine_os_version
-
-#
 # Load user configuration:  This builds the strategy.
 #
 if [ -z "$BOARD" ] && [ -z "$CONFIGFILE" ]; then
@@ -85,6 +80,16 @@ fi
 if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
+
+#
+# set OS variables
+#
+os_determine_os_version
+ 
+#
+# image name
+#
+board_generate_image_name
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
