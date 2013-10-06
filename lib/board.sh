@@ -30,7 +30,9 @@ board_setup ( ) {
 }
 
 board_generate_image_name ( ) {
-    IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}.img
+    if [ -z "${IMG}" ]; then
+        IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}.img
+    fi
     echo "Image name is: ${IMG}"
 }
 
@@ -45,8 +47,6 @@ board_overlay_files ( ) {
     if [ -d $1/overlay ]; then
 	echo "Overlaying board-specific files from $1/overlay"
 	(cd $1/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
-    else
-	echo "Warning; no overlays found for $1"
     fi
 }
 

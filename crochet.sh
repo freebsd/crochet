@@ -37,7 +37,7 @@ crochet_usage ( ) {
 }
 
 # Parse command-line options
-args=`getopt ub:c:e: $*`
+args=`getopt b:c:e:u $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -87,7 +87,7 @@ fi
 os_determine_os_version
  
 #
-# image name
+# generate image name
 #
 board_generate_image_name
 
@@ -106,7 +106,12 @@ SOURCE TREE: ${FREEBSD_SRC}"
 #
 handle_trap ( ) {
     disk_unmount_all
+
     email_status "${BUILDCONFIG}" "Crochet build failed"
+
+    echo
+    echo 'ERROR: Exiting at '`date`
+    echo
     exit 2
 }
 trap handle_trap INT QUIT KILL
@@ -128,10 +133,13 @@ email_status "${BUILDCONFIG}" "Crochet build commenced"
 #
 run_strategy
 
-#
-# we're done
-#
 email_status "${BUILDCONFIG}" "Crochet build finished"
 
-echo 'Finished at `date`'
+# Clear the error exit handler
+trap - INT QUIT KILL EXIT
+
+# Clean up
+disk_unmount_all
+
+echo 'Finished at '`date`
 
