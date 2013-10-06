@@ -74,6 +74,16 @@ Using the script to build an image consists of a few steps:
 
 ***********************************************************
 
+COMMAND-LINE OPTIONS
+------------
+
+* -b <board>: Load standard configuration for board
+* -c <file>: Load configuration from file
+* -e <email>: Email address to receive build status
+* -u: Update source tree
+
+***********************************************************
+
 PROJECTS
 ------------
 

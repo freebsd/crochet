@@ -14,6 +14,7 @@
 # board_setup BeagleBone
 # board_setup GenericI386
 # board_setup PandaBoard
+# board_setup Soekris
 # board_setup RaspberryPi
 # board_setup VersatilePB
 # board_setup ZedBoard
@@ -26,6 +27,11 @@
 # Read board/<board-name>/README for more details
 # about configuring for your particular board.
 #
+
+#
+# email address to send build status notifications to
+#
+#option Email me@gmail.com
 
 # Suggested: option ImageSize
 #
