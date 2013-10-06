@@ -7,7 +7,7 @@
 +#ifndef CONFIG_SPL_BUILD
 +#define CONFIG_CMD_ELF
 +#define CONFIG_API
-+#define CONFIG_SYS_MMC_MAX_DEVICE 2
++#define CONFIG_SYS_MMC_MAX_DEVICE 4
 +#endif
 +
  #define CONFIG_DMA_COHERENT
