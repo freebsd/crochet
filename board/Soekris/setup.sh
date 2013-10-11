@@ -16,6 +16,10 @@ soekris_copy_buildconfig ( ) {
         then
             KERNEL_CONFIG_FILE="SOEKRIS10"
         fi
+        if [ "$MAJOR_OS_VERSION" -eq "11" ]
+        then
+            KERNEL_CONFIG_FILE="SOEKRIS11"
+        fi
         echo "Copying build config ${KERNEL_CONFIG_FILE} to source tree"
         cp ${BOARDDIR}/conf/${KERNEL_CONFIG_FILE} ${FREEBSD_SRC}/sys/i386/conf/${KERNCONF}
 }
