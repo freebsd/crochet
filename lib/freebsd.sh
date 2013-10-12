@@ -110,14 +110,13 @@ freebsd_src_test ( ) {
 
 # freebsd_current_test:  Check that FreeBSD-CURRENT sources are available
 # (Specialized version of freebsd_src_test for the common case.)
+# TODO: Add more checks here to verify that the src tree really
+# is -CURRENT.
 freebsd_current_test ( ) {
     freebsd_src_test \
         ${KERNCONF} \
         " $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
 }
-# TODO: Not everything requires -CURRENT; copy this into all the
-# board setups and remove it from here.
-strategy_add $PHASE_CHECK freebsd_current_test
 
 # Common code for buildworld and buildkernel.  In particular, this
 # compares the command we're about to run to the previous run and
@@ -177,7 +176,6 @@ freebsd_buildworld ( ) {
     fi
     _freebsd_build world ${CONF}
 }
-strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 
 
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
@@ -196,7 +194,6 @@ freebsd_buildkernel ( ) {
     fi
     _freebsd_build kernel ${CONF}
 }
-strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
 
 
 # freebsd_installworld: Install FreeBSD world to image

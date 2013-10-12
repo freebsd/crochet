@@ -59,6 +59,10 @@ board_defined ( ) {
 }
 strategy_add $PHASE_POST_CONFIG board_defined
 
+# TODO: Not every board requires -CURRENT; copy this into all the
+# board setups and remove it from here.
+strategy_add $PHASE_CHECK freebsd_current_test
+
 board_check_image_size_set ( ) {
     # Check that IMAGE_SIZE is set.
     # For now, support SD_SIZE for backwards compatibility.
@@ -92,12 +96,24 @@ board_default_mount_partitions ( ) {
 }
 strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
+board_default_buildworld ( ) {
+    freebsd_buildworld
+}
+strategy_add $PHASE_BUILD_WORLD board_default_buildworld
+
+board_default_buildkernel ( ) {
+    freebsd_buildkernel
+}
+strategy_add $PHASE_BUILD_KERNEL board_default_buildkernel
+
 board_default_installworld ( ) {
     if [ -n "$FREEBSD_INSTALL_WORLD" ]; then
         freebsd_installworld ${BOARD_FREEBSD_MOUNTPOINT}
     fi
 }
 strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_default_installworld
+
+strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
 
 board_default_goodbye ( ) {
     echo "DONE."

@@ -26,10 +26,6 @@ disk_record_md ( ) {
     _DISK_MDS="${_DISK_MDS} $1"
 }
 
-strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
-
-
-
 # $1: full path of image file
 # $2: size of SD image
 disk_create_image ( ) {
