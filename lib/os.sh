@@ -9,6 +9,9 @@ os_determine_os_version ( ) {
 
 # find the OBJS
 os_determine_obj_location ( ) {
+    # default
+    OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}/
+    
     if [ "$MAJOR_OS_VERSION" -eq "8" ]
     then
         OBJFILES=${MAKEOBJDIRPREFIX}/i386${FREEBSD_SRC}/

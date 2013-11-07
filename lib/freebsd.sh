@@ -1,5 +1,5 @@
 # This should be overridden by the board setup
-TARGET_ARCH=armv6
+TARGET_ARCH=arm
 
 # Board setup should not touch these, so users can
 FREEBSD_SRC=/usr/src
