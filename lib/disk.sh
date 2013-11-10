@@ -48,6 +48,7 @@ disk_create_image ( ) {
 #
 disk_partition_mbr ( ) {
     echo "Partitioning the raw disk image at "`date`
+    echo gpart create -s MBR ${DISK_MD}
     gpart create -s MBR ${DISK_MD}
 }
 

@@ -8,8 +8,11 @@
 # The strategy list for this run is kept in ${STRATEGYDIR}.
 # Clean out old strategies.
 STRATEGYBASE=/tmp/crochet/strategy
+if [ -d ${STRATEGYBASE} ]
+then
+    find ${STRATEGYBASE} -maxdepth 1 -ctime +3 | xargs rm -rf
+fi
 mkdir -p ${STRATEGYBASE}
-find ${STRATEGYBASE} -maxdepth 1 -ctime +3 | xargs rm -rf
 # Create a new dir for this run.
 # Including timestamp in the dirname simplifies debugging.
 _DATE=`date +%Y.%m.%d.%H.%M.%S`
@@ -167,5 +170,8 @@ __run ( ) {
         cd ${TOPDIR}
     fi
     shift
+    if $VERBOSE; then
+	echo "Running: " $@
+    fi
     eval $@
 }

@@ -9,6 +9,7 @@ WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
+VERBOSE=false
 
 # Load utility libraries: strategy.sh must go first
 . ${LIBDIR}/strategy.sh
@@ -19,7 +20,6 @@ UPDATE_SOURCE=
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/freebsd.sh
-. ${LIBDIR}/os.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/uboot.sh
 
@@ -31,11 +31,12 @@ crochet_usage ( ) {
     echo " -c <file>: Load configuration from file"
     echo " -e <email>: Email address to receive build status"
     echo " -u: Update source tree"
+    echo " -v: Print more detailed progress information"
     exit 2
 }
 
 # Parse command-line options
-args=`getopt b:c:e:u $*`
+args=`getopt b:c:e:vu $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -58,6 +59,10 @@ while true; do
             UPDATE_SOURCETREE=yes
             shift
             ;;
+	-v)
+	    VERBOSE=true
+	    shift
+	    ;;
         --)
             shift; break
             ;;
@@ -79,8 +84,7 @@ if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
 
-os_determine_os_version
-board_generate_image_name
+echo "loaded config file"
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}

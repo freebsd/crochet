@@ -10,6 +10,9 @@ IMAGE_SIZE=$((600 * 1000 * 1000))
 rm -rf ${WORKDIR}/boot
 mkdir -p ${WORKDIR}/boot/defaults
 
+# Value in MB.
+VMWARE_MEMSIZE=1024
+
 #
 # Note that the 'build' functions here all do a fake 'install' to
 # ${WORKDIR}/boot so we can copy single files to the final image
@@ -76,6 +79,19 @@ vmware_guest_post_config_names ( ) {
     if [ -z "${VMWARE_DIR}" ]; then
 	VMWARE_DIR="${WORKDIR}/${VMWARE_NAME}.vmwarevm"
     fi
+
+    # Avoid overwriting an existing VM
+    # TODO: use *-${i}.vmwarevm instead of *.vmwarevm.${i}
+    # the latter confuses Mac OS extension-based file open logic.
+    BASEVMDIR=`echo ${VMWARE_DIR} | sed -e s/.vmwarevm$//`
+    BASEVMNAME="${VMWARE_NAME}"
+    i=1
+    while [ -d "${VMWARE_DIR}" ]; do
+	VMWARE_DIR="${BASEVMDIR}-${i}.vmwarevm"
+	VMWARE_NAME="${BASEVMNAME}.${i}"
+	i=$(($i + 1))
+    done
+
     mkdir ${VMWARE_DIR}
     IMG="${VMWARE_DIR}/Disk0.hdd"
     strategy_add $PHASE_POST_UNMOUNT vmware_guest_build_vm  ${IMG}
@@ -100,20 +116,10 @@ vmware_guest_build_vm ( ) {
     echo "Building VMWare VM"
     IMG=$1; shift
 
-    # Avoid overwriting an existing VM
-    BASEVMDIR="${VMWARE_DIR}"
-    BASEVMNAME="${VMWARE_NAME}"
-    i=1
-    while [ -d "${VMWARE_DIR}" ]; do
-	VMWARE_DIR="${BASEVMDIR}.${i}"
-	VMWARE_NAME="${BASEVMNAME}.${i}"
-    done
-
     echo "  VMWare machine name: $VMWARE_NAME"
     echo "  VMWare machine directory:"
     echo "     $VMWARE_DIR"
-    mkdir -p "${VMWARE_DIR}"
-    rm -rf "${VMWARE_DIR}"/*
+
     strategy_add $PHASE_GOODBYE_LWW vmware_guest_goodbye "${VMWARE_DIR}"
 
     # Compute the appropriate MBR geometry for this image
@@ -123,6 +129,7 @@ vmware_guest_build_vm ( ) {
     # If the image isn't an exact multiple of the cylinder size, pad it.
     PADDED_SIZE=$(( $CYLINDERS * 512 * 16 * 63 ))
     if [ $PADDED_SIZE -gt $IMAGE_SIZE ]; then
+	echo dd of=${IMG} if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
 	dd of=${IMG} if=/dev/zero bs=1 count=1 oseek=$(( $PADDED_SIZE - 1))
     fi
 
@@ -159,7 +166,7 @@ ethernet0.virtualDev = "e1000"
 guestOS = "freebsd"
 ide0:0.filename = "Disk0.vmdk"
 ide0:0.present = "TRUE"
-memsize = "512"
+memsize = "${VMWARE_MEMSIZE}"
 tools.syncTime = "TRUE"
 uuid.action = "create"
 usb.present = "TRUE"

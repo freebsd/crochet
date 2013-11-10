@@ -3,15 +3,15 @@ KERNCONF=GENERIC
 IMAGE_SIZE=$((600 * 1000 * 1000))
 
 generic_i386_partition_image ( ) { 
-        BOOTFILES=${OBJFILES}sys/boot/i386
-        echo "Boot files are at: "${BOOTFILES} 
-
         # basic setup
         disk_partition_mbr
         disk_ufs_create
 
         # boot loader	
         echo "Installing bootblocks"
+
+        BOOTFILES=${OBJFILES}sys/boot/i386
+        echo "Boot files are at: "${BOOTFILES} 
         gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
         gpart set -a active -i 1 ${DISK_MD} || exit 1
         bsdlabel -B -b ${BOOTFILES}/boot2/boot ${DISK_UFS_PARTITION} || exit 1

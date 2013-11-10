@@ -63,6 +63,25 @@ freebsd_dtc_test ( ) {
     fi
 }
 
+
+freebsd_src_version ( ) {
+    FREEBSD_VERSION=`/usr/bin/grep "REVISION=" ${FREEBSD_SRC}/sys/conf/newvers.sh | awk 'BEGIN {FS="="} {print $2}' | /usr/bin/tr -d '"'`
+    FREEBSD_MAJOR_VERSION=`echo $FREEBSD_VERSION | awk 'BEGIN {FS="."} {print $1}'`
+    echo "Building FreeBSD version: $FREEBSD_VERSION";
+}
+
+# find the OBJS
+freebsd_objdir ( ) {
+    # This is wrong.  Fix it or (better) remove the need for it.
+    if [ "$FREEBSD_MAJOR_VERSION" -le 8 ]
+    then
+        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}${FREEBSD_SRC}/
+    else
+        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}.${ARCH}${FREEBSD_SRC}/
+    fi
+    echo "Object files are at: "${OBJFILES}
+}
+
 # freebsd_src_test: Check that this looks like a FreeBSD src tree.
 #
 # $1: Name of kernel configuration we expect
@@ -104,6 +123,8 @@ freebsd_src_test ( ) {
         shift; freebsd_download_instructions "$@"
         exit 1
     fi
+    freebsd_src_version
+    freebsd_objdir
     echo "Found suitable FreeBSD source tree in:"
     echo "    $FREEBSD_SRC"
 }
