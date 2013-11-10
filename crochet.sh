@@ -84,8 +84,6 @@ if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
 
-echo "loaded config file"
-
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
 rm -f ${WORKDIR}/*.log
