@@ -141,7 +141,7 @@ uboot_build ( ) (
     cd "$1"
     echo "Building U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.build.log)"
-    if gmake SED=gsed CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} > $1/_.uboot.build.log 2>&1; then
+    if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} > $1/_.uboot.build.log 2>&1; then
         # success
     else
         echo "  Failed to build U-Boot."
