@@ -10,6 +10,8 @@ CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
 
+DEBUG=0
+
 # Load utility libraries: strategy.sh must go first
 . ${LIBDIR}/strategy.sh
 # Rest in alphabetic order
@@ -35,7 +37,7 @@ crochet_usage ( ) {
 }
 
 # Parse command-line options
-args=`getopt b:c:e:u $*`
+args=`getopt b:c:de:u $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -49,6 +51,10 @@ while true; do
         -c)
             CONFIGFILE="$2"
             shift; shift
+            ;;
+        -d)
+            DEBUG=1
+            shift
             ;;
         -e)
             option Email "$2"

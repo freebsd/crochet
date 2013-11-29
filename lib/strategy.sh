@@ -144,6 +144,9 @@ run_strategy ( ) {
                 _PHASE_FILE=${STRATEGYDIR}/${P}.sh
                 # Sort by priority, then by insertion order.
                 sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
+		if [ ${DEBUG} -ge 1 ]; then
+			echo "====================> Phase $P <===================="
+		fi
                 . ${_PHASE_FILE}.sorted
                 break
             fi
