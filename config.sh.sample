@@ -108,6 +108,20 @@
 # Copies the src tree that was used to build this image to /usr/src
 # on the image.
 
+#option NanoBSD '/dev/sd0' 1g
+#option NanoBSD /dev/mmcsd0 1g 2 16m
+#
+# Partition the system in a way similar to NanoBSD.
+# The arguments and default values are:
+#
+#    + The device that the system will use to mount it's disks.
+#      Default: /dev/mmcsd0
+#    + The size of the OS partition(s).  Default: 1g
+#    + The number of OS partitions.  Can be 1 or 2.  Default: 2
+#    + The size of the /cfg partition.  Default: 32m
+#
+# This option will also install nanobsd specific tools into /root/bin/
+
 # KERNCONF=MYCONF
 #
 # Each board picks a default KERNCONF but you can override it.
