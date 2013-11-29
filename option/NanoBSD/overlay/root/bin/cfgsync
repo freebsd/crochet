@@ -1,0 +1,457 @@
+#!/bin/sh
+#
+# Copyright (c) 2009-2010 Paul Schenkeveld
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+# OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+# SUCH DAMAGE.
+#
+# $Id: cfgsync,v 1.15 2010/02/05 11:32:50 paul Exp $
+#
+
+usage()
+{
+  echo "usage: cfgsync [-nv] [-a|-j jail_path ...]" >&2
+  exit 1
+}
+
+fatal()      # $1 = exit value, $* = message
+{
+  ret="$1"
+  shift
+  echo "$*" >&2
+  exit $ret
+}
+
+err()      # $* = message
+{
+  echo " !! Error: $*" >&2
+  errors=$(($errors + 1))
+}
+
+warn()      # $* = message
+{
+  echo "Warning: $*" >&2
+  warns=$(($warns + 1))
+}
+
+progress()    # $* = message
+{
+  if [ $quiet = n ]; then
+    echo " ** $*" >&2
+  fi
+}
+
+verbose()    # $1 = level, $* = message
+{
+  v=$1
+  shift
+  if [ $verbosity -ge "$v" ]; then
+    echo " -- $*" >&2
+  fi
+}
+
+status_rpt()    # $1 = exit value
+{
+  if [ $errors -ne 0 ]; then
+    echo "  $errors errors issued" >&2
+  fi
+  if [ $warns -ne 0 ]; then
+    echo "  $warns warnings issued" >&2
+  fi
+  if [ $files_copied -gt 0 ]; then
+    echo "  $files_copied files copied$nw" >&2
+  fi
+  if [ $links_made -gt 0 ]; then
+    echo "  $links_made links made or updated$nw" >&2
+  fi
+}
+
+cmd()      # $* = command line
+{
+  if [ $nflag = y -o $verbosity -gt 0 ]; then
+    echo "    $xq $*" >&2
+  fi
+  if [ $nflag = n ]; then
+    eval "$*"
+  fi
+}
+
+check_cfg_mount_status()
+{
+  case $(/sbin/mount | grep " on $prefix/cfg ") in
+    *read-only*)
+      cfg_initial_mount_status="r";;
+    */cfg*)
+      cfg_initial_mount_status="w";;
+    *)
+      cfg_initial_mount_status="-";;
+  esac
+  : ${cfg_current_mount_status:=$cfg_initial_mount_status}
+}
+
+mount_cfg()    # $1 = requested mount status (r/w/-)
+{
+  if [ ! -f /etc/fstab ] ||
+     ! grep -q "^[^   ]*[   ]*$prefix/cfg[   ]" /etc/fstab
+  then
+    return
+  fi
+  case "$cfg_initial_mount_status:$cfg_current_mount_status:$1" in
+    *:-:r)
+      verbose 1 "Mounting $prefix/cfg read-only"
+      mount -r $prefix/cfg
+      cfg_current_mount_status=r;;
+    *:-:w)
+      verbose 1 "Mounting $prefix/cfg read-write"
+      mount -w $prefix/cfg
+      cfg_current_mount_status=w;;
+    *:r:w)
+      verbose 1 "Re-mounting $prefix/cfg read-write"
+      mount -uw $prefix/cfg
+      cfg_current_mount_status=w;;
+    r:w:-)
+      verbose 1 "Re-mounting $prefix/cfg read-only"
+      mount -ur $prefix/cfg
+      cfg_current_mount_status=r;;
+    -:[rw]:-)
+      verbose 1 "Unmounting $prefix/cfg"
+      umount $prefix/cfg
+      cfg_current_mount_status=-;;
+  esac
+}
+
+compare_trees()
+{
+  ret=0
+  sync_files=""
+  sync_links=""
+  for file in $(find $dirs |
+          sed -E "s!^$prefix/(conf/base/etc|etc|cfg)/?!!" |
+          egrep -v -x -f $exclude_list |
+          sort -u)
+  do
+    file_type "$prefix/conf/base/etc/$file";  t1=$?
+    file_type "$prefix/etc/$file";      t2=$?
+    file_type "$prefix/cfg/$file";      t3=$?
+    verbose 2 "[$t1$t2$t3] $file"
+    case "$t1$t2$t3" in
+      100|101)
+        err "File not in $prefix/etc: $file"; ret=1;;
+      200|202)
+        err "Dir not in $prefix/etc: $file"; ret=1;;
+      300|303)
+        err "Link not in $prefix/etc: $file"; ret=1;;
+      010|011|110|111)
+        sync_files="$sync_files $file";;
+      020|022|220|222)
+        ;;  # automatically updated
+      030|033|330|333)
+        sync_links="$sync_links $file";;
+      000)
+        err "File disappeared or invalid name: $file"
+        ret=1;;
+      001)
+        warn "File only in $prefix/cfg;" \
+             "$file - skipped" >&2;;
+      002)
+        warn "Dir only in $prefix/cfg;" \
+             "$file - skipped" >&2;;
+      003)
+        warn "Link only in $prefix/cfg;" \
+             "$file - skipped" >&2;;
+      *1*[23]* | *2*[13]* | *3*[12]*)
+        err "Iconsistent file type: $file"; ret=1;;
+      *9*)
+        err "Invalid file type: $file"; ret=1;;
+      *)
+        err "Internal error"; ret=1;;
+    esac
+  done
+  return $ret
+}
+
+file_type()    # $1 = absolute pathname
+{
+  if [ -L "$1" ]; then
+    return 3
+  elif [ -f "$1" ]; then
+    return 1
+  elif [ -d "$1" ]; then
+    return 2
+  elif [ ! -e "$1" ]; then
+    return 0
+  else
+    return 9
+  fi
+}
+
+synchronize_files()  # $* = file list (relative paths)
+{
+  local s1 s2 s3
+  for file
+  do
+    s1=$(file_stat "$prefix/conf/base/etc/$file")
+    s2=$(file_stat "$prefix/etc/$file")
+    s3=$(file_stat "$prefix/cfg/$file")
+    if [ "$s1" = "$s2" ] \
+        && cmp -s "$prefix/conf/base/etc/$file" \
+            "$prefix/etc/$file"; then
+      if [ "$s2" = "$s3" ] \
+          && cmp -s "$prefix/etc/$file" \
+              "$prefix/cfg/$file"; then
+        warn "Not needed in $prefix/cfg: $file"
+      elif [ -n "$s3" ]; then
+        warn "Bad file in $prefix/cfg: $link"
+      fi
+    else
+      if [ -z "$s3" -o "$s2" != "$s3" ] \
+          || ! cmp -s "$prefix/etc/$file" \
+          "$prefix/cfg/$file"; then
+        copy_file "$file"
+      fi
+    fi
+  done
+}
+
+copy_file()    # $1 = relative path
+{
+  if [ $nflag = n ]; then
+    mount_cfg w
+  fi
+  case "$1" in
+    */*)
+      if [ ! -d "$prefix/cfg/${1%/*}" ]
+      then
+        cmd mkdir -p "$prefix/cfg/${1%/*}"
+      fi;;
+  esac
+  cmd cp -p "$prefix/etc/$1" "$prefix/cfg/$1"
+  files_copied=$(($files_copied + 1))
+}
+
+file_stat()    # $1 = absolute path
+{
+  if [ -f "$1" ]; then
+    stat -f "%p:%u:%g:%m:%z" "$1"
+  fi
+}
+
+synchronize_links()  # $* = link list (relative paths)
+{
+  for link
+  do
+    s1=$(link_stat "$prefix/conf/base/etc/$link")
+    s2=$(link_stat "$prefix/etc/$link")
+    s3=$(link_stat "$prefix/cfg/$link")
+    if [ "$s1" = "$s2" ]; then
+      if [ "$s2" = "$s3" ]; then
+        warn "Not needed in $prefix/cfg: $link"
+      elif [ -n "$s3" ]; then
+        warn "Bad link in $prefix/cfg: $link"
+      fi
+    else
+      if [ "$s2" != "$s3" ]; then
+        target=$(link_target "$prefix/etc/$link")
+        copy_link "$link" "$target" "$s2"
+      fi
+    fi
+  done
+}
+
+copy_link()    # $1 = relative path, $2 = target, $3 = perm:uid:gid:tgt
+{
+  if [ $nflag = n ]; then
+    mount_cfg w
+  fi
+  case "$1" in
+    */*)
+      cmd mkdir -p "$prefix/cfg/${1%/*}";;
+  esac
+  cmd ln -f -s "$2" "$prefix/cfg/$1"
+  mode=${3%%:*}
+  cmd chmod -h ${mode#???} "$prefix/cfg/$1"
+  uid_gid_tgt=${3#*:}
+  cmd chown -h ${uid_gid_tgt%:*} "$prefix/cfg/$1"
+  links_made=$(($links_made + 1))
+}
+
+link_stat()    # $1 = absolute path
+{
+  if [ -L "$1" ]; then
+    stat -f "%p:%u:%g:%Y" "$1"
+  fi
+}
+
+link_target()    # $1 = absolute path
+{
+  if [ -L "$1" ]; then
+    stat -f "%Y" "$1"
+  fi
+}
+
+synchronize_dirs()
+{
+  cmd "(cd $prefix/cfg; find . -type d) | (cd $prefix/etc; cpio -pdma $prefix/cfg 2>/dev/null)"
+}
+
+synchronize_tree()
+{
+  saved_files_copied=$files_copied
+  saved_links_made=$links_made
+  dir1="$prefix/conf/base/etc"
+  dir2="$prefix/etc"
+  dir3="$prefix/cfg"
+  if [ $quiet = n ]; then
+    echo "Synchronizing between $prefix/conf/base/etc," \
+         "$prefix/etc and $prefix/cfg" >&2
+  fi
+
+  if [ -f "$prefix/etc/cfgsync.exclude" ]; then
+    exclude_list="$prefix/etc/cfgsync.exclude"
+  else
+    exclude_list=/dev/null
+  fi
+
+  # Sanity check
+  dirs="$dir1 $dir2 $dir3"
+  err=0
+  for dir in $dirs
+  do
+    if [ ! -d $dir ]; then
+      echo "Non-existent diectory: $dir" >&2
+      err=1
+    fi
+  done
+  if [ $err -ne 0 ]; then
+    fatal 1 "Missing required directory - aborting"
+  fi
+
+  # Mount $prefix/cfg read-only unless already mounted;
+  # remember initial mount status
+  check_cfg_mount_status "$prefix/cfg"
+  trap "ret=$?; mount_cfg -; echo 'Aborted.' >&2; status_rpt; exit $ret" \
+    HUP INT TERM
+  mount_cfg r
+
+  progress "Compare $dir1, $dir2 and $dir3" >&2
+  compare_trees || fatal 1 "Inconsistencies found, aborting"
+
+  if [ -n "$sync_files" ]; then
+    progress "Synchronize files" >&2
+    synchronize_files $sync_files
+  fi
+
+  if [ -n "$sync_links" ]; then
+    progress "Synchronize links" >&2
+    synchronize_links $sync_links
+  fi
+
+  if [ $saved_files_copied -ne $files_copied \
+       -o $saved_links_made -ne $links_made ]; then
+    progress "Synchronize directories" >&2
+    synchronize_dirs $sync_dirs
+  fi
+
+  mount_cfg -
+
+  if [ $quiet = n ]; then
+    echo "" >&2
+  fi
+}
+
+#
+#   Main
+#
+
+files_copied=0
+links_made=0
+warns=0
+errors=0
+
+nw=""
+xq="!"
+nflag=n
+verbosity=0
+quiet=n
+sync_root=y
+jail_list=
+jail_arg=n
+
+if [ $(id -u) -ne 0 ]; then
+  fatal 1 "Must be root to run cfgsync"
+fi
+
+while getopts aj:nqv opt 2> /dev/null
+do
+  case "$opt" in
+    a)
+      sync_root=y
+      jail_list="$(ls /jail | sed 's!^!/jail/!')";;
+    j)
+      sync_root=n
+      jail_list="$jail_list $OPTARG"
+      jail_arg=y;;
+    n)
+      nflag=y
+      nw=" (NO WRITE)"
+      xq="?";;
+    q)
+      quiet=y;;
+    v)
+      verbosity=$((verbosity + 1));;
+    ?)
+      usage;;
+  esac
+done
+
+if [ $sync_root = y ]; then
+  prefix=""
+  synchronize_tree
+fi
+
+if [ -n "$jail_list" ]; then
+  for jail in $jail_list
+  do
+    if [ -d "$jail/etc" ]; then
+      if [ -d $jail/cfg -a -n "$(ls $jail/conf/base/etc)" ]
+      then
+        prefix="$jail"
+        synchronize_tree
+      else
+        if [ $jail_arg = y ]; then
+          warn "Cannot synchronize jail: $jail"
+        fi
+      fi
+    else
+      if [ $jail_arg = y ]; then
+        warn "Not a valid jail: $jail"
+      fi
+    fi
+  done
+fi
+
+if [ $quiet = n ]; then
+  echo "Finished.$nw" >&2
+  status_rpt
+fi
+
+exit 0
