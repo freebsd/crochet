@@ -22,7 +22,10 @@ strategy_add $PHASE_MOUNT_LWW wandboard_partition_image_mount_partitions
 #
 # Wandboard uses U-Boot.
 #
-# patches come from here https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-wandboard-uEnv.txt-bootz-n-fixes.patch
+# patches come from here 
+#
+# https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-wandboard-uEnv.txt-bootz-n-fixes.patch
+# https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-ARM-mx6-Update-non-Freescale-boards-to-include-CPU-e.patch
 #
 wandboard_check_uboot ( ) {
         # Crochet needs to build U-Boot.
