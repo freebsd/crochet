@@ -85,7 +85,7 @@ disk_fat_create ( ) {
 disk_fat_mount ( ) {
     echo "Mounting FAT partition"
     if [ -d "$1" ]; then
-        echo "   Removing already-existing mount directory."
+        echo "   Removing already-existing mount directory: $1"
         if umount $1; then
             if rmdir $1; then
                 echo "   Removed pre-existing mount directory; creating new one."
@@ -133,7 +133,7 @@ disk_ufs_create ( ) {
 disk_ufs_mount ( ) {
     echo "Mounting UFS partition"
     if [ -d "$1" ]; then
-        echo "   Removing already-existing mount directory."
+        echo "   Removing already-existing mount directory: $1"
         if umount $1; then
             if rmdir $1; then
                 echo "   Removed pre-existing mount directory; creating new one."
