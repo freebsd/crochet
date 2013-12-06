@@ -32,7 +32,7 @@ strategy_add $PHASE_MOUNT_LWW wandboard_partition_image_mount_partitions
 # https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-ARM-mx6-Update-non-Freescale-boards-to-include-CPU-e.patch
 #
 wandboard_check_uboot ( ) {
-        # Crochet needs to build U-Boot.
+	# Crochet needs to build U-Boot.
         uboot_test \
             WANDBOARD_UBOOT_SRC \
             "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile" \
@@ -43,6 +43,13 @@ wandboard_check_uboot ( ) {
         strategy_add $PHASE_BUILD_OTHER uboot_build $WANDBOARD_UBOOT_SRC
 }
 strategy_add $PHASE_CHECK wandboard_check_uboot
+
+wandboard_uboot_install ( ) {
+        echo installing 
+	dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=${BOARD_BOOT_MOUNTPOINT} bs=1 seek=1024
+}
+
+strategy_add $PHASE_BOOT_INSTALL wandboard_uboot_install
 
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
 
