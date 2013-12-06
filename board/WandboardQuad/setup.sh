@@ -6,6 +6,10 @@ WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2013.10
 #
 # 2 partitions, a FAT one for the boot and a UFS one
 #
+# the kernel config (WANDBOARD.common) specifies:
+# U-Boot stuff lives on slice 1, FreeBSD on slice 2.
+# options         ROOTDEVNAME=\"ufs:mmcsd0s2a\"
+#
 wandboard_partition_image ( ) {
     disk_partition_mbr
     disk_fat_create 2m
@@ -31,7 +35,7 @@ wandboard_check_uboot ( ) {
         # Crochet needs to build U-Boot.
         uboot_test \
             WANDBOARD_UBOOT_SRC \
-            "$WANDBOARD_UBOOT_SRC/board/ti/am335x/Makefile" \
+            "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile" \
             "ftp ftp://ftp.denx.de/pub/u-boot/u-boot-2013.10.tar.bz2" \
             "tar xf u-boot-2013.10.tar.bz2"
         strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} ${BOARDDIR}/files/*.patch
