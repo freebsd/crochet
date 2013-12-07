@@ -44,13 +44,31 @@ wandboard_check_uboot ( ) {
 }
 strategy_add $PHASE_CHECK wandboard_check_uboot
 
+#
+# install uboot
+#
 wandboard_uboot_install ( ) {
         echo Installing U-Boot to ${DISK_FAT_DEVICE}
-	dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=${DISK_FAT_DEVICE} bs=1 seek=1024
+        cp ${WANDBOARD_UBOOT_SRC}/u-boot.imx ${BOARD_BOOT_MOUNTPOINT}
 }
-
 strategy_add $PHASE_BOOT_INSTALL wandboard_uboot_install
 
+#
+# ubldr
+#
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+
+#
+# kernel
+#
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
+
+#
+# Make a /boot/msdos directory so the running image
+# can mount the FAT partition.  (See overlay/etc/fstab.)
+#
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 
 
