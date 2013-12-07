@@ -45,8 +45,8 @@ wandboard_check_uboot ( ) {
 strategy_add $PHASE_CHECK wandboard_check_uboot
 
 wandboard_uboot_install ( ) {
-        echo installing 
-	dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=${BOARD_BOOT_MOUNTPOINT} bs=1 seek=1024
+        echo Installing U-Boot to ${DISK_FAT_DEVICE}
+	dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=${DISK_FAT_DEVICE} bs=1 seek=1024
 }
 
 strategy_add $PHASE_BOOT_INSTALL wandboard_uboot_install
