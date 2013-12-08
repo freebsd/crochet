@@ -14,6 +14,7 @@ wandboard_partition_image ( ) {
     disk_partition_mbr
     disk_fat_create 2m
     disk_ufs_create
+    wandboard_uboot_install
 }
 strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 
@@ -49,9 +50,9 @@ strategy_add $PHASE_CHECK wandboard_check_uboot
 #
 wandboard_uboot_install ( ) {
         echo Installing U-Boot to ${DISK_FAT_DEVICE}
-        cp ${WANDBOARD_UBOOT_SRC}/u-boot.imx ${BOARD_BOOT_MOUNTPOINT}
+        sudo dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=${DISK_FAT_DEVICE} bs=512 seek=2; sync
 }
-strategy_add $PHASE_BOOT_INSTALL wandboard_uboot_install
+#strategy_add $PHASE_PARTITION_LWW wandboard_uboot_install
 
 #
 # ubldr
