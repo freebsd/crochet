@@ -28,8 +28,6 @@ disk_record_md ( ) {
 
 strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
 
-
-
 # $1: full path of image file
 # $2: size of SD image
 disk_create_image ( ) {
@@ -56,13 +54,19 @@ disk_partition_mbr ( ) {
 # $1: size of partition, can use 'k', 'm', 'g' suffixes
 # TODO: If $1 is empty, use whole disk.
 # $2: '12', '16', or '32' for FAT type (default depends on $1)
+# $3: start block
 #
 disk_fat_create ( ) {
-    echo "Creating the FAT partition at "`date`
-    _DISK_FAT_SLICE=`gpart add -a 63 -b 63 -s$1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+    # start block
+    FAT_START_BLOCK=$3
+    if [ -z ${FAT_START_BLOCK} ]; then
+        FAT_START_BLOCK=63
+    fi
+    echo "Creating the FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
+    _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s$1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
     DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
-     gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
+    gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2

@@ -2,3 +2,5 @@
 /u-boot*
 /work
 *~
+nohup.out
+
