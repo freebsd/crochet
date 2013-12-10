@@ -60,6 +60,15 @@ strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 
 #
+# uEnv
+#
+wandboard_install_uenvtxt(){
+    echo "Installing uEnv.txt"
+    cp ${BOARDDIR}/files/uEnv.txt .
+}
+strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
+
+#
 # kernel
 #
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
