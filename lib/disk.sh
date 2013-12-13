@@ -56,7 +56,7 @@ disk_partition_mbr ( ) {
 #
 disk_reserved_create( ) {
     echo "Creating reserve partition at "`date`" of size $1"
-    _DISK_RESERVED_SLICE=`gpart add -a 63 -s$1 -t '7F' ${DISK_MD} | sed -e 's/ .*//'`
+    _DISK_RESERVED_SLICE=`gpart add -a 63 -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_RESERVED_DEVICE=/dev/${_DISK_RESERVED_SLICE}
 }
 
@@ -74,7 +74,7 @@ disk_fat_create ( ) {
         FAT_START_BLOCK=63
     fi
     echo "Creating the FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
-    _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s$1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+    _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
     DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
     gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
