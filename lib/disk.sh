@@ -49,6 +49,17 @@ disk_partition_mbr ( ) {
     gpart create -s MBR ${DISK_MD}
 }
 
+#
+# Add a reserve partition
+#
+# $1 size of partition
+#
+disk_reserved_create( ) {
+    echo "Creating reserve partition at "`date`" of size $1"
+    _DISK_RESERVED_SLICE=`gpart add -a 63 -s$1 -t '7F' ${DISK_MD} | sed -e 's/ .*//'`
+    DISK_RESERVED_DEVICE=/dev/${_DISK_RESERVED_SLICE}
+}
+
 # Add a FAT partition and format it.
 #
 # $1: size of partition, can use 'k', 'm', 'g' suffixes
