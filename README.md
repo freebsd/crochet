@@ -6,6 +6,7 @@ It can currently build images for:
 * [RaspberryPi](http://www.raspberrypi.org/)
 * [Soekris](http://soekris.com/)
 * generic x86 systems.
+* [Wandboard](http://wandboard.org/)
 * [VMWare](http://www.vmware.com/)
 * [ZedBoard](http://www.zedboard.org/)
 

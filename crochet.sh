@@ -108,8 +108,23 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL
 
 if [ -n "${UPDATE_SOURCETREE}" ]; then
-    update_sourcetree
+    svn_update_sourcetree
 fi
+
+#
+# show source revision
+#
+svn_get_revision
+
+#
+# get the OS version from the source tree
+#
+os_determine_os_version
+
+#
+# generate the image name
+#
+board_generate_image_name
 
 #
 # Run the strategy to do all of the work.

@@ -1,5 +1,5 @@
 # This should be overridden by the board setup
-TARGET_ARCH=armv6
+TARGET_ARCH=arm
 
 # Board setup should not touch these, so users can
 FREEBSD_SRC=/usr/src
@@ -63,7 +63,6 @@ freebsd_dtc_test ( ) {
     fi
 }
 
-
 freebsd_src_version ( ) {
     FREEBSD_VERSION=`/usr/bin/grep "REVISION=" ${FREEBSD_SRC}/sys/conf/newvers.sh | awk 'BEGIN {FS="="} {print $2}' | /usr/bin/tr -d '"'`
     FREEBSD_MAJOR_VERSION=`echo $FREEBSD_VERSION | awk 'BEGIN {FS="."} {print $1}'`
@@ -72,12 +71,26 @@ freebsd_src_version ( ) {
 
 # find the OBJS
 freebsd_objdir ( ) {
-    # This is wrong.  Fix it or (better) remove the need for it.
-    if [ "$FREEBSD_MAJOR_VERSION" -le 8 ]
+    # This is still broken. It gets the OBJDIR wrong when
+    # doing native builds.
+    # TODO: Fix it or remove the need for it.  (We
+    # really should not need this; we can instead use the following
+    # idiom to copy files out of the obj tree without actually
+    # knowing where it is:
+    #     "cd src-dir-location; make DESTDIR=XYZ install" 
+    OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    
+    if [ "$MAJOR_OS_VERSION" -eq "8" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}${FREEBSD_SRC}/
-    else
-        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}.${ARCH}${FREEBSD_SRC}/
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    if [ "$MAJOR_OS_VERSION" -eq "9" ]
+    then
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    if [ "$MAJOR_OS_VERSION" -eq "10" ]
+    then
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
     echo "Object files are at: "${OBJFILES}
 }
