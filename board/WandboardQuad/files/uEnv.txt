@@ -1,2 +1,3 @@
-bootfile=ubldr
+uenvcmd=fatload mmc 0:1 12000000 kernel.bin;go 12000000;
+
 
