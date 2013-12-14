@@ -9,7 +9,8 @@ WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
-VERBOSE=false
+
+VERBOSE=0
 
 # Load utility libraries: strategy.sh must go first
 . ${LIBDIR}/strategy.sh
@@ -60,7 +61,7 @@ while true; do
             shift
             ;;
 	-v)
-	    VERBOSE=true
+	    VERBOSE=$(($VERBOSE + 1))
 	    shift
 	    ;;
         --)

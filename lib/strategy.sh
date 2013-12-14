@@ -147,6 +147,9 @@ run_strategy ( ) {
                 _PHASE_FILE=${STRATEGYDIR}/${P}.sh
                 # Sort by priority, then by insertion order.
                 sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
+		if [ $VERBOSE -gt 0 ]; then
+			echo "====================> Phase $P <===================="
+		fi
                 . ${_PHASE_FILE}.sorted
                 break
             fi
@@ -170,7 +173,7 @@ __run ( ) {
         cd ${TOPDIR}
     fi
     shift
-    if $VERBOSE; then
+    if [ $VERBOSE -gt 0 ]; then
 	echo "Running: " $@
     fi
     eval $@
