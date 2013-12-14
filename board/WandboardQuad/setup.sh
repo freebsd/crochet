@@ -13,7 +13,7 @@ WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2013.10
 wandboard_partition_image ( ) {
     disk_partition_mbr
     wandboard_uboot_install
-    disk_fat_create 2m 32 16384
+    disk_fat_create 50m 32 16384
     disk_ufs_create
 }
 strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
@@ -58,6 +58,16 @@ wandboard_uboot_install ( ) {
 #
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x10800000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+
+#
+#
+#
+wandboard_kernel_install ( ) {
+ 	echo "Installing kernel"
+	cp ${OBJFILES}/sys/${KERNCONF}/kernel .
+	cp ${OBJFILES}/sys/${KERNCONF}/kernel.bin .
+}
+strategy_add $PHASE_BOOT_INSTALL wandboard_kernel_install
 
 #
 # uEnv

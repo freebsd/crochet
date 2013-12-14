@@ -10,19 +10,19 @@ os_determine_os_version ( ) {
 # find the OBJS
 os_determine_obj_location ( ) {
     # default
-    OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}/
+    OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     
     if [ "$MAJOR_OS_VERSION" -eq "8" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/i386${FREEBSD_SRC}/
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
     fi
     if [ "$MAJOR_OS_VERSION" -eq "9" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}/
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
     if [ "$MAJOR_OS_VERSION" -eq "10" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/i386.i386${FREEBSD_SRC}/
+        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
     echo "Object files are at: "${OBJFILES}
 }
