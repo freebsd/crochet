@@ -78,21 +78,21 @@ freebsd_objdir ( ) {
     # idiom to copy files out of the obj tree without actually
     # knowing where it is:
     #     "cd src-dir-location; make DESTDIR=XYZ install" 
-    OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     
     if [ "$MAJOR_OS_VERSION" -eq "8" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
     fi
     if [ "$MAJOR_OS_VERSION" -eq "9" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
     if [ "$MAJOR_OS_VERSION" -eq "10" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
-    echo "Object files are at: "${OBJFILES}
+    echo "Object files are at: "${FREEBSD_OBJDIR}
 }
 
 # freebsd_src_test: Check that this looks like a FreeBSD src tree.
