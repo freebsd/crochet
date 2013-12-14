@@ -80,15 +80,15 @@ freebsd_objdir ( ) {
     #     "cd src-dir-location; make DESTDIR=XYZ install" 
     FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     
-    if [ "$MAJOR_OS_VERSION" -eq "8" ]
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
         FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
     fi
-    if [ "$MAJOR_OS_VERSION" -eq "9" ]
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "9" ]
     then
         FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
-    if [ "$MAJOR_OS_VERSION" -eq "10" ]
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "10" ]
     then
         FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     fi
