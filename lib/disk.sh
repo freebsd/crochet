@@ -1,17 +1,26 @@
+# $1 - dir to unmount and delete
+disk_unmount_dir ( ) {
+    echo "Unmounting $1"
+    umount $1 || true
+    rmdir $1 || true
+}
+
+# $1 - md to release
+disk_release_md ( ) {
+    echo "Releasing $1"
+    mdconfig -d -u  $1 || true
+}
 
 _DISK_MDS=""  # List of MDs to clean up
 _DISK_MOUNTED_DIRS=""  # List of things to be unmounted when we're done
 disk_unmount_all ( ) {
     cd ${TOPDIR}
     for d in ${_DISK_MOUNTED_DIRS}; do
-        echo "Unmounting $d"
-        umount $d
-        rmdir $d
+	disk_unmount_dir $d
     done
     _DISK_MOUNTED_DIRS=""
     for d in ${_DISK_MDS}; do
-        echo "Releasing $d"
-        mdconfig -d -u  $d
+	disk_release_md $d
     done
     _DISK_MDS=""
 }
