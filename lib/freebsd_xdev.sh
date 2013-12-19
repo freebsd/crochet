@@ -1,6 +1,5 @@
 FREEBSD_XDEV_PREFIX=
 
-
 # freebsd_xdev_test: Verify that xdev tools exist.
 #
 freebsd_xdev_test ( ) {

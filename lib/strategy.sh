@@ -1,15 +1,26 @@
 # Strategy List management
 
+# TODO: Rename 'strategy' to something more appropriate, since
+# this has nothing to do with the 'strategy pattern.'  That
+# will involve renaming this file and a lot of internal variables
+# and functions...
+
 # Most of Crochet runs off of a "strategy list" of operations.  The
 # configuration hooks all invoke strategy_add to add operations to the
 # strategy list.  After configuration, the strategy list is sorted and
 # then the items are run to actually do the work.
 
 # The strategy list for this run is kept in ${STRATEGYDIR}.
+# Note: ${STRATEGYDIR} cannot be under ${WORKDIR} since WORKDIR
+# hasn't been set yet.
+
 # Clean out old strategies.
 STRATEGYBASE=/tmp/crochet/strategy
+if [ -d ${STRATEGYBASE} ]
+then
+    find ${STRATEGYBASE} -maxdepth 1 -ctime +3 | xargs rm -rf
+fi
 mkdir -p ${STRATEGYBASE}
-find ${STRATEGYBASE} -maxdepth 1 -ctime +3 | xargs rm -rf
 # Create a new dir for this run.
 # Including timestamp in the dirname simplifies debugging.
 _DATE=`date +%Y.%m.%d.%H.%M.%S`
@@ -72,7 +83,14 @@ PHASE_FREEBSD_OPTION_INSTALL=760
 PHASE_FREEBSD_USER_CUSTOMIZATION=790
 PHASE_FREEBSD_DONE=799
 
-PHASE_UNMOUNT_LWW=891 # For internal use only; don't override this.
+# Do not override: This is for the lib/disk.sh "unmount everything" function.
+# TODO: This should go away in favor of PHASE_UNMOUNT
+PHASE_UNMOUNT_LWW=891
+
+# TODO: Rework unmount handling so that mount functions add an
+# operation to PHASE_UNMOUNT.  That should remove the need for
+# lib/disk.sh to track what partitions have been mounted.
+PHASE_UNMOUNT=892
 
 # PHASE_POST_UNMOUNT runs after the filesystems are unmounted.
 PHASE_POST_UNMOUNT=900
@@ -131,6 +149,20 @@ EOF
     echo ${PHASE} >> ${STRATEGYDIR}/phases.txt
 }
 
+#
+# $1 - Numeric ID of phase to run
+#
+run_phase ( ) {
+    _PHASE_FILE=${STRATEGYDIR}/${P}.sh
+    # Sort by priority, then by insertion order.
+    sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
+    if [ $VERBOSE -gt 0 ]; then
+	# TODO: Print a description, not just the number.
+	echo "====================> Phase $P <===================="
+    fi
+    . ${_PHASE_FILE}.sorted
+}
+
 # Run all phases.
 # We rescan the phases.txt file each time because an item
 # can be registered for a later phase at any time, this might
@@ -141,10 +173,7 @@ run_strategy ( ) {
         for P in `cat ${STRATEGYDIR}/phases.txt | sort -n | uniq`; do
             if [ $P -gt $_CURRENT_PHASE ]; then
                 _CURRENT_PHASE=$P
-                _PHASE_FILE=${STRATEGYDIR}/${P}.sh
-                # Sort by priority, then by insertion order.
-                sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
-                . ${_PHASE_FILE}.sorted
+		run_phase ${P}
                 break
             fi
         done
@@ -167,5 +196,8 @@ __run ( ) {
         cd ${TOPDIR}
     fi
     shift
+    if [ $VERBOSE -gt 0 ]; then
+	echo "Running: " $@
+    fi
     eval $@
 }

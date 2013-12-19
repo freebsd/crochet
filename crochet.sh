@@ -10,6 +10,8 @@ CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
 
+VERBOSE=0
+
 # Load utility libraries: strategy.sh must go first
 . ${LIBDIR}/strategy.sh
 # Rest in alphabetic order
@@ -19,7 +21,6 @@ UPDATE_SOURCE=
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/freebsd.sh
-. ${LIBDIR}/os.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/uboot.sh
 
@@ -31,11 +32,12 @@ crochet_usage ( ) {
     echo " -c <file>: Load configuration from file"
     echo " -e <email>: Email address to receive build status"
     echo " -u: Update source tree"
+    echo " -v: Print more detailed progress information"
     exit 2
 }
 
 # Parse command-line options
-args=`getopt b:c:e:u $*`
+args=`getopt b:c:e:vu $*`
 if [ $? -ne 0 ]; then
     crochet_usage
 fi
@@ -58,6 +60,10 @@ while true; do
             UPDATE_SOURCETREE=yes
             shift
             ;;
+	-v)
+	    VERBOSE=$(($VERBOSE + 1))
+	    shift
+	    ;;
         --)
             shift; break
             ;;
@@ -78,9 +84,6 @@ fi
 if [ -n "$CONFIGFILE" ]; then
     load_config $CONFIGFILE
 fi
-
-os_determine_os_version
-board_generate_image_name
 
 # Initialize the work directory, clean out old logs.
 mkdir -p ${WORKDIR}
@@ -106,8 +109,18 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL
 
 if [ -n "${UPDATE_SOURCETREE}" ]; then
-    update_sourcetree
+    svn_update_sourcetree
 fi
+
+#
+# show source revision
+#
+svn_get_revision
+
+#
+# get the OS version from the source tree
+#
+freebsd_src_version
 
 #
 # Run the strategy to do all of the work.

@@ -1,5 +1,5 @@
 # This should be overridden by the board setup
-TARGET_ARCH=armv6
+TARGET_ARCH='needs-to-be-set-by-board-definition'
 
 # Board setup should not touch these, so users can
 FREEBSD_SRC=/usr/src
@@ -63,6 +63,38 @@ freebsd_dtc_test ( ) {
     fi
 }
 
+freebsd_src_version ( ) {
+    FREEBSD_VERSION=`/usr/bin/grep "REVISION=" ${FREEBSD_SRC}/sys/conf/newvers.sh | awk 'BEGIN {FS="="} {print $2}' | /usr/bin/tr -d '"'`
+    FREEBSD_MAJOR_VERSION=`echo $FREEBSD_VERSION | awk 'BEGIN {FS="."} {print $1}'`
+    echo "Building FreeBSD version: $FREEBSD_VERSION";
+}
+
+# find the OBJS
+freebsd_objdir ( ) {
+    # This is still broken. It gets the OBJDIR wrong when
+    # doing native builds.
+    # TODO: Fix it or remove the need for it.  (We
+    # really should not need this; we can instead use the following
+    # idiom to copy files out of the obj tree without actually
+    # knowing where it is:
+    #     "cd src-dir-location; make DESTDIR=XYZ install" 
+    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
+    then
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "9" ]
+    then
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "10" ]
+    then
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    echo "Object files are at: "${FREEBSD_OBJDIR}
+}
+
 # freebsd_src_test: Check that this looks like a FreeBSD src tree.
 #
 # $1: Name of kernel configuration we expect
@@ -104,6 +136,8 @@ freebsd_src_test ( ) {
         shift; freebsd_download_instructions "$@"
         exit 1
     fi
+    freebsd_src_version
+    freebsd_objdir
     echo "Found suitable FreeBSD source tree in:"
     echo "    $FREEBSD_SRC"
 }

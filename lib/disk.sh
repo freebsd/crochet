@@ -1,17 +1,26 @@
+# $1 - dir to unmount and delete
+disk_unmount_dir ( ) {
+    echo "Unmounting $1"
+    umount $1 || true
+    rmdir $1 || true
+}
+
+# $1 - md to release
+disk_release_md ( ) {
+    echo "Releasing $1"
+    mdconfig -d -u  $1 || true
+}
 
 _DISK_MDS=""  # List of MDs to clean up
 _DISK_MOUNTED_DIRS=""  # List of things to be unmounted when we're done
 disk_unmount_all ( ) {
     cd ${TOPDIR}
     for d in ${_DISK_MOUNTED_DIRS}; do
-        echo "Unmounting $d"
-        umount $d
-        rmdir $d
+	disk_unmount_dir $d
     done
     _DISK_MOUNTED_DIRS=""
     for d in ${_DISK_MDS}; do
-        echo "Releasing $d"
-        mdconfig -d -u  $d
+	disk_release_md $d
     done
     _DISK_MDS=""
 }
@@ -25,6 +34,8 @@ disk_record_mountdir ( ) {
 disk_record_md ( ) {
     _DISK_MDS="${_DISK_MDS} $1"
 }
+
+strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
 
 # $1: full path of image file
 # $2: size of SD image
@@ -44,7 +55,19 @@ disk_create_image ( ) {
 #
 disk_partition_mbr ( ) {
     echo "Partitioning the raw disk image at "`date`
+    echo gpart create -s MBR ${DISK_MD}
     gpart create -s MBR ${DISK_MD}
+}
+
+#
+# Add a reserve partition
+#
+# $1 size of partition
+#
+disk_reserved_create( ) {
+    echo "Creating reserve partition at "`date`" of size $1"
+    _DISK_RESERVED_SLICE=`gpart add -a 63 -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+    DISK_RESERVED_DEVICE=/dev/${_DISK_RESERVED_SLICE}
 }
 
 # Add a FAT partition and format it.
@@ -52,13 +75,19 @@ disk_partition_mbr ( ) {
 # $1: size of partition, can use 'k', 'm', 'g' suffixes
 # TODO: If $1 is empty, use whole disk.
 # $2: '12', '16', or '32' for FAT type (default depends on $1)
+# $3: start block
 #
 disk_fat_create ( ) {
-    echo "Creating the FAT partition at "`date`
-    _DISK_FAT_SLICE=`gpart add -a 63 -b 63 -s$1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+    # start block
+    FAT_START_BLOCK=$3
+    if [ -z ${FAT_START_BLOCK} ]; then
+        FAT_START_BLOCK=63
+    fi
+    echo "Creating the FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
+    _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
     DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
-     gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
+    gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2
@@ -82,16 +111,12 @@ disk_fat_mount ( ) {
     echo "Mounting FAT partition"
     if [ -d "$1" ]; then
         echo "   Removing already-existing mount directory."
-        if umount $1; then
-            if rmdir $1; then
-                echo "   Removed pre-existing mount directory; creating new one."
-            else
-                echo "Error: Unable to remove pre-existing mount directory?"
-                echo "   $1"
-                exit 1
-            fi
+        umount $1 || true
+        if rmdir $1; then
+            echo "   Removed pre-existing mount directory; creating new one."
         else
-            echo "Error: Unable to unmount $1"
+            echo "Error: Unable to remove pre-existing mount directory?"
+            echo "   $1"
             exit 1
         fi
     fi
@@ -130,16 +155,12 @@ disk_ufs_mount ( ) {
     echo "Mounting UFS partition"
     if [ -d "$1" ]; then
         echo "   Removing already-existing mount directory."
-        if umount $1; then
-            if rmdir $1; then
-                echo "   Removed pre-existing mount directory; creating new one."
-            else
-                echo "Error: Unable to remove pre-existing mount directory?"
-                echo "   $1"
-                exit 1
-            fi
+        umount $1 || true
+        if rmdir $1; then
+            echo "   Removed pre-existing mount directory; creating new one."
         else
-            echo "Error: Unable to unmount $1"
+            echo "Error: Unable to remove pre-existing mount directory?"
+            echo "   $1"
             exit 1
         fi
     fi

@@ -31,10 +31,18 @@ board_setup ( ) {
 
 board_generate_image_name ( ) {
     if [ -z "${IMG}" ]; then
-        IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}.img
+        if [ -z "${SOURCE_VERSION}" ]; then
+           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}.img
+       else
+           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${OS_VERSION}-${KERNCONF}-r${SOURCE_VERSION}.img
+       fi
     fi
-    echo "Image name is: ${IMG}"
+    echo "Image name is:"
+    echo "    ${IMG}"
 }
+# Run this late, so we print image name after other post-config has had a chance
+PRIORITY=200 strategy_add $PHASE_POST_CONFIG board_generate_image_name
+
 
 # $1 - BOARDDIR
 # Registered from end of board_setup so that it can get the BOARDDIR
