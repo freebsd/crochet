@@ -121,8 +121,6 @@ board_default_installworld ( ) {
 }
 strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_default_installworld
 
-strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
-
 board_default_goodbye ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"
