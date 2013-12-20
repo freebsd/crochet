@@ -9,7 +9,8 @@ WORKDIR=${TOPDIR}/work
 CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
-VERBOSE=false
+
+VERBOSE=0
 
 # Load utility libraries: strategy.sh must go first
 . ${LIBDIR}/strategy.sh
@@ -60,7 +61,7 @@ while true; do
             shift
             ;;
 	-v)
-	    VERBOSE=true
+	    VERBOSE=$(($VERBOSE + 1))
 	    shift
 	    ;;
         --)
@@ -108,8 +109,18 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL
 
 if [ -n "${UPDATE_SOURCETREE}" ]; then
-    update_sourcetree
+    svn_update_sourcetree
 fi
+
+#
+# show source revision
+#
+svn_get_revision
+
+#
+# get the OS version from the source tree
+#
+freebsd_src_version
 
 #
 # Run the strategy to do all of the work.

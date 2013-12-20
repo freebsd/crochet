@@ -1,5 +1,5 @@
 # This should be overridden by the board setup
-TARGET_ARCH=armv6
+TARGET_ARCH='needs-to-be-set-by-board-definition'
 
 # Board setup should not touch these, so users can
 FREEBSD_SRC=/usr/src
@@ -63,7 +63,6 @@ freebsd_dtc_test ( ) {
     fi
 }
 
-
 freebsd_src_version ( ) {
     FREEBSD_VERSION=`/usr/bin/grep "REVISION=" ${FREEBSD_SRC}/sys/conf/newvers.sh | awk 'BEGIN {FS="="} {print $2}' | /usr/bin/tr -d '"'`
     FREEBSD_MAJOR_VERSION=`echo $FREEBSD_VERSION | awk 'BEGIN {FS="."} {print $1}'`
@@ -72,14 +71,28 @@ freebsd_src_version ( ) {
 
 # find the OBJS
 freebsd_objdir ( ) {
-    # This is wrong.  Fix it or (better) remove the need for it.
-    if [ "$FREEBSD_MAJOR_VERSION" -le 8 ]
+    # This is still broken. It gets the OBJDIR wrong when
+    # doing native builds.
+    # TODO: Fix it or remove the need for it.  (We
+    # really should not need this; we can instead use the following
+    # idiom to copy files out of the obj tree without actually
+    # knowing where it is:
+    #     "cd src-dir-location; make DESTDIR=XYZ install" 
+    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
-        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}${FREEBSD_SRC}/
-    else
-        OBJFILES=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}.${ARCH}${FREEBSD_SRC}/
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
     fi
-    echo "Object files are at: "${OBJFILES}
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "9" ]
+    then
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    if [ "$FREEBSD_MAJOR_VERSION" -eq "10" ]
+    then
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    fi
+    echo "Object files are at: "${FREEBSD_OBJDIR}
 }
 
 # freebsd_src_test: Check that this looks like a FreeBSD src tree.
@@ -131,14 +144,13 @@ freebsd_src_test ( ) {
 
 # freebsd_current_test:  Check that FreeBSD-CURRENT sources are available
 # (Specialized version of freebsd_src_test for the common case.)
+# TODO: Add more checks here to verify that the src tree really
+# is -CURRENT.
 freebsd_current_test ( ) {
     freebsd_src_test \
         ${KERNCONF} \
         " $ svn co https://svn0.us-west.freebsd.org/base/head $FREEBSD_SRC"
 }
-# TODO: Not everything requires -CURRENT; copy this into all the
-# board setups and remove it from here.
-strategy_add $PHASE_CHECK freebsd_current_test
 
 # Common code for buildworld and buildkernel.  In particular, this
 # compares the command we're about to run to the previous run and
@@ -198,7 +210,6 @@ freebsd_buildworld ( ) {
     fi
     _freebsd_build world ${CONF}
 }
-strategy_add $PHASE_BUILD_WORLD freebsd_buildworld
 
 
 # freebsd_buildkernel: Build FreeBSD kernel if it's not already built.
@@ -217,7 +228,6 @@ freebsd_buildkernel ( ) {
     fi
     _freebsd_build kernel ${CONF}
 }
-strategy_add $PHASE_BUILD_KERNEL freebsd_buildkernel
 
 
 # freebsd_installworld: Install FreeBSD world to image

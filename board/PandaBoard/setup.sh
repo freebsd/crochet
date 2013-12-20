@@ -1,6 +1,7 @@
 KERNCONF=PANDABOARD
 PANDABOARD_UBOOT_SRC=${TOPDIR}/u-boot-2012.07
 IMAGE_SIZE=$((1000 * 1000 * 1000))
+TARGET_ARCH=arm
 
 #
 # PandaBoard uses MBR image with 2mb FAT partition for booting.

@@ -1,30 +1,27 @@
 BeagleBone is supported by FreeBSD-CURRENT since
-August, 2012.
+August, 2012.  BeagleBone Black is also supported.
 
 ============================================================
 
 What is a BeagleBone?
 --------------------
 
-The BeagleBone is an ARM-based development/test board from the
-BeagleBoard project.  It features a modern ARMv7 processor and a
-wealth of on-chip peripheral support.  Details can be found at:
+The BeagleBone and BeagleBone Black are ARM-based development/test
+boards from the BeagleBoard project.  They feature a modern ARMv7
+processor and a wealth of on-chip peripheral support.  Details can be
+found at:
 
    http://beagleboard.org/bone
 
 The BeagleBone is an easy way to learn about ARM development: it is
-inexpensive (about $85) and does not require any special skills or
-hardware to use.  You connect it to your desktop with a Mini USB cable
-(which both powers the board and provides serial console access) and
-boot it from a MicroSDHC card with the system image.
+inexpensive (about $45) and does not require any special skills or
+hardware to use.  You boot it from a MicroSDHC card with the system
+image.
 
 Once you have the BeagleBone working, you can expand it by connecting
 it to Ethernet, adding USB peripherals (such as external disk drives
 or wireless network interfaces) or attaching new hardware to the
 connectors on the board.
-
-Note: We believe this image will also work on the "next-gen
-BeagleBone" but as of April 2013 have not yet had a chance to try it.
 
 ============================================================
 
@@ -43,6 +40,35 @@ How to boot the BeagleBone
 
 4. REBOOT the BeagleBone by depressing the small
    switch next to the Ethernet port.
+
+============================================================
+
+How to boot the BeagleBone Black
+--------------------------------
+
+1. CONNECT the board to your FreeBSD (or other) system
+   using a third-party adapter cable such as the Adafruit 954:
+      http://www.adafruit.com/product/954
+
+2. ACCESS the serial console
+
+3. INSERT the MicroSDHC card into your BeagleBone Black
+
+4. HOLD the boot switch next to the MicroSDHC slot
+
+5. POWER the board by connecting it to a 5v power supply
+
+Note:  The original BeagleBone has a built-in serial-to-USB
+converter that is not present on the later BeagleBone Black.
+This is why I recommend using a separate adapter cable.
+
+Note:  As of December 2013, the micro-HDMI video output
+on the BeagleBone Black is not supported.  To access the
+board, you'll need to use a serial-to-USB adapter or SSH.
+
+Note:  As of December 2013, the onboard eMMC is accessible
+from FreeBSD but cannot yet be booted.  Boot support should
+be coming soon...
 
 ============================================================
 

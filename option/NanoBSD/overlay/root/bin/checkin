@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# wait for the IP address to settle in case of DHCP
+sleep 180
+
+#
+BASE=`basename $0`
+TMPFILE=`mktemp /tmp/${BASE}.XXXXXXXXXX` || exit 1
+trap "rm -f ${TMPFILE}; exit 2" 1 2 15 EXIT
+
+#
+CURL=/usr/local/bin/curl
+UA='pod 2.0'
+
+URL_CHECKIN='https://dragonresearchgroup.org/pods/checkin.html'
+URL_CSR='https://dragonresearchgroup.org/pods/csr.html'
+
+
+# grab information about the pod
+touch ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+if [ ! -e /etc/podinfo ]; then
+  echo "No /etc/podinfo found" >> ${TMPFILE}
+else
+  . /etc/podinfo
+  echo "/etc/podinfo:" >> ${TMPFILE}
+  cat /etc/podinfo >> ${TMPFILE}
+fi
+echo "--------------------" >> ${TMPFILE}
+uptime >> ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+ifconfig -a >> ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+netstat -rn >> ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+netstat -an >> ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+df -k >> ${TMPFILE}
+echo "--------------------" >> ${TMPFILE}
+
+# signal a reboot
+${CURL} -A ${UA} -d ${TMPFILE} ${CHECKINURL}
+
+# cleanup
+rm -f ${TMPFILE}
+
+#
+if [ ! -e /etc/ssl/certs/syslog-ng.crt ]; then
+  if [ -e /etc/ssl/csr/syslog-ng.csr ]; then
+    ${CURL} -A ${UA} -d /etc/ssl/csr/syslog-ng.csr ${CSRURL}
+    mv /etc/ssl/csr/syslog-ng.csr /etc/ssl/csr/SENT_syslog-ng.csr
+  else
+    touch ${TMPFILE}
+    echo '/etc/ssl/csr/syslog-ng.csr not found' >> ${TMPFILE}
+    ${CURL} -A ${UA} -d ${TMPFILE} ${CSRURL}
+    rm -f ${TMPFILE}
+  fi
+fi
+
+exit 0
