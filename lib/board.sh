@@ -73,15 +73,9 @@ strategy_add $PHASE_CHECK freebsd_current_test
 
 board_check_image_size_set ( ) {
     # Check that IMAGE_SIZE is set.
-    # For now, support SD_SIZE for backwards compatibility.
-    # June 2013: Remove SD_SIZE support entirely.
     if [ -z "${IMAGE_SIZE}" ]; then
-        if [ -z "${SD_SIZE}" ]; then
-            echo "Error: \$IMAGE_SIZE not set."
-            exit 1
-        fi
-        echo "SD_SIZE is deprecated; please use IMAGE_SIZE instead"
-        IMAGE_SIZE=${SD_SIZE}
+        echo "Error: \$IMAGE_SIZE not set."
+        exit 1
     fi
 }
 strategy_add $PHASE_CHECK board_check_image_size_set
