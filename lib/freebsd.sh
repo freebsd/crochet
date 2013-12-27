@@ -391,6 +391,10 @@ freebsd_install_usr_src ( ) {
 # $1:  root of image
 #
 _freebsd_install_usr_ports ( ) {
+    if [ -f $1/usr/ports/Makefile ]; then
+	    # Ports tree already exists.
+	    return 0
+    fi
     mkdir -p $1/usr/ports
     echo "Updating ports snapshot at "`date`
     portsnap fetch > ${WORKDIR}/_.portsnap.fetch.log
