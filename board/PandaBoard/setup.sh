@@ -59,7 +59,7 @@ strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 # ubldr help file goes on the UFS partition (after boot dir exists)
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 

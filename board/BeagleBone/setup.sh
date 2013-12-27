@@ -72,7 +72,7 @@ strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr bbubldr
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 # overlay/etc/fstab mounts the FAT partition at /boot/msdos
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
 # ubldr help and config files go on the UFS partition (after boot dir exists)

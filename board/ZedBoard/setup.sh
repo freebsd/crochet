@@ -35,7 +35,7 @@ strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts zedboard.dts
 strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts board.dtb
 
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
 # ubldr help file goes on the UFS partition (after boot dir is created)
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot

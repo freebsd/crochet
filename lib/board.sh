@@ -115,6 +115,15 @@ board_default_installworld ( ) {
 }
 strategy_add $PHASE_FREEBSD_INSTALLWORLD_LWW board_default_installworld
 
+board_default_installkernel ( ) {
+    freebsd_installkernel "$@"
+}
+# Note: we don't automatically put installkernel into the
+# strategy here because different boards install the kernel
+# into different places (e.g., separate firmware or
+# separate partition).
+
+
 board_default_goodbye ( ) {
     echo "DONE."
     echo "Completed disk image is in: ${IMG}"

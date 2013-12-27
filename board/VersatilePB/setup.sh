@@ -24,7 +24,7 @@ versatilepb_build_flash_image ( ) {
     /usr/bin/printf "\001\366\240\343" >> ${WORKDIR}/first_commands
     # install kernel
     [ ! -d ${WORKDIR}/_.kernel.bin ] && mkdir ${WORKDIR}/_.kernel.bin
-    freebsd_installkernel ${WORKDIR}/_.kernel.bin
+    board_default_installkernel ${WORKDIR}/_.kernel.bin
 
     dd of=$VERSATILEPB_FLASH bs=1M count=4 if=/dev/zero
     dd of=$VERSATILEPB_FLASH bs=1 conv=notrunc if=${WORKDIR}/first_commands

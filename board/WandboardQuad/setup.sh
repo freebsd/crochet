@@ -81,7 +81,7 @@ strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
 #
 # kernel
 #
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
 #
