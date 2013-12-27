@@ -1,5 +1,9 @@
 KERNCONF=RPI-B
-RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
+if [ "X${RPI_UBOOT_SRC}" != "X" ]; then
+	# Already set in config.sh
+else
+	RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
+fi
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
 TARGET_ARCH=arm
