@@ -23,6 +23,9 @@ raspberry_pi_check_uboot ( ) {
         RPI_UBOOT_SRC \
         "$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
         "git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
+    strategy_add $PHASE_BUILD_OTHER uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+    strategy_add $PHASE_BUILD_OTHER uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
+    strategy_add $PHASE_BUILD_OTHER uboot_build ${RPI_UBOOT_SRC}
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_uboot
 
@@ -38,14 +41,6 @@ raspberry_pi_check_bootcode ( ) {
     fi
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_bootcode
-
-# Build U-Boot; wait until RPI_UBOOT_SRC is finalized before installing these
-rpi_uboot ( ) {
-    strategy_add $PHASE_BUILD_OTHER uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
-    strategy_add $PHASE_BUILD_OTHER uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
-    strategy_add $PHASE_BUILD_OTHER uboot_build ${RPI_UBOOT_SRC}
-}
-strategy_add $PHASE_POST_CONFIG rpi_uboot
 
 # Build ubldr.
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
