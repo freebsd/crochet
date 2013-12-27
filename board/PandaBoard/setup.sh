@@ -28,11 +28,11 @@ pandaboard_check_prerequisites ( ) {
         "${PANDABOARD_UBOOT_SRC}/board/ti/panda/Makefile" \
         "fetch ftp://ftp.denx.de/pub/u-boot/u-boot-2012.07.tar.bz2" \
         "tar xf u-boot-2012.07.tar.bz2"
+    strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+    strategy_add $PHASE_BUILD_OTHER uboot_configure ${PANDABOARD_UBOOT_SRC} omap4_panda
+    strategy_add $PHASE_BUILD_OTHER uboot_build ${PANDABOARD_UBOOT_SRC}
 }
 strategy_add $PHASE_CHECK pandaboard_check_prerequisites
-strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
-strategy_add $PHASE_BUILD_OTHER uboot_configure ${PANDABOARD_UBOOT_SRC} omap4_panda
-strategy_add $PHASE_BUILD_OTHER uboot_build ${PANDABOARD_UBOOT_SRC}
 
 pandaboard_install_uboot ( ) {
     echo "Installing U-Boot onto the boot partition"
