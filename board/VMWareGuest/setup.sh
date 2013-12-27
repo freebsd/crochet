@@ -70,7 +70,7 @@ generic_i386_board_install ( ) {
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL generic_i386_board_install
 
 # Kernel installs in UFS partition
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 
 vmware_guest_post_config_names ( ) {
     if [ -z "${VMWARE_NAME}" ]; then

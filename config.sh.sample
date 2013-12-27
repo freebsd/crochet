@@ -9,7 +9,8 @@
 # suitable FreeBSD sources.  Everything else below is optional.
 
 # REQUIRED: 
-# Uncomment one to choose the default configuration for your board
+# Uncomment one to choose the default configuration for your board.
+# THIS MUST BE THE FIRST LINE IN YOUR CONFIG.SH FILE!
 #
 # board_setup BeagleBone
 # board_setup GenericI386

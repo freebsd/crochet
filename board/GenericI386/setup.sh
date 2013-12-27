@@ -25,4 +25,4 @@ generic_i386_partition_image ( ) {
 strategy_add $PHASE_PARTITION_LWW generic_i386_partition_image
 
 # Kernel installs in UFS partition
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .

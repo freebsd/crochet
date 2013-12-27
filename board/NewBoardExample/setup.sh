@@ -222,7 +222,7 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # some boards need this on the boot partition and some on the freebsd
 # partition.  A helper makes this easy:
 #
-# strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_installkernel .
+# strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 
 ########################################################################
 #
