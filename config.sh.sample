@@ -39,6 +39,10 @@
 #
 # 'mb' = 10 ^ 6,  'gb' = 10 ^ 9, 'mib' = 2 ^ 20 and 'gib' = 2 ^ 30
 #
+# Typically 5%-10% of the flash on a memory card is
+# reserved for the hardware controller, so the filesystem
+# image size needs to be a bit smaller than you might expect:
+#
 #option ImageSize 100mb # for kernel-only images
 #option ImageSize 1950mb # for 2 Gigabyte card
 #option ImageSize 3900mb # for 4 Gigabyte card
@@ -74,11 +78,14 @@
 
 # option AutoSize
 #
-# "AutoSize" adds a startup item that will use "growfs" to
-# grow the UFS partition as large as it can.  This can be used
-# to construct small (e.g., 1GB) images that can be copied onto larger
-# (e.g., 32GB) media.  At boot, such images will automatically resize
-# to fully utilize the larger media.
+# "AutoSize" adds a startup item that will use "growfs" to grow the
+# UFS partition as large as it can.  This can be used to construct
+# small (e.g., 1GB) images that can be copied onto larger (e.g., 32GB)
+# media.  At boot, such images will automatically resize to fully
+# utilize the larger media.  This should be considered experimental:
+# FreeBSD's resize logic sometimes doesn't take effect until after a
+# couple of extra reboots, which can make this occasionally perplexing
+# to use.
 
 # option Email me@gmail.com
 #
@@ -94,16 +101,23 @@
 # Create a user account with the specified username.
 # Password will be the same as the user name.
 
-# option SwapFile
+# option SwapFile <size>
 #
 # Takes a size argument (e.g., "768mb") and adds a swap file
 # to the UFS partition of the indicated size.  This also adds
-# the appropriate rc.conf entries to use the swap file.
+# the appropriate rc.conf and fstab entries to use the swap file.
 
 # option UsrPorts
 #
 # Uses "portsnap" to download an up-to-date ports tree and
 # install it on the image.
+
+# option UsrPorts <path>
+#
+# Copy the existing /usr/ports tree on the build system
+# from <path> into the image.  The copy logic does not
+# copy distfiles, work directories, or SVN checkout
+# information.
 
 # option UsrSrc
 #
@@ -135,14 +149,13 @@
 # it will tell you how to get appropriate sources into this directory.
 # (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
 
-
 # WORKDIR=${TOPDIR}/work
 #
 # You will probably never override this, but you may need to
-# understand it: WORKDIR holds all of the created files (in
-# particular, the FreeBSD "obj" is redirected here).  It also holds a
-# lot of log files: If something goes wrong, there's probably a record
-# here.
+# understand it: WORKDIR holds all of the created and temporary files
+# (in particular, the FreeBSD "obj" is redirected here).  It also
+# holds a lot of log files: If something goes wrong, there's probably
+# a record here.
 #
 # After successful world or kernel builds, a marker is put in this
 # directory; subsequent runs of this script check for the marker and
@@ -152,7 +165,6 @@
 #
 # In particular: If you need to do a clean build of everything from
 # scratch, remove the contents of $WORKDIR first.
-
 
 # IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 #
@@ -166,8 +178,7 @@
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
 # generation.  Set IMAGE_SIZE to 50 * MB or even smaller
-# to really shorten your build/test cycles:
-#
+# to really shorten your build/test cycles.
 
 # Extra arguments for FreeBSD build stages.
 #
@@ -207,16 +218,14 @@
 # Most customization simply consists of putting extra
 # files onto the image.
 #
-# The contents of ${BOARDDIR}/overlay, ${TOPDIR}/overlay, and
-# ${WORKDIR}/overlay are copied over the image in that order.  For
-# example, you can put a custom passwd or fstab file into
-# ${TOPDIR}/overlay/etc and it will be picked up automatically.
-
-
-# Adding Strategy Items
-#
-# XXX explain how to use strategy_add directly and why you might want to XXX
-#
+# After the board logic has populated the FreeBSD system, the contents
+# of ${BOARDDIR}/overlay, ${TOPDIR}/overlay, and ${WORKDIR}/overlay
+# are copied on top of the image in that order.  For example, you can
+# put a custom passwd or fstab file into ${TOPDIR}/overlay/etc and it
+# will be picked up automatically.  Simlarly, if you need to
+# dynamically create a certain file, you can do that here (config.sh
+# is a /bin/sh file and you can use arbitrary shell logic) and put the
+# result into ${WORKDIR}/overlay
 
 
 # STANDARD customize_ FUNCTIONS
@@ -274,6 +283,29 @@
 # customize_post_unmount is called after the image is fully created
 # and unmounted.  $1 is the filename of the constructed image file.
 # You can remount, resize partitions, change partition options, etc.
-# If you do anything interesting with this, please let me know.  (I've
-# never actually needed it and am dreadfully curious what someone
-# might use it for.)
+# If you do anything interesting with this, please let me know.
+# I've used it for things like compressing the image file
+# and for creating distribution bundles that have a disk image
+# and other associated files.
+
+
+# Adding Strategy Items
+#
+# Internally, Crochet's configuration works by constructing
+# several lists of shell functions to run.  These lists
+# comprise Crochet's "strategy".  Once the configuration is
+# complete, these lists are sorted and the shell functions
+# in them are run to actually carry out the image creation.
+#
+# You can add new items to the strategy from directly within
+# your config.sh file.  This allows you to alter almost
+# any part of Crochet's internal operation.  However, be aware
+# that the strategy mechanism may change in future versions
+# of Crochet, so you should generally only use this for
+# things that are difficult or impossible to do in any other
+# way.  Please let the Crochet maintainers know about this;
+# they are always looking for more information about how
+# Crochet is being used.
+#
+
+
