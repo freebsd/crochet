@@ -1,7 +1,7 @@
 KERNCONF=BEAGLEBONE
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2013.04
 IMAGE_SIZE=$((1000 * 1000 * 1000))
-TARGET_ARCH=arm
+TARGET_ARCH=armv6
 
 #
 # BeagleBone requires a FAT partition to hold the boot loader bits.

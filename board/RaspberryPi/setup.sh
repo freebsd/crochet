@@ -2,7 +2,7 @@ KERNCONF=RPI-B
 RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
-TARGET_ARCH=arm
+TARGET_ARCH=armv6
 
 #
 # Because of the complexity of the Raspberry Pi boot
