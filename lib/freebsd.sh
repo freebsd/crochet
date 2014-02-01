@@ -71,14 +71,21 @@ freebsd_src_version ( ) {
 
 # find the OBJS
 freebsd_objdir ( ) {
-    # This is still broken. It gets the OBJDIR wrong when
-    # doing native builds.
-    # TODO: Fix it or remove the need for it.  (We
-    # really should not need this; we can instead use the following
-    # idiom to copy files out of the obj tree without actually
-    # knowing where it is:
-    #     "cd src-dir-location; make DESTDIR=XYZ install" 
-    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+    # fix this: (https://github.com/kientzle/crochet-freebsd/issues/31)
+
+    # platform
+    if [ $TARGET_ARCH = "armv6" ];
+    then
+       PLATFORMDESTDIR="arm.armv6"
+    fi
+
+    if [ $TARGET_ARCH = "i386" ];
+    then
+       PLATFORMDESTDIR="i386.i386"
+    fi
+
+    # default case
+    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$PLATFORMDESTDIR${FREEBSD_SRC}
     
     if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
@@ -86,11 +93,11 @@ freebsd_objdir ( ) {
     fi
     if [ "$FREEBSD_MAJOR_VERSION" -eq "9" ]
     then
-        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$PLATFORMDESTDIR${FREEBSD_SRC}
     fi
     if [ "$FREEBSD_MAJOR_VERSION" -eq "10" ]
     then
-        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$PLATFORMDESTDIR${FREEBSD_SRC}
     fi
     echo "Object files are at: "${FREEBSD_OBJDIR}
 }
