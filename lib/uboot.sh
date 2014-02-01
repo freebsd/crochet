@@ -157,3 +157,16 @@ uboot_build ( ) (
 
     touch $1/_.uboot.built
 )
+
+# uboot_download
+# $1: Variable that holds root of U-Boot tree
+# $2: path to a file that should be in this U-Boot tree
+# $3: uboot source package name
+uboot_download ( ) {
+    if [ ! -f "$2" ]; then
+       FTP_URL="ftp://ftp.denx.de/pub/u-boot/$3"
+       echo $FTP_URL
+       ftp -n $FTP_URL
+       `tar zxvf $3`
+    fi
+}
