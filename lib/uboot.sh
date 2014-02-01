@@ -27,6 +27,13 @@ _uboot_download_instructions ( ) (
 # $3...: list of commands to fetch appropriate U-Boot sources
 #
 uboot_test ( ) {
+    if [ -z `which gcc` ]; then
+        echo "U-Boot requires GCC."
+        echo "If you have pkgng you can install gcc with 'pkg install gcc'"
+        echo "Followed by 'ln -s /usr/local/bin/gcc46 /usr/local/bin/gcc'"
+        exit 1
+    fi
+
     # We use FreeBSD xdev tools to build U-Boot
     freebsd_xdev_test
 
@@ -51,7 +58,6 @@ uboot_test ( ) {
         _uboot_download_instructions $_UBOOT_SRC_VAR "$@"
         exit 1
     fi
-
 }
 
 # uboot_patch: Apply patches to the U-Boot sources.
@@ -151,3 +157,16 @@ uboot_build ( ) (
 
     touch $1/_.uboot.built
 )
+
+# uboot_download
+# $1: Variable that holds root of U-Boot tree
+# $2: path to a file that should be in this U-Boot tree
+# $3: uboot source package name
+uboot_download ( ) {
+    if [ ! -f "$2" ]; then
+       FTP_URL="ftp://ftp.denx.de/pub/u-boot/$3"
+       echo $FTP_URL
+       ftp -n $FTP_URL
+       `tar zxvf $3`
+    fi
+}
