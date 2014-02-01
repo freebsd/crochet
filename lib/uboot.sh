@@ -27,6 +27,13 @@ _uboot_download_instructions ( ) (
 # $3...: list of commands to fetch appropriate U-Boot sources
 #
 uboot_test ( ) {
+    if [ -z `which gcc` ]; then
+        echo "U-Boot requires GCC."
+        echo "If you have pkgng you can install gcc with 'pkg install gcc'"
+        echo "Followed by 'ln -s /usr/local/bin/gcc46 /usr/local/bin/gcc'"
+        exit 1
+    fi
+
     # We use FreeBSD xdev tools to build U-Boot
     freebsd_xdev_test
 
@@ -51,7 +58,6 @@ uboot_test ( ) {
         _uboot_download_instructions $_UBOOT_SRC_VAR "$@"
         exit 1
     fi
-
 }
 
 # uboot_patch: Apply patches to the U-Boot sources.
