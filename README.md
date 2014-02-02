@@ -1,6 +1,7 @@
 Crochet is a tool for building bootable FreeBSD images.
 
 It can currently build images for:
+* [Alix](http://pcengines.ch/alix.htm)
 * [BeagleBone](http://beagleboard.org/)
 * [PandaBoard](http://pandaboard.org/)
 * [RaspberryPi](http://www.raspberrypi.org/)

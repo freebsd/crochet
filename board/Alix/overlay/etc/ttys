@@ -1,0 +1,4 @@
+console	none				unknown	off secure
+ttyu0	"/usr/libexec/getty std.115200"	xterm   on secure
+# Dumb console
+dcons	"/usr/libexec/getty std.9600"	vt100   off secure

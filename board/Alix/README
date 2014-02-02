@@ -1,0 +1,23 @@
+
+================================================================
+
+What is Alix
+--------------------------------
+
+Alix is a family of reliable, robust, superior quality communications computers
+
+ http://pcengines.ch/alix.htm
+
+================================================================
+
+How to Boot the Alix
+--------------------------------
+
+1. Connect the DB-9 serial port on the Alix to your system.  This 
+   will allow you to view the console output.  Console is 115200 bps.
+
+2. Insert the CF card into your Soekris
+
+3. Power on the Alix by plugging it in
+
+

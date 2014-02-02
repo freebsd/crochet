@@ -12,6 +12,7 @@
 # Uncomment one to choose the default configuration for your board.
 # THIS MUST BE THE FIRST LINE IN YOUR CONFIG.SH FILE!
 #
+# board_setup Alix
 # board_setup BeagleBone
 # board_setup GenericI386
 # board_setup PandaBoard
