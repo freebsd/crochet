@@ -1,18 +1,19 @@
-From fd62c8d6f86822373c2a620d1e726f23aba13265 Mon Sep 17 00:00:00 2001
-From: Robert Nelson <robertcnelson@gmail.com>
-Date: Thu, 3 Oct 2013 10:42:21 -0500
-Subject: [PATCH] wandboard: uEnv.txt, bootz, n fixes
-
-Signed-off-by: Robert Nelson <robertcnelson@gmail.com>
----
- include/configs/wandboard.h | 63 +++++++++++++++++++++++++++++----------------
- 1 file changed, 41 insertions(+), 22 deletions(-)
-
-diff --git a/include/configs/wandboard.h b/include/configs/wandboard.h
-index 442a984..47dcf54 100644
---- a/include/configs/wandboard.h
-+++ b/include/configs/wandboard.h
-@@ -48,7 +48,7 @@
+--- u-boot-2013.10/include/configs/wandboard.h	2013-10-16 11:08:12.000000000 -0600
++++ xxx/wandboard.h	2014-02-18 20:52:52.014481935 -0700
+@@ -17,6 +17,12 @@
+ #define CONFIG_DISPLAY_CPUINFO
+ #define CONFIG_DISPLAY_BOARDINFO
+ 
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_CMD_ELF
++#define CONFIG_API
++#define CONFIG_SYS_MMC_MAX_DEVICE 4
++#endif
++
+ #define MACH_TYPE_WANDBOARD		4412
+ #define CONFIG_MACH_TYPE		MACH_TYPE_WANDBOARD
+ 
+@@ -48,7 +54,7 @@
  #define CONFIG_CMD_BMODE
  #define CONFIG_CMD_SETEXPR
  
@@ -21,7 +22,7 @@ index 442a984..47dcf54 100644
  
  #define CONFIG_SYS_MEMTEST_START	0x10000000
  #define CONFIG_SYS_MEMTEST_END		(CONFIG_SYS_MEMTEST_START + 500 * SZ_1M)
-@@ -67,6 +67,8 @@
+@@ -67,6 +73,8 @@
  #define CONFIG_BOUNCE_BUFFER
  #define CONFIG_CMD_EXT2
  #define CONFIG_CMD_FAT
@@ -30,7 +31,7 @@ index 442a984..47dcf54 100644
  #define CONFIG_DOS_PARTITION
  
  /* Ethernet Configuration */
-@@ -116,9 +118,12 @@
+@@ -116,9 +124,12 @@
  	"fdt_addr=0x11000000\0" \
  	"boot_fdt=try\0" \
  	"ip_dyn=yes\0" \
@@ -45,7 +46,7 @@ index 442a984..47dcf54 100644
  	"update_sd_firmware_filename=u-boot.imx\0" \
  	"update_sd_firmware=" \
  		"if test ${ip_dyn} = yes; then " \
-@@ -134,27 +139,34 @@
+@@ -134,27 +145,34 @@
  			"fi; "	\
  		"fi\0" \
  	"mmcargs=setenv bootargs console=${console},${baudrate} " \
@@ -85,7 +86,7 @@ index 442a984..47dcf54 100644
  		"fi;\0" \
  	"netargs=setenv bootargs console=${console},${baudrate} " \
  		"root=/dev/nfs " \
-@@ -166,32 +178,38 @@
+@@ -166,32 +184,38 @@
  		"else " \
  			"setenv get_cmd tftp; " \
  		"fi; " \
@@ -138,7 +139,7 @@ index 442a984..47dcf54 100644
  
  /* Miscellaneous configurable options */
  #define CONFIG_SYS_LONGHELP
-@@ -234,6 +252,7 @@
+@@ -234,6 +258,7 @@
  
  #define CONFIG_OF_LIBFDT
  #define CONFIG_CMD_BOOTZ
@@ -146,6 +147,3 @@ index 442a984..47dcf54 100644
  
  #ifndef CONFIG_SYS_DCACHE_OFF
  #define CONFIG_CMD_CACHE
--- 
-1.8.4.rc3
-
