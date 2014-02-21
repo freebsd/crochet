@@ -56,18 +56,8 @@ wandboard_uboot_install ( ) {
 #
 # ubldr
 #
-strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x10800000
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
-
-#
-#
-#
-wandboard_kernel_install ( ) {
- 	echo "Installing kernel"
-	cp ${FREEBSD_OBJDIR}/sys/${KERNCONF}/kernel .
-	cp ${FREEBSD_OBJDIR}/sys/${KERNCONF}/kernel.bin .
-}
-strategy_add $PHASE_BOOT_INSTALL wandboard_kernel_install
 
 #
 # uEnv
