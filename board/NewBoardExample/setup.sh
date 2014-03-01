@@ -55,7 +55,12 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # BOARDDIR - the full path of this directory.  Many boards have additional
 #    files in subdirectories that can be referenced using ${BOARDDIR}/<subdir>
 # BOARD_BOOT_MOUNTPOINT - full path where the boot partition is mounted (if any)
-# BOARD_FREEBSD_MOUNTPOINT - full path of the freebsd partition
+# BOARD_FREEBSD_MOUNTPOINT - automatically set to the mountpoint of the current
+#    freebsd partition, which is based on BOARD_FREEBSD_MOUNTPOINT_PREFIX and the
+#    index of that partition.  When referring to this variable in a call to
+#    strategy_add, it must be enclosed in single quotes to defer its evaluation
+#    until the registered operation runs (i.e., '${BOARD_FREEBSD_MOUNTPOINT}')
+# BOARD_FREEBSD_MOUNTPOINT_PREFIX - full path prefix for the freebsd partitions
 
 ########################################################################
 #
@@ -161,16 +166,17 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # Mount Phase
 #
 # Like partitioning, mounting is also LWW.  The only partition that's
-# generally mandatory is ${BOARD_FREEBSD_MOUNTPOINT}.  (In fact,
-# if that's all you need, you may not need to do anything here,
-# since the default mount handler does that much by itself.)
+# generally mandatory is a UFS partition mounted at ${BOARD_FREEBSD_MOUNTPOINT},
+# which board_ufs_mount_all will take care of.  (In fact, if that's all
+# you need, you may not need to do anything here, since the default mount
+# handler does that much by itself.)
 #
 # If your board needs a separate boot partition, mount that
 # at ${BOARD_BOOT_MOUNTPOINT}.
 #
 # myboard_mount_partitions ( ) {
 #  disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-#  disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+#  board_ufs_mount_all
 # }
 # strategy_add $PHASE_MOUNT_LWW myboard_mount_partitions
 

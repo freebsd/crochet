@@ -45,8 +45,8 @@ option_usrports_copydir ( ) {
 
 if [ -z "$1" ]; then
     # Plain "option UsrPorts" with no argument
-    strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_usrports_portsnap ${BOARD_FREEBSD_MOUNTPOINT}
+    strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_usrports_portsnap '${BOARD_FREEBSD_MOUNTPOINT}'
 else
     # "option UsrPorts arg"
-    strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_usrports_copydir ${BOARD_FREEBSD_MOUNTPOINT} "$1"
+    strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_usrports_copydir '${BOARD_FREEBSD_MOUNTPOINT}' "$1"
 fi

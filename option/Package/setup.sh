@@ -7,5 +7,5 @@
 option PackageInit
 
 for p in $@; do
-    strategy_add $PHASE_FREEBSD_OPTION_INSTALL pkg -c ${BOARD_FREEBSD_MOUNTPOINT} -y $p
+    strategy_add $PHASE_FREEBSD_OPTION_INSTALL pkg -c '${BOARD_FREEBSD_MOUNTPOINT}' -y $p
 done

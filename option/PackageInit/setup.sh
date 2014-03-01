@@ -42,6 +42,6 @@ package_init ( ) {
 if [ -z "$_PACKAGE_INIT" ]; then
     strategy_add $PHASE_CHECK package_test
     # Ensure this happens before any "option Package"
-    PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init ${BOARD_FREEBSD_MOUNTPOINT}
+    PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init '${BOARD_FREEBSD_MOUNTPOINT}'
     _PACKAGE_INIT=t
 fi

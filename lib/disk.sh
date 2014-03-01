@@ -40,7 +40,8 @@ strategy_add $PHASE_UNMOUNT_LWW disk_unmount_all
 # $1: full path of image file
 # $2: size of SD image
 disk_create_image ( ) {
-    echo "Creating the raw disk image in:"
+    local SIZE_DISPLAY="$(($2 / 1000000))MB"
+    echo "Creating a ${SIZE_DISPLAY} raw disk image in:"
     echo "    $1"
     [ -f $1 ] && rm -f $1
     dd if=/dev/zero of=$1 bs=512 seek=$(($2 / 512)) count=0 >/dev/null 2>&1
@@ -83,7 +84,7 @@ disk_fat_create ( ) {
     if [ -z ${FAT_START_BLOCK} ]; then
         FAT_START_BLOCK=63
     fi
-    echo "Creating the FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
+    echo "Creating a FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
     _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
     DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
@@ -125,34 +126,77 @@ disk_fat_mount ( ) {
     disk_record_mountdir $1
 }
 
-# TODO: Support $1 size argument
-# TODO: If $1 is empty, use whole disk.
+# $1: index of UFS partition
+disk_ufs_device ( ) {
+    local PARTITION_INDEX=$1
+
+    if [ -z "$PARTITION_INDEX" ]; then
+	PARTITION_INDEX=1
+    fi
+
+    echo `eval echo \\$DISK_UFS_DEVICE_${PARTITION_INDEX}`
+}
+
+# $1: index of UFS partition
+disk_ufs_partition ( ) {
+    local PARTITION_INDEX=$1
+
+    if [ -z "$PARTITION_INDEX" ]; then
+	PARTITION_INDEX=1
+    fi
+
+    echo `eval echo \\$DISK_UFS_PARTITION_${PARTITION_INDEX}`
+}
+
+disk_creating_new_ufs_partition ( ) {
+    DISK_UFS_COUNT=$(( ${DISK_UFS_COUNT:-0} + 1 ))
+}
+
+# $1: size of partition, uses remainder of disk if not specified
 disk_ufs_create ( ) {
-    echo "Creating the UFS partition at "`date`
+    local SIZE_ARG
+    local SIZE_DISPLAY="auto-sized"
+    local NEW_UFS_SLICE
+    local NEW_UFS_SLICE_NUMBER
+    local NEW_UFS_PARTITION
+    local NEW_UFS_DEVICE
+    
+    if [ -n "$1" ]; then
+	SIZE_ARG="-s $1"
+	SIZE_DISPLAY=$1
+    fi
 
-    _DISK_UFS_SLICE=`gpart add -t freebsd ${DISK_MD} | sed -e 's/ .*//'` || exit 1
-    DISK_UFS_SLICE_NUMBER=`echo ${_DISK_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
+    echo "Creating a ${SIZE_DISPLAY} UFS partition at "`date`
 
-    gpart create -s BSD ${_DISK_UFS_SLICE}
-    DISK_UFS_PARTITION=`gpart add -t freebsd-ufs ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    disk_creating_new_ufs_partition
 
-    DISK_UFS_DEVICE=/dev/${DISK_UFS_PARTITION}
+    NEW_UFS_SLICE=`gpart add -t freebsd ${SIZE_ARG} ${DISK_MD} | sed -e 's/ .*//'` || exit 1
+    NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
-    newfs ${DISK_UFS_DEVICE}
+    gpart create -s BSD ${NEW_UFS_SLICE}
+    NEW_UFS_PARTITION=`gpart add -t freebsd-ufs ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+
+    NEW_UFS_DEVICE=/dev/${NEW_UFS_PARTITION}
+
+    newfs ${NEW_UFS_DEVICE}
     # Turn on Softupdates
-    tunefs -n enable ${DISK_UFS_DEVICE}
+    tunefs -n enable ${NEW_UFS_DEVICE}
     # Turn on SUJ with a minimally-sized journal.
     # This makes reboots tolerable if you just pull power on the BB
     # Note:  A slow SDHC reads about 1MB/s, so a 30MB
     # journal can delay boot by 30s.
-    tunefs -j enable -S 4194304 ${DISK_UFS_DEVICE}
+    tunefs -j enable -S 4194304 ${NEW_UFS_DEVICE}
     # Turn on NFSv4 ACLs
-    tunefs -N enable ${DISK_UFS_DEVICE}
+    tunefs -N enable ${NEW_UFS_DEVICE}
+
+    setvar DISK_UFS_PARTITION_${DISK_UFS_COUNT} ${NEW_UFS_PARTITION}
+    setvar DISK_UFS_DEVICE_${DISK_UFS_COUNT} ${NEW_UFS_DEVICE}
 }
 
 # $1: directory where UFS partition will be mounted
+# $2: index of partition to be mounted, 1 if not specified
 disk_ufs_mount ( ) {
-    echo "Mounting UFS partition"
+    echo "Mounting UFS partition ${2:-1} at $1"
     if [ -d "$1" ]; then
         echo "   Removing already-existing mount directory."
         umount $1 || true
@@ -165,6 +209,7 @@ disk_ufs_mount ( ) {
         fi
     fi
     mkdir $1 || exit 1
-    mount ${DISK_UFS_DEVICE} $1 || exit 1
+    mount `disk_ufs_device $2` $1 || exit 1
     disk_record_mountdir $1
 }
+

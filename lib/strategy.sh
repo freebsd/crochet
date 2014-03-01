@@ -171,9 +171,22 @@ run_strategy ( ) {
     while true; do
         _LAST_PHASE=$_CURRENT_PHASE
         for P in `cat ${STRATEGYDIR}/phases.txt | sort -n | uniq`; do
+	    if [ \( $P -gt $PHASE_FREEBSD_DONE \) -a \( -n "$1" \) ]; then
+		# There's another partition to install, run through FREEBSD phases again
+		_CURRENT_PHASE=$(( ${PHASE_FREEBSD_START} - 1 ))
+		_CURRENT_UFS_PARTITION=$1
+		shift
+		break;
+	    fi
             if [ $P -gt $_CURRENT_PHASE ]; then
                 _CURRENT_PHASE=$P
 		run_phase ${P}
+		if [ $P -eq $PHASE_PARTITION_LWW ]; then
+		    # Done partitioning, get ready for first set of FREEBSD phases
+		    set -- $BOARD_INSTALL_WORLD_PARTITIONS
+		    _CURRENT_UFS_PARTITION=$1
+		    shift
+		fi
                 break
             fi
         done
@@ -189,6 +202,7 @@ run_strategy ( ) {
 __run ( ) {
     # Set the cwd appropriately depending on the phase we're running.
     if [ $_CURRENT_PHASE -ge $PHASE_FREEBSD_START ] && [ $_CURRENT_PHASE -le $PHASE_FREEBSD_DONE ]; then
+	BOARD_FREEBSD_MOUNTPOINT=`board_ufs_mountpoint ${_CURRENT_UFS_PARTITION}`
         cd ${BOARD_FREEBSD_MOUNTPOINT}
     elif [ $_CURRENT_PHASE -ge $PHASE_BOOT_START ] && [ $_CURRENT_PHASE -le $PHASE_BOOT_DONE ]; then
         cd ${BOARD_BOOT_MOUNTPOINT}

@@ -56,7 +56,7 @@ strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
 
 raspberry_pi_mount_partitions ( ) {
     disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+    board_ufs_mount_all
 }
 
 strategy_add $PHASE_MOUNT_LWW raspberry_pi_mount_partitions

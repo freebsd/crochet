@@ -3,8 +3,12 @@
 #
 
 # Boards that need more than this can define their own.
-BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
+BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
+BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
 BOARD_BOOT_MOUNTPOINT=${WORKDIR}/_.mount.boot
+
+# List of UFS partition indexes to install world to
+BOARD_INSTALLWORLD_PARTITIONS="1"
 
 # Default is to install world ...
 FREEBSD_INSTALL_WORLD=y
@@ -92,9 +96,9 @@ board_default_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW board_default_partition_image
 
-# Default mounts just the FreeBSD partition
+# Default mounts just the FreeBSD partitions
 board_default_mount_partitions ( ) {
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+    board_ufs_mount_all
 }
 strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
@@ -134,3 +138,62 @@ board_default_goodbye ( ) {
     echo
 }
 strategy_add $PHASE_GOODBYE_LWW board_default_goodbye
+
+# $1: index of UFS partition
+board_is_installworld_partition ( ) {
+    local PARTITION_INDEX=$1
+    
+    if [ -n "$PARTITION_INDEX" ]; then
+	for i in $BOARD_INSTALLWORLD_PARTITIONS; do
+	    if [ $i -eq $PARTITION_INDEX ]; then
+		return 0
+	    fi
+	done
+    fi
+
+    return 1
+}
+
+# $1: index of UFS partition
+board_add_installworld_partition ( ) {
+    local PARTITION_INDEX=$1
+    
+    if [ ! $(board_is_installworld_partition $1) ]; then
+	BOARD_INSTALLWORLD_PARTITIONS="${BOARD_INSTALLWORLD_PARTITIONS} $1"
+    fi
+}
+
+# $1: index of UFS partition to get mountpoint for
+board_ufs_mountpoint ( ) {
+    local PARTITION_INDEX=$1
+    local MOUNTPOINT_PREFIX
+
+    if [ -z "$PARTITION_INDEX" ]; then
+	PARTITION_INDEX=1
+    fi
+
+    if $(board_is_installworld_partition $PARTITION_INDEX); then
+	MOUNTPOINT_PREFIX=${BOARD_FREEBSD_MOUNTPOINT_PREFIX}
+    else
+	MOUNTPOINT_PREFIX=${BOARD_UFS_MOUNTPOINT_PREFIX}
+    fi
+
+    if [ $PARTITION_INDEX -eq 1 ]; then
+	echo ${MOUNTPOINT_PREFIX}
+    else
+	echo ${MOUNTPOINT_PREFIX}.${PARTITION_INDEX}
+    fi
+}
+
+board_ufs_mount_all ( ) {
+    local INDEX
+
+    echo "Mounting all UFS partitions:"
+
+    INDEX=1
+    while [ $INDEX -le $DISK_UFS_COUNT ]; do
+	disk_ufs_mount `board_ufs_mountpoint ${INDEX}` ${INDEX}
+	INDEX=$(( ${INDEX} + 1))
+    done
+}
+

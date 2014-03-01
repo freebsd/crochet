@@ -32,32 +32,37 @@ fi
 
 #
 disk_ufs_create() {
+    local NEW_UFS_SLICE
+    local NEW_UFS_SLICE_NUMBER
+
     echo "Creating the NanoBSD style UFS partitions at "`date`
 
-    _DISK_UFS_SLICE=`gpart add -t freebsd ${DISK_MD} | sed -e 's/ .*//'` || exit 1
-    DISK_UFS_SLICE_NUMBER=`echo ${_DISK_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
+    disk_creating_new_ufs_partition
+
+    NEW_UFS_SLICE=`gpart add -t freebsd ${DISK_MD} | sed -e 's/ .*//'` || exit 1
+    NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
     #
-    gpart create -s BSD ${_DISK_UFS_SLICE}
+    gpart create -s BSD ${NEW_UFS_SLICE}
 
     # OS Partitions
-    OSA_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    OSA_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
     OSA_UFS_DEVICE=/dev/${OSA_UFS_PARTITION}
     newfs ${OSA_UFS_DEVICE}
 
-    DISK_UFS_DEVICE=${OSA_UFS_DEVICE}
+    setvar DISK_UFS_DEVICE_{$DISK_UFS_COUNT} ${OSA_UFS_DEVICE}
 
-    OSB_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    OSB_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
 
     # CFG Paritition
-    #CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} -l cfg ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-    CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    #CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} -l cfg ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
     CFG_UFS_DEVICE=/dev/${CFG_UFS_PARTITION}
     newfs ${CFG_UFS_DEVICE}
 
     # DATA Paritition
-    #DATA_UFS_PARTITION=`gpart add -t freebsd-ufs -l data ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-    DATA_UFS_PARTITION=`gpart add -t freebsd-ufs ${_DISK_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    #DATA_UFS_PARTITION=`gpart add -t freebsd-ufs -l data ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    DATA_UFS_PARTITION=`gpart add -t freebsd-ufs ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
     DATA_UFS_DEVICE=/dev/${DATA_UFS_PARTITION}
     newfs ${DATA_UFS_DEVICE}
     tunefs -n enable ${DATA_UFS_DEVICE}			# Turn on Softupdates

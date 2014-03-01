@@ -15,7 +15,7 @@ strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 
 beaglebone_mount_partitions ( ) {
     disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+    board_ufs_mount_all
 }
 strategy_add $PHASE_MOUNT_LWW beaglebone_mount_partitions
 

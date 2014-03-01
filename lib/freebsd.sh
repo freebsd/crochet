@@ -348,19 +348,19 @@ freebsd_ubldr_build ( ) {
 # $1: Target directory to receive ubldr files
 #
 freebsd_ubldr_copy ( ) {
-    echo "Installing ubldr"
+    echo "Installing all ubldr files in $1"
     CONF=${TARGET_ARCH}-${KERNCONF}
     (cd ${WORKDIR}/ubldr-${CONF}/boot && find . | cpio -pdum $1) || exit 1
 }
 
 freebsd_ubldr_copy_ubldr ( ) {
-    echo "Installing ubldr"
+    echo "Installing ubldr in $1"
     CONF=${TARGET_ARCH}-${KERNCONF}
     cp ${WORKDIR}/ubldr-${CONF}/boot/ubldr $1 || exit 1
 }
 
 freebsd_ubldr_copy_ubldr_help ( ) {
-    echo "Installing ubldr help file"
+    echo "Installing ubldr help file in $1"
     CONF=${TARGET_ARCH}-${KERNCONF}
     cp ${WORKDIR}/ubldr-${CONF}/boot/loader.help $1 || exit 1
 }

@@ -17,7 +17,7 @@ install_customize_hooks ( ) {
         PRIORITY=200 strategy_add $PHASE_BOOT_INSTALL customize_boot_partition ${BOARD_BOOT_MOUNTPOINT}
     fi
     if command -v customize_freebsd_partition >/dev/null 2>&1; then
-        PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition ${BOARD_FREEBSD_MOUNTPOINT}
+        PRIORITY=200 strategy_add $PHASE_FREEBSD_USER_CUSTOMIZATION customize_freebsd_partition '${BOARD_FREEBSD_MOUNTPOINT}'
     fi
     if command -v customize_post_unmount >/dev/null 2>&1; then
         PRIORITY=200 strategy_add $PHASE_POST_UNMOUNT customize_post_unmount
