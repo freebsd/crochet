@@ -30,8 +30,8 @@ export MAKEOBJDIRPREFIX
 SRCCONF=/dev/null
 __MAKE_CONF=/dev/null
 
-WORLDJOBS=1
-KERNJOBS=1
+WORLDJOBS=${WORLDJOBS}
+KERNJOBS=${KERNJOBS}
 
 freebsd_download_instructions ( ) {
     echo
@@ -78,19 +78,15 @@ freebsd_objdir ( ) {
     # idiom to copy files out of the obj tree without actually
     # knowing where it is:
     #     "cd src-dir-location; make DESTDIR=XYZ install" 
-    FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
     
     if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
         FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
     fi
-    if [ "$FREEBSD_MAJOR_VERSION" -eq "9" ]
+    if [ "$FREEBSD_MAJOR_VERSION" -ge "9" ]
     then
-        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
-    fi
-    if [ "$FREEBSD_MAJOR_VERSION" -eq "10" ]
-    then
-        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH.$TARGET_ARCH${FREEBSD_SRC}
+        buildenv=`make -C $FREEBSD_SRC TARGET_ARCH=$TARGET_ARCH buildenvvars`
+        FREEBSD_OBJDIR=`eval $buildenv printenv MAKEOBJDIRPREFIX`${FREEBSD_SRC}
     fi
     echo "Object files are at: "${FREEBSD_OBJDIR}
 }
@@ -204,7 +200,7 @@ freebsd_buildworld ( ) {
         _FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
     fi
     CONF=${TARGET_ARCH}
-    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" -j ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
+    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
         rm -f ${WORKDIR}/_.built-world.${CONF}
     fi
@@ -222,7 +218,7 @@ freebsd_buildkernel ( ) {
         _FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
     fi
     CONF=${TARGET_ARCH}-${KERNCONF}
-    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" -j $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
+    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
         rm -f ${WORKDIR}/_.built-kernel.${CONF}
     fi

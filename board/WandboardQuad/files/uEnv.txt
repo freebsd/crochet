@@ -1,3 +1,2 @@
-uenvcmd=fatload mmc 0:1 12000000 kernel.bin;go 12000000;
-
+uenvcmd=fatload mmc 0:1 88000000 ubldr;bootelf 88000000;
 

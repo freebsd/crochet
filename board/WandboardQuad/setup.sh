@@ -50,24 +50,14 @@ strategy_add $PHASE_CHECK wandboard_check_uboot
 #
 wandboard_uboot_install ( ) {
         echo Installing U-Boot to /dev/${DISK_MD}
-        sudo dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=/dev/${DISK_MD} bs=512 seek=2
+        dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=/dev/${DISK_MD} bs=512 seek=2
 }
 
 #
 # ubldr
 #
-strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x10800000
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
-
-#
-#
-#
-wandboard_kernel_install ( ) {
- 	echo "Installing kernel"
-	cp ${FREEBSD_OBJDIR}/sys/${KERNCONF}/kernel .
-	cp ${FREEBSD_OBJDIR}/sys/${KERNCONF}/kernel.bin .
-}
-strategy_add $PHASE_BOOT_INSTALL wandboard_kernel_install
 
 #
 # uEnv
