@@ -183,7 +183,7 @@ run_strategy ( ) {
 		run_phase ${P}
 		if [ $P -eq $PHASE_PARTITION_LWW ]; then
 		    # Done partitioning, get ready for first set of FREEBSD phases
-		    set -- $BOARD_INSTALL_WORLD_PARTITIONS
+		    set -- $BOARD_INSTALLWORLD_PARTITIONS
 		    _CURRENT_UFS_PARTITION=$1
 		    shift
 		fi
