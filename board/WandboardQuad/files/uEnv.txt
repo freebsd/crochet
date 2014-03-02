@@ -1,2 +1,0 @@
-uenvcmd=fatload mmc 0:1 88000000 ubldr;bootelf 88000000;
-

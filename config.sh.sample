@@ -12,6 +12,7 @@
 # Uncomment one to choose the default configuration for your board.
 #
 # THIS MUST BE THE FIRST LINE IN YOUR CONFIG.SH FILE!
+#
 # Don't see your board here?  board/NewBoardExample has details for
 # how to add a new board definition.  If you need help, ask.  If you
 # get it working, please consider contributing it.
@@ -27,7 +28,7 @@
 #board_setup RaspberryPi
 #board_setup VersatilePB
 #board_setup ZedBoard
-#board_setup WandboardQuad
+#board_setup Wandboard
 #
 
 # Size of the disk image that will be built.  This is usually the same
