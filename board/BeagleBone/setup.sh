@@ -58,10 +58,10 @@ beaglebone_uboot_install ( ) {
         cp ${BEAGLEBONE_UBOOT_SRC}/u-boot.img bb-uboot.img
         cp ${BOARDDIR}/files/uEnv.txt bb-uEnv.txt
     fi
-    freebsd_install_fdt beaglebone.dts bbone.dts
-    freebsd_install_fdt beaglebone.dts bbone.dtb
-    freebsd_install_fdt beaglebone-black.dts bboneblk.dts
-    freebsd_install_fdt beaglebone-black.dts bboneblk.dtb
+    freebsd_install_fdt arm/beaglebone.dts bbone.dts
+    freebsd_install_fdt arm/beaglebone.dts bbone.dtb
+    freebsd_install_fdt arm/beaglebone-black.dts bboneblk.dts
+    freebsd_install_fdt arm/beaglebone-black.dts bboneblk.dtb
 }
 strategy_add $PHASE_BOOT_INSTALL beaglebone_uboot_install
 
