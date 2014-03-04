@@ -73,18 +73,30 @@ disk_reserved_create( ) {
 
 # Add a FAT partition and format it.
 #
-# $1: size of partition, can use 'k', 'm', 'g' suffixes
-# TODO: If $1 is empty, use whole disk.
-# $2: '12', '16', or '32' for FAT type (default depends on $1)
-# $3: start block
-#
+# $1: size of partition, can use 'k', 'm', 'g' suffixes, or whole disk if -1 or not specified
+# $2: '12', '16', or '32' for FAT type (-1 or empty for default, which depends on $1)
+# $3: start block, -1 for default of 63
+# $4: label, empty for default of "BOOT"
 disk_fat_create ( ) {
+    local SIZE_ARG
+    local SIZE_DISPLAY="n auto-sized"
+    local FAT_LABEL=$4
+
+    if [ -n "$1" -a \( "$1" != "-1" \) ]; then
+	SIZE_ARG="-s $1"
+	SIZE_DISPLAY=" $1"
+    fi
+
+    if [ -z ${FAT_LABEL} ]; then
+	FAT_LABEL="BOOT"
+    fi
+
     # start block
     FAT_START_BLOCK=$3
-    if [ -z ${FAT_START_BLOCK} ]; then
+    if [ -z ${FAT_START_BLOCK} -o \( ${FAT_START_BLOCK} -eq -1 \) ]; then
         FAT_START_BLOCK=63
     fi
-    echo "Creating a FAT partition at "`date`" with start block $FAT_START_BLOCK of size $1"
+    echo "Creating a${SIZE_DISPLAY} FAT partition at "`date`" with start block $FAT_START_BLOCK and label ${FAT_LABEL}"
     _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
     DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
@@ -92,7 +104,7 @@ disk_fat_create ( ) {
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2
-    if [ -z ${_FAT_TYPE} ]; then
+    if [ -z ${_FAT_TYPE} -o \( ${_FAT_TYPE} -eq -1 \) ]; then
         case $1 in
             *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
                 ;;
@@ -104,7 +116,7 @@ disk_fat_create ( ) {
         echo "Default to FAT${_FAT_TYPE} for partition size $1"
     fi
 
-    newfs_msdos -L "boot" -F ${_FAT_TYPE} ${DISK_FAT_DEVICE} >/dev/null
+    newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${DISK_FAT_DEVICE} >/dev/null
 }
 
 # $1: Directory where FAT partition will be mounted
@@ -155,7 +167,7 @@ disk_creating_new_ufs_partition ( ) {
 # $1: size of partition, uses remainder of disk if not specified
 disk_ufs_create ( ) {
     local SIZE_ARG
-    local SIZE_DISPLAY="auto-sized"
+    local SIZE_DISPLAY="n auto-sized"
     local NEW_UFS_SLICE
     local NEW_UFS_SLICE_NUMBER
     local NEW_UFS_PARTITION
@@ -163,10 +175,10 @@ disk_ufs_create ( ) {
     
     if [ -n "$1" ]; then
 	SIZE_ARG="-s $1"
-	SIZE_DISPLAY=$1
+	SIZE_DISPLAY=" $1"
     fi
 
-    echo "Creating a ${SIZE_DISPLAY} UFS partition at "`date`
+    echo "Creating a${SIZE_DISPLAY} UFS partition at "`date`
 
     disk_creating_new_ufs_partition
 
@@ -191,6 +203,24 @@ disk_ufs_create ( ) {
 
     setvar DISK_UFS_PARTITION_${DISK_UFS_COUNT} ${NEW_UFS_PARTITION}
     setvar DISK_UFS_DEVICE_${DISK_UFS_COUNT} ${NEW_UFS_DEVICE}
+}
+
+# $1: index of UFS partition
+# $2: filesystem label
+disk_ufs_label ( ) {
+    local PARTITION_INDEX=$1
+    local UFS_LABEL=$2
+    local UFS_DEVICE
+
+    if [ -z "$PARTITION_INDEX" ]; then
+	PARTITION_INDEX=1
+    fi
+
+    if [ -n "$UFS_LABEL" ]; then
+	UFS_DEVICE=`disk_ufs_device ${PARTITION_INDEX}`
+	echo "Labeling ${UFS_DEVICE} ${UFS_LABEL}" 
+	tunefs -L ${UFS_LABEL} ${UFS_DEVICE}
+    fi
 }
 
 # $1: directory where UFS partition will be mounted
