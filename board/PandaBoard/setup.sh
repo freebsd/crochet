@@ -23,12 +23,12 @@ strategy_add $PHASE_MOUNT_LWW pandaboard_mount_partitions
 # PandaBoard uses U-Boot
 #
 pandaboard_check_prerequisites ( ) {
+    uboot_set_patch_version ${PANDABOARD_UBOOT_SRC} ${PANDABOARD_UBOOT_PATCH_VERSION}
+
     uboot_test \
         PANDABOARD_UBOOT_SRC \
-        "${PANDABOARD_UBOOT_SRC}/board/ti/panda/Makefile" \
-        "fetch ftp://ftp.denx.de/pub/u-boot/u-boot-2012.07.tar.bz2" \
-        "tar xf u-boot-2012.07.tar.bz2"
-    strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+        "${PANDABOARD_UBOOT_SRC}/board/ti/panda/Makefile"
+    strategy_add $PHASE_BUILD_OTHER uboot_patch ${PANDABOARD_UBOOT_SRC} `uboot_patch_files`
     strategy_add $PHASE_BUILD_OTHER uboot_configure ${PANDABOARD_UBOOT_SRC} omap4_panda
     strategy_add $PHASE_BUILD_OTHER uboot_build ${PANDABOARD_UBOOT_SRC}
 }

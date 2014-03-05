@@ -1,5 +1,6 @@
 KERNCONF=RPI-B
-RPI_UBOOT_SRC=${TOPDIR}/u-boot-rpi
+RPI_UBOOT_PATCH_VERSION="rpi"
+RPI_UBOOT_SRC=${TOPDIR}/u-boot-${RPI_UBOOT_PATCH_VERSION}
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
 TARGET_ARCH=armv6
@@ -19,11 +20,13 @@ RPI_FIRMWARE_SRC=${BOARDDIR}
 . ${BOARDDIR}/mkimage.sh
 
 raspberry_pi_check_uboot ( ) {
+    uboot_set_patch_version ${RPI_UBOOT_SRC} ${RPI_UBOOT_PATCH_VERSION}
+
     uboot_test \
         RPI_UBOOT_SRC \
         "$RPI_UBOOT_SRC/board/raspberrypi/rpi_b/Makefile" \
         "git clone git://github.com/gonzoua/u-boot-pi.git ${RPI_UBOOT_SRC}"
-    strategy_add $PHASE_BUILD_OTHER uboot_patch ${RPI_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+    strategy_add $PHASE_BUILD_OTHER uboot_patch ${RPI_UBOOT_SRC} `uboot_patch_files`
     strategy_add $PHASE_BUILD_OTHER uboot_configure ${RPI_UBOOT_SRC} rpi_b_config
     strategy_add $PHASE_BUILD_OTHER uboot_build ${RPI_UBOOT_SRC}
 }
