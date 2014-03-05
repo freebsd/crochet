@@ -1,4 +1,4 @@
-KERNCONF=WANDBOARD-QUAD
+KERNCONF=IMX6
 TARGET_ARCH=armv6
 IMAGE_SIZE=$((1024 * 1000 * 1000))
 WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2013.10
@@ -67,6 +67,16 @@ wandboard_install_uenvtxt(){
     cp ${BOARDDIR}/files/uEnv.txt .
 }
 strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
+
+#
+# DTS
+#
+wandboard_install_dts(){
+    echo "Installing DTS"
+    freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dts
+    freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dtb
+}
+strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts
 
 #
 # kernel

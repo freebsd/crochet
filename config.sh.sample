@@ -2,7 +2,7 @@
 # SAMPLE CONFIGURATION
 #
 # Copy this to another file and use that when running Crochet, e.g.
-#  $ sudo /bin/sh Crochet.sh -c <myconfig>
+#  $ sudo /bin/sh crochet.sh -c <myconfig>
 #
 
 # Note: Only board_setup is actually required, assuming /usr/src has
@@ -10,29 +10,27 @@
 
 # REQUIRED: 
 # Uncomment one to choose the default configuration for your board.
+#
 # THIS MUST BE THE FIRST LINE IN YOUR CONFIG.SH FILE!
 #
-# board_setup Alix
-# board_setup BeagleBone
-# board_setup GenericI386
-# board_setup PandaBoard
-# board_setup Soekris
-# board_setup RaspberryPi
-# board_setup VersatilePB
-# board_setup ZedBoard
-# board_setup WandboardQuad
-
 # Don't see your board here?  board/NewBoardExample has details for
 # how to add a new board definition.  If you need help, ask.  If you
 # get it working, please consider contributing it.
-
 #
 # Read board/<board-name>/README for more details
 # about configuring for your particular board.
 #
-
-# Suggested: option ImageSize
+#board_setup Alix
+#board_setup BeagleBone
+#board_setup GenericI386
+#board_setup PandaBoard
+#board_setup Soekris
+#board_setup RaspberryPi
+#board_setup VersatilePB
+#board_setup ZedBoard
+#board_setup Wandboard
 #
+
 # Size of the disk image that will be built.  This is usually the same
 # size as your memory card or disk drive, but it can be smaller.
 # Each board setup above defines a default value, but it's deliberately
@@ -44,6 +42,7 @@
 # reserved for the hardware controller, so the filesystem
 # image size needs to be a bit smaller than you might expect:
 #
+# Suggested: option ImageSize
 #option ImageSize 100mb # for kernel-only images
 #option ImageSize 1950mb # for 2 Gigabyte card
 #option ImageSize 3900mb # for 4 Gigabyte card
@@ -77,8 +76,6 @@
 # and we'll see if we can add something else.
 #
 
-# option AutoSize
-#
 # "AutoSize" adds a startup item that will use "growfs" to grow the
 # UFS partition as large as it can.  This can be used to construct
 # small (e.g., 1GB) images that can be copied onto larger (e.g., 32GB)
@@ -87,47 +84,46 @@
 # FreeBSD's resize logic sometimes doesn't take effect until after a
 # couple of extra reboots, which can make this occasionally perplexing
 # to use.
-
-# option Email me@gmail.com
 #
+#option AutoSize
+
 # Enable emailed status notifications.
 # This can also be enabled via the -e command-line flag.
-
-# option GzipImage
 #
+#option Email me@gmail.com
+
 # Gzip the final image.
-
-# option User <username>
 #
+#option GzipImage
+
 # Create a user account with the specified username.
 # Password will be the same as the user name.
-
-# option SwapFile <size>
 #
+#option User <username>
+
 # Takes a size argument (e.g., "768mb") and adds a swap file
 # to the UFS partition of the indicated size.  This also adds
 # the appropriate rc.conf and fstab entries to use the swap file.
-
-# option UsrPorts
 #
+#option SwapFile <size>
+
 # Uses "portsnap" to download an up-to-date ports tree and
 # install it on the image.
-
-# option UsrPorts <path>
 #
+#option UsrPorts
+
 # Copy the existing /usr/ports tree on the build system
 # from <path> into the image.  The copy logic does not
 # copy distfiles, work directories, or SVN checkout
 # information.
-
-# option UsrSrc
 #
+#option UsrPorts <path>
+
 # Copies the src tree that was used to build this image to /usr/src
 # on the image.
-
-#option NanoBSD '/dev/sd0' 1g
-#option NanoBSD /dev/mmcsd0 1g 2 16m
 #
+#option UsrSrc
+
 # Partition the system in a way similar to NanoBSD.
 # The arguments and default values are:
 #
@@ -138,20 +134,21 @@
 #    + The size of the /cfg partition.  Default: 32m
 #
 # This option will also install nanobsd specific tools into /root/bin/
-
-# KERNCONF=MYCONF
 #
+#option NanoBSD '/dev/sd0' 1g
+#option NanoBSD /dev/mmcsd0 1g 2 16m
+
 # Each board picks a default KERNCONF but you can override it.
-
-# FREEBSD_SRC=/usr/src
 #
+#KERNCONF=MYCONF
+
 # FreeBSD source that will be used for kernel, world, and ubldr.
 # This directory doesn't need to exist yet.  When you run the script,
 # it will tell you how to get appropriate sources into this directory.
 # (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
-
-# WORKDIR=${TOPDIR}/work
 #
+#FREEBSD_SRC=/usr/src
+
 # You will probably never override this, but you may need to
 # understand it: WORKDIR holds all of the created and temporary files
 # (in particular, the FreeBSD "obj" is redirected here).  It also
@@ -166,20 +163,22 @@
 #
 # In particular: If you need to do a clean build of everything from
 # scratch, remove the contents of $WORKDIR first.
-
-# IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 #
+#WORKDIR=${TOPDIR}/work
+
 # The name of the final disk image.
 # This file will be as large as IMAGE_SIZE above, so make
 # sure it's located somewhere with enough space.
-
-# FREEBSD_INSTALL_WORLD=y
 #
+#IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
+
 # Unset this to suppress installworld.  This is
 # useful when experimenting with boot and kernel
 # startup, since it greatly speeds up the image
 # generation.  Set IMAGE_SIZE to 50 * MB or even smaller
 # to really shorten your build/test cycles.
+#
+#FREEBSD_INSTALL_WORLD=y
 
 # Extra arguments for FreeBSD build stages.
 #
@@ -190,27 +189,32 @@
 #
 # You can add your own options to any single build phase:
 #
-# FREEBSD_BUILDWORLD_EXTRA_ARGS=""
-# FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
-# FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
-# FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
+#FREEBSD_BUILDWORLD_EXTRA_ARGS=""
+#FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
+#FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
+#FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
 
 # You can specify options for both buildworld and installworld:
-# FREEBSD_WORLD_EXTRA_ARGS=""
+#
+#FREEBSD_WORLD_EXTRA_ARGS=""
 
 # You can specify options for both buildkernel and installkernel.
-# FREEBSD_KERNEL_EXTRA_ARGS=""
+#
+#FREEBSD_KERNEL_EXTRA_ARGS=""
 
 # You can specify options used for all four of the above:
-# FREEBSD_EXTRA_ARGS=""
+#
+#FREEBSD_EXTRA_ARGS=""
 
 # You can specify a custom src.conf or make.conf; the defaults are:
-# SRCCONF="/dev/null"
-# __MAKE_CONF="/dev/null"
+#
+#SRCCONF="/dev/null"
+#__MAKE_CONF="/dev/null"
 
 # For example, I find each of the following quite useful at times:
-# FREEBSD_EXTRA_ARGS="-DNO_CLEAN"
-# FREEBSD_KERNEL_EXTRA_ARGS="-DKERNFAST"
+#
+#FREEBSD_EXTRA_ARGS="-DNO_CLEAN"
+#FREEBSD_KERNEL_EXTRA_ARGS="-DKERNFAST"
 
 
 
@@ -223,7 +227,7 @@
 # of ${BOARDDIR}/overlay, ${TOPDIR}/overlay, and ${WORKDIR}/overlay
 # are copied on top of the image in that order.  For example, you can
 # put a custom passwd or fstab file into ${TOPDIR}/overlay/etc and it
-# will be picked up automatically.  Simlarly, if you need to
+# will be picked up automatically.  Similarly, if you need to
 # dynamically create a certain file, you can do that here (config.sh
 # is a /bin/sh file and you can use arbitrary shell logic) and put the
 # result into ${WORKDIR}/overlay
@@ -254,7 +258,7 @@
 # Some useful shell variables:
 #   ${WORKDIR} is the full path to the 'work' directory
 #       which you can use for intermediate files
-#   ${TOPDIR} is the current directory where crochet is located
+#   ${TOPDIR} is the current directory in which crochet is located
 #
 # The lib/*.sh files also define a number of functions
 # that you may find useful here.
@@ -262,8 +266,8 @@
 # # Runs after boot partition is built.
 # # The current working directory is at the root of the mounted
 # # boot partition.
-# customize_boot_partition ( ) {
-# }
+#customize_boot_partition ( ) {
+#}
 #
 # Note that the following runs even if FREEBSD_INSTALL_KERNEL
 # and FREEBSD_INSTALL_WORLD are not enabled.
@@ -271,14 +275,14 @@
 # # Runs after FreeBSD partition is built and populated.
 # # The current working directory is at the root of the mounted
 # # freebsd partition.
-# customize_freebsd_partition ( ) {
-# }
+#customize_freebsd_partition ( ) {
+#}
 
-# For example, here's one way to add an entry to the default fstab:
+# For example, here's one way to add an entry to the default /etc/fstab:
 #
-# customize_freebsd_partition ( ) {
-#   echo "md /tmp mfs rw,noatime,-s30m 0 0" >> etc/fstab
-# }
+#customize_freebsd_partition ( ) {
+#  echo "md /tmp mfs rw,noatime,-s30m 0 0" >> etc/fstab
+#}
 
 # If you can't do what you want with the above, try this:
 # customize_post_unmount is called after the image is fully created
@@ -308,5 +312,3 @@
 # they are always looking for more information about how
 # Crochet is being used.
 #
-
-
