@@ -23,6 +23,7 @@ VERBOSE=0
 . ${LIBDIR}/freebsd.sh
 . ${LIBDIR}/subversion.sh
 . ${LIBDIR}/uboot.sh
+. ${LIBDIR}/util.sh
 
 crochet_usage ( ) {
     echo "Usage: sudo $0 [-b <board>|-c <configfile>]"
