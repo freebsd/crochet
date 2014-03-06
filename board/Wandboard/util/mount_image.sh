@@ -1,4 +1,4 @@
-IMAGE=`ls work/*.img`
+IMAGE=`ls ../../../work/*.img`
 mdconfig -a -t vnode -f ${IMAGE} -u 0
 mkdir -p /tmp/crochet_root
 mkdir -p /tmp/crochet_freebsd
