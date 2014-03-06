@@ -69,14 +69,24 @@ wandboard_install_uenvtxt(){
 strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
 
 #
-# DTS
+# DTS to FAT file system
 #
-wandboard_install_dts(){
-    echo "Installing DTS"
+wandboard_install_dts_fat(){
+    echo "Installing DTS to FAT"
     freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dts
     freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dtb
 }
-strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts
+#strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts_fat
+
+#
+# DTS to UFS file system. This is in PHASE_FREEBSD_BOARD_POST_INSTALL b/c it needs to happen *after* the kernel install
+#
+wandboard_install_dts_ufs(){
+    echo "Installing DTS to UFS"
+    freebsd_install_fdt arm/wandboard-quad.dts boot/kernel/wandboard-quad.dts
+    freebsd_install_fdt arm/wandboard-quad.dts boot/kernel/wandboard-quad.dtb
+}
+strategy_add $PHASE_FREEBSD_BOARD_POST_INSTALL wandboard_install_dts_ufs
 
 #
 # kernel
