@@ -74,8 +74,8 @@ strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
 #
 wandboard_install_dts(){
     echo "Installing DTS"
-    freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dts
-    freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dtb
+    freebsd_install_fdt wandboard-quad.dts wandboard-quad.dts
+    freebsd_install_fdt wandboard-quad.dts wandboard-quad.dtb
 }
 strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts
 
