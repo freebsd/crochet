@@ -60,6 +60,204 @@ disk_partition_mbr ( ) {
     gpart create -s MBR ${DISK_MD}
 }
 
+
+# $1: mount directory
+disk_prep_mountdir ( ) {
+    if [ -d "$1" ]; then
+        echo "   Removing already-existing mount directory."
+        umount $1 || true
+        if rmdir $1; then
+            echo "   Removed pre-existing mount directory; creating new one."
+        else
+            echo "Error: Unable to remove pre-existing mount directory?"
+            echo "   $1"
+            exit 1
+        fi
+    fi
+    mkdir $1 || exit 1
+}
+
+#
+# Get the count of disks of the given type, or total disks if no type
+# specified
+#
+# $1: Optional type (e.g., FAT, RESERVED, UFS)
+disk_count ( ) {
+    local TYPE=$1
+
+    if [ -z "$TYPE" ]; then
+	echo $DISK_COUNT
+    else
+	echo `eval echo \\$DISK_${TYPE}_COUNT`
+    fi
+}
+
+# 
+# Get value for variable with the given name from the given disk
+# index, which is relative to the given type, or absolute if the type
+# is omitted or empty.
+#
+# disk_get_var [type] index varname
+#
+disk_get_var ( ) {
+    local TYPE
+    local ABSINDEX
+    local VARNAME
+
+    if [ $# -eq 3 ]; then
+	TYPE=$1
+	shift
+    else
+	TYPE=
+    fi
+    ABSINDEX=$1
+
+    if [ -n "$TYPE" ]; then 
+	ABSINDEX=`disk_absindex ${TYPE} ${1}`
+    fi
+    VARNAME=$2
+
+    echo `eval echo \\$DISK_${ABSINDEX}_${VARNAME}`
+}
+
+
+# 
+# Set variable with the given name to the given value for the given
+# disk index, which is relative to the given type, or absolute if the
+# type is omitted or empty.
+#
+# disk_set_var [type] index varname value
+#
+disk_set_var ( ) {
+    local TYPE
+    local ABSINDEX
+    local VARNAME
+    local VALUE
+
+    if [ $# -eq 4 ]; then
+	TYPE=$1
+	shift
+    else
+	TYPE=
+    fi
+    ABSINDEX=$1
+
+    if [ -n "$TYPE" ]; then 
+	ABSINDEX=`disk_absindex ${TYPE} ${1}`
+    fi
+    VARNAME=$2
+    VALUE=$3
+
+    setvar DISK_${ABSINDEX}_${VARNAME} ${VALUE}
+}
+
+# 
+# Set post-creation per-disk info-tracking variables
+#
+# $1: Type (e.g., FAT, RESERVED, UFS)
+# $2: Partition name (a slice or partition-of-slice name, e.g., md0s1 or md0s2a)
+disk_init_vars ( ) {
+    local TYPE=$1
+    local NAME=$2
+    local ABSINDEX=`disk_count`
+    local RELINDEX=`disk_count ${TYPE}`
+
+    # The absolute index is the only value tracked by type and
+    # relative index.
+    setvar DISK_${TYPE}_${RELINDEX}_ABSINDEX ${ABSINDEX}
+
+    disk_set_var ${ABSINDEX} TYPE      ${TYPE}
+    disk_set_var ${ABSINDEX} RELINDEX  ${RELINDEX}
+    disk_set_var ${ABSINDEX} ABSINDEX  ${ABSINDEX}
+    disk_set_var ${ABSINDEX} PARTITION ${NAME}
+    disk_set_var ${ABSINDEX} DEVICE    /dev/${NAME}
+
+    # The first FAT partition is always considered a boot partition
+    if [ \( "$TYPE" = "FAT" \) -a \( ${RELINDEX} -eq 1 \) ]; then
+	disk_set_var ${ABSINDEX} BOOT "y"
+    fi
+
+    # The first UFS partition always gets FreeBSD installed
+    if [ \( "$TYPE" = "UFS" \) -a \( ${RELINDEX} -eq 1 \) ]; then
+	echo "Setting UFS partition 1 FREEBSD to y"
+	disk_set_var ${ABSINDEX} FREEBSD "y"
+    fi
+}
+
+
+#
+# Get the absolute index for the given type and relative index
+#
+# disk_absindex type relindex
+#
+disk_absindex ( ) {
+    local TYPE=$1
+    local RELINDEX=$2
+
+    echo `eval echo \\$DISK_${TYPE}_${RELINDEX}_ABSINDEX`
+}
+
+
+#
+# Get the type (e.g., FAT, RESERVED, UFS) for the given absolute
+# partition index
+#
+# disk_type absindex
+#
+disk_type ( ) {
+    disk_get_var $1 TYPE
+}
+
+#
+# Get the partition name for the given partition index, which is
+# relative to the given type, or absolute if no type is specified.
+#
+# disk_partition [type] index
+#
+disk_partition ( ) {
+    disk_get_var $1 $2 PARTITION
+}
+
+#
+# Get the device name for the given partition index, which is relative
+# to the given type, or absolute if no type is specified.
+#
+# disk_device [type] index
+#
+disk_device ( ) {
+    disk_get_var $1 $2 DEVICE
+}
+
+
+
+#
+# Internal routine for counting all partitions, called by all of the
+# type-specific coungting routines
+#
+_disk_creating_new_partition ( ) {
+    DISK_COUNT=$(( ${DISK_COUNT:-0} + 1 ))
+}
+
+
+disk_creating_new_reserved_partition ( ) {
+    _disk_creating_new_partition
+    DISK_RESERVED_COUNT=$(( ${DISK_RESERVED_COUNT:-0} + 1 ))
+}
+
+# $1: index of RESERVED partition
+disk_reserved_device ( ) {
+    local INDEX=$1
+
+    disk_device RESERVED ${INDEX:-1}
+}
+
+# $1: index of RESERVED partition
+disk_reserved_partition ( ) {
+    local INDEX=$1
+
+    disk_partition RESERVED ${INDEX:-1}
+}
+
 #
 # Add a reserve partition
 #
@@ -67,8 +265,32 @@ disk_partition_mbr ( ) {
 #
 disk_reserved_create( ) {
     echo "Creating reserve partition at "`date`" of size $1"
-    _DISK_RESERVED_SLICE=`gpart add -a 63 -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+
+    disk_creating_new_reserved_partition
+
+   _DISK_RESERVED_SLICE=`gpart add -a 63 -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_RESERVED_DEVICE=/dev/${_DISK_RESERVED_SLICE}
+
+    disk_init_vars RESERVED ${_DISK_RESERVED_SLICE}
+}
+
+disk_creating_new_fat_partition ( ) {
+    _disk_creating_new_partition
+    DISK_FAT_COUNT=$(( ${DISK_FAT_COUNT:-0} + 1 ))
+}
+
+# $1: index of FAT partition
+disk_fat_device ( ) {
+    local INDEX=$1
+
+    disk_device FAT ${INDEX:-1}
+}
+
+# $1: index of FAT partition
+disk_fat_partition ( ) {
+    local INDEX=$1
+
+    disk_partition FAT ${INDEX:-1}
 }
 
 # Add a FAT partition and format it.
@@ -81,30 +303,37 @@ disk_fat_create ( ) {
     local SIZE_ARG
     local SIZE_DISPLAY="n auto-sized"
     local FAT_LABEL=$4
+    local NEW_FAT_SLICE
+    local NEW_FAT_DEVICE
+    local NEW_FAT_SLICE_NUMBER
 
     if [ -n "$1" -a \( "$1" != "-1" \) ]; then
 	SIZE_ARG="-s $1"
 	SIZE_DISPLAY=" $1"
     fi
 
-    if [ -z ${FAT_LABEL} ]; then
+    if [ -z "${FAT_LABEL}" ]; then
 	FAT_LABEL="BOOT"
     fi
 
     # start block
     FAT_START_BLOCK=$3
-    if [ -z ${FAT_START_BLOCK} -o \( ${FAT_START_BLOCK} -eq -1 \) ]; then
+    if [ -z "${FAT_START_BLOCK}" -o \( ${FAT_START_BLOCK} -eq -1 \) ]; then
         FAT_START_BLOCK=63
     fi
+
     echo "Creating a${SIZE_DISPLAY} FAT partition at "`date`" with start block $FAT_START_BLOCK and label ${FAT_LABEL}"
-    _DISK_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
-    DISK_FAT_DEVICE=/dev/${_DISK_FAT_SLICE}
-    DISK_FAT_SLICE_NUMBER=`echo ${_DISK_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
-    gpart set -a active -i ${DISK_FAT_SLICE_NUMBER} ${DISK_MD}
+
+    disk_creating_new_fat_partition
+
+    NEW_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
+    NEW_FAT_DEVICE=/dev/${NEW_FAT_SLICE}
+    NEW_FAT_SLICE_NUMBER=`echo ${NEW_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
+    gpart set -a active -i ${NEW_FAT_SLICE_NUMBER} ${DISK_MD}
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2
-    if [ -z ${_FAT_TYPE} -o \( ${_FAT_TYPE} -eq -1 \) ]; then
+    if [ -z "${_FAT_TYPE}" -o \( ${_FAT_TYPE} -eq -1 \) ]; then
         case $1 in
             *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
                 ;;
@@ -116,52 +345,37 @@ disk_fat_create ( ) {
         echo "Default to FAT${_FAT_TYPE} for partition size $1"
     fi
 
-    newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${DISK_FAT_DEVICE} >/dev/null
+    newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+
+    disk_init_vars FAT ${NEW_FAT_SLICE}
 }
 
 # $1: Directory where FAT partition will be mounted
+# $2: relative index of partition to be mounted, 1 if not specified
 disk_fat_mount ( ) {
-    echo "Mounting FAT partition"
-    if [ -d "$1" ]; then
-        echo "   Removing already-existing mount directory."
-        umount $1 || true
-        if rmdir $1; then
-            echo "   Removed pre-existing mount directory; creating new one."
-        else
-            echo "Error: Unable to remove pre-existing mount directory?"
-            echo "   $1"
-            exit 1
-        fi
-    fi
-    mkdir $1
-    mount_msdosfs ${DISK_FAT_DEVICE} $1
+    echo "Mounting FAT partition ${2:-1} at $1"
+    disk_prep_mountdir $1
+    mount_msdosfs `disk_fat_device $2` $1
     disk_record_mountdir $1
+}
+
+disk_creating_new_ufs_partition ( ) {
+    _disk_creating_new_partition
+    DISK_UFS_COUNT=$(( ${DISK_UFS_COUNT:-0} + 1 ))
 }
 
 # $1: index of UFS partition
 disk_ufs_device ( ) {
-    local PARTITION_INDEX=$1
+    local INDEX=$1
 
-    if [ -z "$PARTITION_INDEX" ]; then
-	PARTITION_INDEX=1
-    fi
-
-    echo `eval echo \\$DISK_UFS_DEVICE_${PARTITION_INDEX}`
+    disk_device UFS ${INDEX:-1} 
 }
 
 # $1: index of UFS partition
 disk_ufs_partition ( ) {
-    local PARTITION_INDEX=$1
+    local INDEX=$1
 
-    if [ -z "$PARTITION_INDEX" ]; then
-	PARTITION_INDEX=1
-    fi
-
-    echo `eval echo \\$DISK_UFS_PARTITION_${PARTITION_INDEX}`
-}
-
-disk_creating_new_ufs_partition ( ) {
-    DISK_UFS_COUNT=$(( ${DISK_UFS_COUNT:-0} + 1 ))
+    disk_partition UFS ${INDEX:-1}
 }
 
 # $1: size of partition, uses remainder of disk if not specified
@@ -201,45 +415,59 @@ disk_ufs_create ( ) {
     # Turn on NFSv4 ACLs
     tunefs -N enable ${NEW_UFS_DEVICE}
 
-    setvar DISK_UFS_PARTITION_${DISK_UFS_COUNT} ${NEW_UFS_PARTITION}
-    setvar DISK_UFS_DEVICE_${DISK_UFS_COUNT} ${NEW_UFS_DEVICE}
+    disk_init_vars UFS ${NEW_UFS_PARTITION}
 }
 
 # $1: index of UFS partition
 # $2: filesystem label
 disk_ufs_label ( ) {
-    local PARTITION_INDEX=$1
+    local UFS_INDEX=$1
     local UFS_LABEL=$2
     local UFS_DEVICE
 
-    if [ -z "$PARTITION_INDEX" ]; then
-	PARTITION_INDEX=1
+    if [ -z "$UFS_INDEX" ]; then
+	UFS_INDEX=1
     fi
 
     if [ -n "$UFS_LABEL" ]; then
-	UFS_DEVICE=`disk_ufs_device ${PARTITION_INDEX}`
+	UFS_DEVICE=`disk_ufs_device ${UFS_INDEX}`
 	echo "Labeling ${UFS_DEVICE} ${UFS_LABEL}" 
 	tunefs -L ${UFS_LABEL} ${UFS_DEVICE}
     fi
 }
 
 # $1: directory where UFS partition will be mounted
-# $2: index of partition to be mounted, 1 if not specified
+# $2: relative index of partition to be mounted, 1 if not specified
 disk_ufs_mount ( ) {
     echo "Mounting UFS partition ${2:-1} at $1"
-    if [ -d "$1" ]; then
-        echo "   Removing already-existing mount directory."
-        umount $1 || true
-        if rmdir $1; then
-            echo "   Removed pre-existing mount directory; creating new one."
-        else
-            echo "Error: Unable to remove pre-existing mount directory?"
-            echo "   $1"
-            exit 1
-        fi
-    fi
-    mkdir $1 || exit 1
+    disk_prep_mountdir $1
     mount `disk_ufs_device $2` $1 || exit 1
     disk_record_mountdir $1
 }
 
+
+#
+# $1: mount point
+# $2: absolute index of partition to mount
+disk_mount ( ) {
+    local MOUNTPOINT=$1
+    local ABSINDEX=$2
+    local RELINDEX
+    local TYPE
+
+    TYPE=`disk_get_var ${ABSINDEX} TYPE`
+    RELINDEX=`disk_get_var ${ABSINDEX} RELINDEX`
+    case ${TYPE} in
+	FAT)
+	    disk_fat_mount ${MOUNTPOINT} ${RELINDEX}
+	    ;;
+	UFS)
+	    disk_ufs_mount ${MOUNTPOINT} ${RELINDEX}
+	    ;;
+	*)
+	    echo "Attempt to mount ${TYPE} partition ${RELINDEX} at ${MOUNTPOINT} failed."
+	    echo "Do not know how to mount partitions of type ${TYPE}."
+	    exit 1
+	    ;;
+    esac
+}

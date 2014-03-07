@@ -50,7 +50,7 @@ disk_ufs_create() {
     OSA_UFS_DEVICE=/dev/${OSA_UFS_PARTITION}
     newfs ${OSA_UFS_DEVICE}
 
-    setvar DISK_UFS_DEVICE_{$DISK_UFS_COUNT} ${OSA_UFS_DEVICE}
+    disk_init_vars UFS ${OSA_UFS_PARTITION}
 
     OSB_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
 
