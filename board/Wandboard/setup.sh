@@ -61,7 +61,7 @@ wandboard_install_uenvtxt(){
     echo "Installing uEnv.txt"
     cp ${BOARDDIR}/files/uEnv.txt .
 }
-strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
+#strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
 
 #
 # DTS to FAT file system

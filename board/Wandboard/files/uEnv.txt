@@ -1,2 +1,0 @@
-uenvcmd=setenv fdt_file wandboard-quad.dtb;fatload mmc 0:1 88000000 ubldr;bootelf 88000000;
-
