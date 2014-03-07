@@ -84,11 +84,13 @@ disk_prep_mountdir ( ) {
 # $1: Optional type (e.g., FAT, RESERVED, UFS)
 disk_count ( ) {
     local TYPE=$1
+    local TYPE_COUNT
 
     if [ -z "$TYPE" ]; then
-	echo $DISK_COUNT
+	echo ${DISK_COUNT:-0}
     else
-	echo `eval echo \\$DISK_${TYPE}_COUNT`
+	TYPE_COUNT=`eval echo \\$DISK_${TYPE}_COUNT`
+	echo ${TYPE_COUNT:-0}
     fi
 }
 
@@ -152,15 +154,21 @@ disk_set_var ( ) {
 }
 
 # 
-# Set post-creation per-disk info-tracking variables
+# Adjust disk counts and set post-creation per-disk info-tracking variables
 #
 # $1: Type (e.g., FAT, RESERVED, UFS)
 # $2: Partition name (a slice or partition-of-slice name, e.g., md0s1 or md0s2a)
-disk_init_vars ( ) {
+disk_created_new ( ) {
     local TYPE=$1
     local NAME=$2
-    local ABSINDEX=`disk_count`
-    local RELINDEX=`disk_count ${TYPE}`
+    local ABSINDEX
+    local RELINDEX
+
+    DISK_COUNT=$(( `disk_count` + 1 ))
+    setvar DISK_${TYPE}_COUNT $(( `disk_count ${TYPE}` + 1 ))
+    
+    ABSINDEX=`disk_count`
+    RELINDEX=`disk_count ${TYPE}`
 
     # The absolute index is the only value tracked by type and
     # relative index.
@@ -179,7 +187,6 @@ disk_init_vars ( ) {
 
     # The first UFS partition always gets FreeBSD installed
     if [ \( "$TYPE" = "UFS" \) -a \( ${RELINDEX} -eq 1 \) ]; then
-	echo "Setting UFS partition 1 FREEBSD to y"
 	disk_set_var ${ABSINDEX} FREEBSD "y"
     fi
 }
@@ -230,20 +237,6 @@ disk_device ( ) {
 
 
 
-#
-# Internal routine for counting all partitions, called by all of the
-# type-specific coungting routines
-#
-_disk_creating_new_partition ( ) {
-    DISK_COUNT=$(( ${DISK_COUNT:-0} + 1 ))
-}
-
-
-disk_creating_new_reserved_partition ( ) {
-    _disk_creating_new_partition
-    DISK_RESERVED_COUNT=$(( ${DISK_RESERVED_COUNT:-0} + 1 ))
-}
-
 # $1: index of RESERVED partition
 disk_reserved_device ( ) {
     local INDEX=$1
@@ -266,17 +259,10 @@ disk_reserved_partition ( ) {
 disk_reserved_create( ) {
     echo "Creating reserve partition at "`date`" of size $1"
 
-    disk_creating_new_reserved_partition
-
    _DISK_RESERVED_SLICE=`gpart add -a 63 -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     DISK_RESERVED_DEVICE=/dev/${_DISK_RESERVED_SLICE}
 
-    disk_init_vars RESERVED ${_DISK_RESERVED_SLICE}
-}
-
-disk_creating_new_fat_partition ( ) {
-    _disk_creating_new_partition
-    DISK_FAT_COUNT=$(( ${DISK_FAT_COUNT:-0} + 1 ))
+    disk_created_new RESERVED ${_DISK_RESERVED_SLICE}
 }
 
 # $1: index of FAT partition
@@ -324,8 +310,6 @@ disk_fat_create ( ) {
 
     echo "Creating a${SIZE_DISPLAY} FAT partition at "`date`" with start block $FAT_START_BLOCK and label ${FAT_LABEL}"
 
-    disk_creating_new_fat_partition
-
     NEW_FAT_SLICE=`gpart add -a 63 -b ${FAT_START_BLOCK} -s $1 -t '!12' ${DISK_MD} | sed -e 's/ .*//'`
     NEW_FAT_DEVICE=/dev/${NEW_FAT_SLICE}
     NEW_FAT_SLICE_NUMBER=`echo ${NEW_FAT_SLICE} | sed -e 's/.*[^0-9]//'`
@@ -347,7 +331,7 @@ disk_fat_create ( ) {
 
     newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
 
-    disk_init_vars FAT ${NEW_FAT_SLICE}
+    disk_created_new FAT ${NEW_FAT_SLICE}
 }
 
 # $1: Directory where FAT partition will be mounted
@@ -359,10 +343,6 @@ disk_fat_mount ( ) {
     disk_record_mountdir $1
 }
 
-disk_creating_new_ufs_partition ( ) {
-    _disk_creating_new_partition
-    DISK_UFS_COUNT=$(( ${DISK_UFS_COUNT:-0} + 1 ))
-}
 
 # $1: index of UFS partition
 disk_ufs_device ( ) {
@@ -394,8 +374,6 @@ disk_ufs_create ( ) {
 
     echo "Creating a${SIZE_DISPLAY} UFS partition at "`date`
 
-    disk_creating_new_ufs_partition
-
     NEW_UFS_SLICE=`gpart add -t freebsd ${SIZE_ARG} ${DISK_MD} | sed -e 's/ .*//'` || exit 1
     NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
@@ -415,7 +393,7 @@ disk_ufs_create ( ) {
     # Turn on NFSv4 ACLs
     tunefs -N enable ${NEW_UFS_DEVICE}
 
-    disk_init_vars UFS ${NEW_UFS_PARTITION}
+    disk_created_new UFS ${NEW_UFS_PARTITION}
 }
 
 # $1: index of UFS partition
