@@ -8,6 +8,7 @@ It can currently build images for:
 * [Soekris](http://soekris.com/)
 * generic x86 systems.
 * [Wandboard](http://wandboard.org/)
+* [Versatile PB](http://arm.com/products/tools/development-boards/versatile/)
 * [VMWare](http://www.vmware.com/)
 * [ZedBoard](http://www.zedboard.org/)
 
