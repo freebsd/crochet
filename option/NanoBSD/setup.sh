@@ -37,8 +37,6 @@ disk_ufs_create() {
 
     echo "Creating the NanoBSD style UFS partitions at "`date`
 
-    disk_creating_new_ufs_partition
-
     NEW_UFS_SLICE=`gpart add -t freebsd ${DISK_MD} | sed -e 's/ .*//'` || exit 1
     NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
@@ -50,7 +48,7 @@ disk_ufs_create() {
     OSA_UFS_DEVICE=/dev/${OSA_UFS_PARTITION}
     newfs ${OSA_UFS_DEVICE}
 
-    setvar DISK_UFS_DEVICE_{$DISK_UFS_COUNT} ${OSA_UFS_DEVICE}
+    disk_created_new UFS ${OSA_UFS_PARTITION}
 
     OSB_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_OS_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
 
