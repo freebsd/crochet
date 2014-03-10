@@ -3,8 +3,10 @@
 #
 
 # Boards that need more than this can define their own.
-BOARD_FREEBSD_MOUNTPOINT=${WORKDIR}/_.mount.freebsd
-BOARD_BOOT_MOUNTPOINT=${WORKDIR}/_.mount.boot
+BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
+BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
+BOARD_FAT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.fat
+BOARD_BOOT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.boot
 
 # Default is to install world ...
 FREEBSD_INSTALL_WORLD=y
@@ -92,9 +94,9 @@ board_default_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW board_default_partition_image
 
-# Default mounts just the FreeBSD partition
+# Default mounts all the FreeBSD partitions
 board_default_mount_partitions ( ) {
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+    board_mount_all
 }
 strategy_add $PHASE_MOUNT_LWW board_default_mount_partitions
 
@@ -134,3 +136,147 @@ board_default_goodbye ( ) {
     echo
 }
 strategy_add $PHASE_GOODBYE_LWW board_default_goodbye
+
+
+# $1: absolute index of partition
+board_is_boot_partition ( ) {
+    local ABSINDEX=$1
+    
+    if [ "`disk_get_var ${ABSINDEX} BOOT`" = "y" ]; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+# $1: absolute index of partition
+board_is_freebsd_partition ( ) {
+    local ABSINDEX=$1
+    
+    if [ "`disk_get_var ${ABSINDEX} FREEBSD`" = "y" ]; then
+	return 0
+    else
+	return 1
+    fi
+}
+
+
+# Wrapper for user-supplied partition customization handlers
+#
+# $1: absolute index of partition to customize
+# $2: name of customization handler
+# $3..: any user-supplied handler args
+_board_customize_partition ( ) {
+    local ABSINDEX=$1
+    local CUSTOMIZATION_HANDLER=$2
+
+    BOARD_CURRENT_MOUNTPOINT=`board_mountpoint ${ABSINDEX}`
+    cd ${BOARD_CURRENT_MOUNTPOINT}
+    eval $CUSTOMIZATION_HANDLER ${ABSINDEX} "$@"
+}
+
+
+#
+# The first UFS partition always gets a FreeBSD installation.  This
+# routine is used to mark additional UFS partitions for FreeBSD
+# installation. It is not necessary, and harmless, to invoke it for
+# the first UFS partition.
+#
+# $1: absolute index of the partition
+board_mark_partition_for_freebsd_install ( ) {
+    local ABSINDEX=$1
+
+    if ! board_is_freebsd_partition ${ABSINDEX}; then
+	disk_set_var ${ABSINDEX} FREEBSD "y"
+	
+	strategy_add $PHASE_REPLICATE_FREEBSD freebsd_replicate `board_ufs_mountpoint 1` `board_mountpoint ${ABSINDEX}`
+    fi
+}
+
+#
+# Register a handler to be called as the final step in preparing the
+# given partition.  The handler is passed the absolute index of the
+# partition and any additional arguments that were given at
+# registration time. When the handler is called, the current working
+# directory is the mount point of that partition.
+#
+# $1: absolute index of the partition to customize
+# $2: name of customization handler
+# $3..: optional additional args to pass to handler
+board_customize_partition ( ) {
+    local ABSINDEX=$1
+    local CUSTOMIZATION_HANDLER=$2
+
+    shift
+    shift
+
+    strategy_add $PHASE_CUSTOMIZE_PARTITION _board_customize_partition $ABSINDEX $CUSTOMIZATION_HANDLER "$@"
+}
+
+# $1: absolute index of the partition to get the mount point for
+board_mountpoint ( ) {
+    local ABSINDEX=$1
+    local TYPE
+    local RELINDEX
+    local MOUNTPOINT_PREFIX
+
+    TYPE=`disk_get_var ${ABSINDEX} TYPE`
+    RELINDEX=`disk_get_var ${ABSINDEX} RELINDEX`
+
+    if board_is_boot_partition ${ABSINDEX}; then
+	MOUNTPOINT_PREFIX=${BOARD_BOOT_MOUNTPOINT_PREFIX}
+    elif board_is_freebsd_partition ${ABSINDEX}; then
+	MOUNTPOINT_PREFIX=${BOARD_FREEBSD_MOUNTPOINT_PREFIX}
+    else
+	MOUNTPOINT_PREFIX=`eval echo \\$BOARD_${TYPE}_MOUNTPOINT_PREFIX`
+    fi
+
+    # For the benefit of users who might be used to certain default
+    # mountpoint names from the old single-partition-of-a-given-type
+    # crochet version, the first partition of a given type has no
+    # suffix.
+    if [ $RELINDEX -eq 1 ]; then
+	echo ${MOUNTPOINT_PREFIX}
+    else
+	echo ${MOUNTPOINT_PREFIX}.${RELINDEX}
+    fi
+}
+
+# $1: relative index of FAT partition to get the mount point for, 1 if
+#     not specified
+board_fat_mountpoint ( ) {
+    local RELINDEX=$1
+    local ABSINDEX
+    
+    ABSINDEX=`disk_get_var FAT ${RELINDEX:-1} ABSINDEX`
+
+    board_mountpoint ${ABSINDEX}
+}
+
+# $1: relative index of UFS partition to get the mount point for, 1 if
+#     not specified
+board_ufs_mountpoint ( ) {
+    local RELINDEX=$1
+    local ABSINDEX
+    
+    ABSINDEX=`disk_get_var UFS ${RELINDEX:-1} ABSINDEX`
+
+    board_mountpoint ${ABSINDEX}
+}
+
+
+#
+# Mount all non-reserved partitions
+#
+board_mount_all ( ) {
+    local ABSINDEX
+
+    echo "Mounting all file systems:"
+
+    ABSINDEX=1
+    while [ $ABSINDEX -le $DISK_COUNT ]; do
+	disk_mount `board_mountpoint ${ABSINDEX}` ${ABSINDEX}
+	ABSINDEX=$(( ${ABSINDEX} + 1))
+    done
+}
+

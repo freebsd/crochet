@@ -17,12 +17,6 @@ zedboard_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW zedboard_partition_image
 
-zedboard_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
-}
-strategy_add $PHASE_MOUNT_LWW zedboard_mount_partitions
-
 # TODO: Build U-Boot from source.
 strategy_add $PHASE_BOOT_INSTALL cp ${BOARDDIR}/bootfiles/* .
 strategy_add $PHASE_BOOT_INSTALL gunzip BOOT.BIN.gz
