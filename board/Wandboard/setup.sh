@@ -21,11 +21,6 @@ strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 #
 # Wandboard uses U-Boot.
 #
-# patches come from here 
-#
-# https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-wandboard-uEnv.txt-bootz-n-fixes.patch
-# https://raw.github.com/eewiki/u-boot-patches/master/v2013.10/0001-ARM-mx6-Update-non-Freescale-boards-to-include-CPU-e.patch
-#
 wandboard_check_uboot ( ) {
 	# Crochet needs to build U-Boot.
         uboot_test \
@@ -60,17 +55,27 @@ wandboard_install_uenvtxt(){
     echo "Installing uEnv.txt"
     cp ${BOARDDIR}/files/uEnv.txt .
 }
-strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
+#strategy_add $PHASE_BOOT_INSTALL wandboard_install_uenvtxt
 
 #
-# DTS
+# DTS to FAT file system
 #
-wandboard_install_dts(){
-    echo "Installing DTS"
+wandboard_install_dts_fat(){
+    echo "Installing DTS to FAT"
     freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dts
     freebsd_install_fdt arm/wandboard-quad.dts wandboard-quad.dtb
 }
-strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts
+#strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts_fat
+
+#
+# DTS to UFS file system. This is in PHASE_FREEBSD_BOARD_POST_INSTALL b/c it needs to happen *after* the kernel install
+#
+wandboard_install_dts_ufs(){
+    echo "Installing DTS to UFS"
+    freebsd_install_fdt arm/wandboard-quad.dts boot/kernel/wandboard-quad.dts
+    freebsd_install_fdt arm/wandboard-quad.dts boot/kernel/wandboard-quad.dtb
+}
+strategy_add $PHASE_FREEBSD_BOARD_POST_INSTALL wandboard_install_dts_ufs
 
 #
 # kernel
@@ -84,4 +89,8 @@ strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 #
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 
+#
+#  build the u-boot scr file
+#
+strategy_add $PHASE_BOOT_INSTALL uboot_mkimage "files/boot.txt" "boot.scr"
 
