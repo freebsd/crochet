@@ -13,12 +13,6 @@ beaglebone_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 
-beaglebone_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    board_ufs_mount_all
-}
-strategy_add $PHASE_MOUNT_LWW beaglebone_mount_partitions
-
 #
 # BeagleBone uses U-Boot.
 #

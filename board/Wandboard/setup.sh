@@ -18,12 +18,6 @@ wandboard_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 
-wandboard_partition_image_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    board_ufs_mount_all
-}
-strategy_add $PHASE_MOUNT_LWW wandboard_partition_image_mount_partitions
-
 #
 # Wandboard uses U-Boot.
 #

@@ -11,7 +11,7 @@ svn_get_revision ( ) {
     cd ${FREEBSD_SRC}
     SOURCE_VERSION=`svn info |grep Revision: |cut -c11-`
     cd $_PWD
-    echo "Source version is: $SOURCE_VERSION";
+    echo "Source version is: ${SOURCE_VERSION:-unknown}";
 }
 
 

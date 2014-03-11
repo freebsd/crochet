@@ -57,13 +57,6 @@ raspberry_pi_partition_image ( ) {
 
 strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
 
-raspberry_pi_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    board_ufs_mount_all
-}
-
-strategy_add $PHASE_MOUNT_LWW raspberry_pi_mount_partitions
-
 raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi boot files to FAT partition
     cp ${RPI_FIRMWARE_SRC}/boot/bootcode.bin .
