@@ -46,15 +46,14 @@ strategy_add $PHASE_BUILD_OTHER generic_i386_build_loader
 
 # Even though there's only the default partition, we have
 # to do extra work here to set all the boot bits.
-# DISK_MD and DISK_UFS_PARTITION are set by the helper
-# functions in lib/disk.sh.
+# DISK_MD is set by the helper functions in lib/disk.sh.
 generic_i386_partition_image ( ) {
     disk_partition_mbr
     disk_ufs_create
     echo "Installing bootblocks"
     gpart bootcode -b ${WORKDIR}/boot/mbr ${DISK_MD} || exit 1
     gpart set -a active -i 1 ${DISK_MD} || exit 1
-    bsdlabel -B -b ${WORKDIR}/boot/boot ${DISK_UFS_PARTITION} || exit 1
+    bsdlabel -B -b ${WORKDIR}/boot/boot `disk_ufs_partition` || exit 1
 }
 strategy_add $PHASE_PARTITION_LWW generic_i386_partition_image
 

@@ -13,30 +13,25 @@ beaglebone_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 
-beaglebone_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
-}
-strategy_add $PHASE_MOUNT_LWW beaglebone_mount_partitions
-
 #
 # BeagleBone uses U-Boot.
 #
 beaglebone_check_uboot ( ) {
-    if u-boot-beaglebone-eabi-install -v >/dev/null 2>&1; then
-        echo "Using U-Boot from port: "`u-boot-beaglebone-eabi-install -v`
+    if [ -n "${BEAGLEBONE_UBOOT_PATCH_VERSION}" -a -n `uboot_eabi_port` ]; then
+        echo "Using U-Boot from port: "`u_boot_eabi_port`
     else
         echo
         echo "Please consider installing sysutils/u-boot-beaglebone-eabi port."
         echo "That will avoid the need for Crochet to build U-Boot."
         echo
         # Crochet needs to build U-Boot.
+
+	uboot_set_patch_version ${BEAGLEBONE_UBOOT_SRC} ${BEAGLEBONE_UBOOT_PATCH_VERSION}
+
         uboot_test \
             BEAGLEBONE_UBOOT_SRC \
-            "$BEAGLEBONE_UBOOT_SRC/board/ti/am335x/Makefile" \
-            "ftp ftp://ftp.denx.de/pub/u-boot/u-boot-2013.04.tar.bz2" \
-            "tar xf u-boot-2013.04.tar.bz2"
-        strategy_add $PHASE_BUILD_OTHER uboot_patch ${BEAGLEBONE_UBOOT_SRC} ${BOARDDIR}/files/uboot_*.patch
+            "$BEAGLEBONE_UBOOT_SRC/board/ti/am335x/Makefile"
+        strategy_add $PHASE_BUILD_OTHER uboot_patch ${BEAGLEBONE_UBOOT_SRC} `uboot_patch_files`
         strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_evm_config
         strategy_add $PHASE_BUILD_OTHER uboot_build $BEAGLEBONE_UBOOT_SRC
     fi
@@ -46,8 +41,8 @@ strategy_add $PHASE_CHECK beaglebone_check_uboot
 
 
 beaglebone_uboot_install ( ) {
-    if u-boot-beaglebone-eabi-install -v >/dev/null 2>&1; then
-        echo "Installing U-Boot from port: "`u-boot-beaglebone-eabi-install -v`
+    if [ -n "${BEAGLEBONE_UBOOT_PATCH_VERSION}" -a -n `uboot_eabi_port` ]; then
+        echo "Installing U-Boot from port: "`uboot_eabi_port`
         u-boot-beaglebone-eabi-install .
     else
         echo "Installing U-Boot onto the FAT partition"

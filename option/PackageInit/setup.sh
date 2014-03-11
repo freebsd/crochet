@@ -33,15 +33,15 @@ package_test ( ) {
 
 package_init ( ) {
     echo "Initializing package system"
-    pkg -c $1 update
-    pkg -c $1 install -y pkg
-    pkg -c $1 upgrade
+    pkg -c ${BOARD_FREEBSD_MOUNTPOINT} update
+    pkg -c ${BOARD_FREEBSD_MOUNTPOINT} install -y pkg
+    pkg -c ${BOARD_FREEBSD_MOUNTPOINT} upgrade
 }
 
 # Only register the package init functions once.
 if [ -z "$_PACKAGE_INIT" ]; then
     strategy_add $PHASE_CHECK package_test
     # Ensure this happens before any "option Package"
-    PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init ${BOARD_FREEBSD_MOUNTPOINT}
+    PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init
     _PACKAGE_INIT=t
 fi
