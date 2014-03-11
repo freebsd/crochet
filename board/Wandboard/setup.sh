@@ -18,23 +18,18 @@ wandboard_partition_image ( ) {
 }
 strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 
-wandboard_partition_image_mount_partitions ( ) {
-    disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-    disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
-}
-strategy_add $PHASE_MOUNT_LWW wandboard_partition_image_mount_partitions
-
 #
 # Wandboard uses U-Boot.
 #
 wandboard_check_uboot ( ) {
 	# Crochet needs to build U-Boot.
+
+    	uboot_set_patch_version ${WANDBOARD_UBOOT_SRC} ${WANDBOARD_UBOOT_PATCH_VERSION}
+
         uboot_test \
             WANDBOARD_UBOOT_SRC \
-            "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile" \
-            "ftp ftp://ftp.denx.de/pub/u-boot/u-boot-2013.10.tar.bz2" \
-            "tar xf u-boot-2013.10.tar.bz2"
-        strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} ${BOARDDIR}/files/*.patch
+            "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile"
+        strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} `uboot_patch_files`
         strategy_add $PHASE_BUILD_OTHER uboot_configure $WANDBOARD_UBOOT_SRC wandboard_quad_config
         strategy_add $PHASE_BUILD_OTHER uboot_build $WANDBOARD_UBOOT_SRC
 }

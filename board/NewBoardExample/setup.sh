@@ -51,11 +51,26 @@ IMAGE_SIZE=$((1000 * 1000 * 1000))
 # FREEBSD_SRC - Full path to FreeBSD source tree.  Defaults to /usr/src
 #    but users may override if they have separate checkouts.
 #    You should generally not override it here.
+#
 # WORKDIR - The full path of the work directory for temporary and built files.
+#
 # BOARDDIR - the full path of this directory.  Many boards have additional
 #    files in subdirectories that can be referenced using ${BOARDDIR}/<subdir>
-# BOARD_BOOT_MOUNTPOINT - full path where the boot partition is mounted (if any)
-# BOARD_FREEBSD_MOUNTPOINT - full path of the freebsd partition
+#
+# BOARD_BOOT_MOUNTPOINT - between PHASE_BOOT_START and PHASE_BOOT_END,
+#    this contains the full path where the boot partition is mounted.
+#    The path name is based on the value of
+#    BOARD_BOOT_MOUNTPOINT_PREFIX, which can be cusomized.
+#
+# BOARD_FREEBSD_MOUNTPOINT - between PHASE_FREEBSD_START and
+#    PHASE_FREEBSD_END, this contains the mount point of the current
+#    freebsd partition.  The mount point path is based on the value of
+#    BOARD_FREEBSD_MOUNTPOINT_PREFIX, which can be customized.
+#
+# BOARD_CURRENT_MOUNTPOINT - between PHASE_BOOT_START and
+#    PHASE_BOOT_END, PHASE_FREEBSD_START and PHASE_FREEBSD_END, and
+#    during PHASE_CUSTOMIZE_PARTITION, this contains the mount point
+#    of the current partition.
 
 ########################################################################
 #
@@ -161,16 +176,18 @@ strategy_add $PHASE_CHECK freebsd_current_test
 # Mount Phase
 #
 # Like partitioning, mounting is also LWW.  The only partition that's
-# generally mandatory is ${BOARD_FREEBSD_MOUNTPOINT}.  (In fact,
-# if that's all you need, you may not need to do anything here,
-# since the default mount handler does that much by itself.)
+# generally mandatory is a UFS partition mounted at ${BOARD_FREEBSD_MOUNTPOINT},
+# which you will have if you create at least one UFS partition.  (In fact,
+# if that's all you need, you may not need to do anything here, since the
+# default mount handler does that much by itself.)
 #
-# If your board needs a separate boot partition, mount that
-# at ${BOARD_BOOT_MOUNTPOINT}.
+# If your board needs a separate boot partition, create a FAT partition
+# it will be mounted at ${BOARD_BOOT_MOUNTPOINT}.
+#
+# The default is equivalent to:
 #
 # myboard_mount_partitions ( ) {
-#  disk_fat_mount ${BOARD_BOOT_MOUNTPOINT}
-#  disk_ufs_mount ${BOARD_FREEBSD_MOUNTPOINT}
+#  board_mount_all
 # }
 # strategy_add $PHASE_MOUNT_LWW myboard_mount_partitions
 
