@@ -226,3 +226,24 @@ uboot_patch_files ( ) {
 	echo "${BOARDDIR}/files/uboot-${UBOOT_PATCH_VERSION}_*.patch"
     fi
 }
+
+#
+#  $1 name of script file
+#  $2 output file
+# 
+uboot_mkimage ( ) (
+    echo "Building and Installing U-Boot script"
+    
+    # location of input file
+    MKIMAGE_INPUT="$BOARDDIR/$1";
+ 
+    # location of output file.  This will end up being the FAT filesystem
+    MKIMAGE_OUTPUT="$2" 
+
+    # location of mkimage
+    MKIMAGE="$WANDBOARD_UBOOT_SRC/tools/mkimage"
+
+    # execute mkimage
+    eval "$MKIMAGE -A arm -O FreeBSD -T script -C none -d $MKIMAGE_INPUT $MKIMAGE_OUTPUT" > ${WORKDIR}/_.mkimage.log
+)
+

@@ -76,6 +76,8 @@ PHASE_FREEBSD_START=700
 PHASE_FREEBSD_INSTALLWORLD_LWW=711
 # "Board" is reserved for board definitions
 PHASE_FREEBSD_BOARD_INSTALL=720
+# "Board post-install is for configuration that happens in the board, after the board install"
+PHASE_FREEBSD_BOARD_POST_INSTALL=721
 # "Option" is reserved for options
 PHASE_FREEBSD_OPTION_INSTALL=760
 # "User" is reserved for user customization and should not be used
