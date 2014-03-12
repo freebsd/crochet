@@ -378,7 +378,7 @@ _freebsd_install_usr_src ( ) {
 }
 
 freebsd_install_usr_src ( ) {
-    _freebsd_install_usr_src $1
+    _freebsd_install_usr_src ${BOARD_FREEBSD_MOUNTPOINT}
 }
 
 # freebsd_install_usr_ports:  Download and install
@@ -457,3 +457,21 @@ freebsd_install_fdt ( ) (
             ;;
     esac
 )
+
+
+#
+# Replicate a FreeBSD install at $1 to $2
+#
+#
+freebsd_replicate ( ) {
+    echo "Replicating FreeBSD installation at ${1}"
+    echo "                                 to ${2} at "`date`
+    cd $1
+    # -k (don't overwrite existing files) is specified because
+    # otherwise pax will try to replace the journal (.sujournal) in
+    # the destination UFS filesystem
+    pax -r -w -p e -k . $2
+    echo "Replication complete at "`date`
+}
+
+
