@@ -26,8 +26,8 @@ strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x80000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
 
 # Install the FDT files on the boot partition
-strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt arm/zedboard.dts zedboard.dts
-strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt arm/zedboard.dts board.dtb
+strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts zedboard.dts
+strategy_add $PHASE_BOOT_INSTALL freebsd_install_fdt zedboard.dts board.dtb
 
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
