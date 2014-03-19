@@ -283,7 +283,7 @@ disk_fat_partition ( ) {
 #
 # $1: size of partition, can use 'k', 'm', 'g' suffixes, or whole disk if -1 or not specified
 # $2: '12', '16', or '32' for FAT type (-1 or empty for default, which depends on $1)
-# $3: start block, -1 for default of 63
+# $3: start block (-1 or empty for default of 63)
 # $4: label, empty for default of "BOOT"
 disk_fat_create ( ) {
     local SIZE_ARG
@@ -304,7 +304,7 @@ disk_fat_create ( ) {
 
     # start block
     FAT_START_BLOCK=$3
-    if [ -z "${FAT_START_BLOCK}" -o \( ${FAT_START_BLOCK} -eq -1 \) ]; then
+    if [ -z "${FAT_START_BLOCK}" -o \( "${FAT_START_BLOCK}" = "-1" \) ]; then
         FAT_START_BLOCK=63
     fi
 
@@ -317,7 +317,7 @@ disk_fat_create ( ) {
 
     # TODO: Select FAT12, FAT16, or FAT32 depending on partition size
     _FAT_TYPE=$2
-    if [ -z "${_FAT_TYPE}" -o \( ${_FAT_TYPE} -eq -1 \) ]; then
+    if [ -z "${_FAT_TYPE}" -o \( "${_FAT_TYPE}" = "-1" \) ]; then
         case $1 in
             *k | [1-9]m | 1[0-6]m) _FAT_TYPE=12
                 ;;
