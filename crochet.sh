@@ -21,7 +21,7 @@ VERBOSE=0
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/freebsd.sh
-. ${LIBDIR}/subversion.sh
+. ${LIBDIR}/scm.sh
 . ${LIBDIR}/uboot.sh
 . ${LIBDIR}/util.sh
 
@@ -110,13 +110,13 @@ handle_trap ( ) {
 trap handle_trap INT QUIT KILL
 
 if [ -n "${UPDATE_SOURCETREE}" ]; then
-    svn_update_sourcetree
+    scm_update_sourcetree
 fi
 
 #
 # show source revision
 #
-svn_get_revision
+scm_get_revision
 
 #
 # get the OS version from the source tree
