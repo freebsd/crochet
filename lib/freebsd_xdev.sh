@@ -2,6 +2,10 @@ FREEBSD_XDEV_PREFIX=
 
 # freebsd_xdev_test: Verify that xdev tools exist.
 #
+# TODO: Add a freebsd_xdev_gcc_test() that explicitly
+# checks that the xdev tools are GCC.  Seems we need
+# this for some versions of U-Boot.
+#
 freebsd_xdev_test ( ) {
     XDEV_ARCH=${TARGET_ARCH}
     case ${XDEV_ARCH} in
@@ -23,7 +27,7 @@ freebsd_xdev_test ( ) {
         echo "Can't find appropriate FreeBSD xdev tools."
         echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
         echo
-        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} xdev"
+        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 xdev"
         echo
         echo "Run this script again after you have the xdev tools installed."
         exit 1
