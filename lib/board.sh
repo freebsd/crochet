@@ -36,7 +36,7 @@ board_generate_image_name ( ) {
         if [ -z "${SOURCE_VERSION}" ]; then
            IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
        else
-           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-r${SOURCE_VERSION}.img
+           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}.img
        fi
     fi
     echo "Image name is:"
