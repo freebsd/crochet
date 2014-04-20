@@ -25,7 +25,7 @@ else:
 
 # Open output (which may be stdout)
 if not output_image or output_image == '-':
-   outfile = sys.stdout
+   outfile = sys.stdout.buffer
 else:
    outfile = open(output_image, "wb")
 
