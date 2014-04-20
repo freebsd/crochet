@@ -6,8 +6,10 @@ scm_update_sourcetree ( ) {
 	    git pull > ${WORKDIR}/_.gitpull.log
     elif [ -d .hg ]; then
 	    hg pull -u > ${WORKDIR}/_.hgpull.log
-    else
+    elif svn --version > /dev/null; then
 	    svn update > ${WORKDIR}/_.svnupdate.log
+    else
+	    svnlite update > ${WORKDIR}/_.svnupdate.log
     fi
     cd ${TOPDIR}
 }
@@ -19,8 +21,10 @@ scm_get_revision ( ) {
 	    SOURCE_VERSION=`git rev-parse --verify --short HEAD`
     elif [ -d .hg ]; then
 	    SOURCE_VERSION=`hg id`
-    else
+    elif svn --version > /dev/null; then
 	    SOURCE_VERSION="r`svn info |grep Revision: |cut -c11-`"
+    else
+	    SOURCE_VERSION="r`svnlite info |grep Revision: |cut -c11-`"
     fi
     cd $_PWD
     echo "Source version is: ${SOURCE_VERSION:-unknown}";
