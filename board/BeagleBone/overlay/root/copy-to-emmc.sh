@@ -87,11 +87,18 @@ echo
 cat /mnt/etc/fstab
 echo
 
+sync; sync; sync
+
 echo
 echo 'System copied.'
+echo
+echo 'eMMC root filesystem is still mounted on /mnt'
+echo 'You can make changes there now before rebootin if you wish.'
 echo
 echo 'To reboot from eMMC:'
 echo '  * Clean shutdown: shutdown -p now'
 echo '  * Remove power'
 echo '  * Remove SD card'
-echo '  * Reapply power'
+echo '  * Reapply power (do NOT hold boot switch)'
+
+
