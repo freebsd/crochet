@@ -31,7 +31,7 @@ else:
 
 # Read in template for first 32k   
 f = open(os.path.join(PATH, "first32k.bin"), "rb")
-mem = [c for c in f.read(32768)]
+mem = bytearray(f.read(32768))
 f.close()
 
 # Overlay boot parameters and args onto template
@@ -42,7 +42,7 @@ def load_to_mem(name, addr):
       if l.startswith('0x'):
          value = int(l, 0)
          for i in range(4):
-            mem[addr] = chr(int(value >> i * 8 & 0xff))
+            mem[addr] = int((value >> i * 8) & 0xff)
             addr += 1
 
    f.close()
@@ -50,12 +50,12 @@ load_to_mem("boot-uncompressed.txt", 0x00000000)
 load_to_mem("args-uncompressed.txt", 0x00000100)
 
 # Write out header
-outfile.write("".join(mem))
+outfile.write(mem)
 
 # Copy input image after header
 while True:
    piece = infile.read(4096)
-   if piece == "":
+   if not piece:
       break # end of file
    outfile.write(piece)
 
