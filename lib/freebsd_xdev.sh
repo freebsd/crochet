@@ -27,7 +27,7 @@ freebsd_xdev_test ( ) {
         echo "Can't find appropriate FreeBSD xdev tools."
         echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
         echo
-        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 xdev"
+        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 WITHOUT_CLANG=1 WITHOUT_CLANG_IS_CC=1 xdev"
         echo
         echo "Run this script again after you have the xdev tools installed."
         exit 1
