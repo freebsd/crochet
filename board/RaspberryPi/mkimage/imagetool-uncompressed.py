@@ -19,13 +19,19 @@ if input_image == "":
   sys.stderr.write("usage : imagetool-uncompressed.py <input image> <output image>\n");
   sys.exit(0)
 elif not input_image or input_image == '-':
-   infile = sys.stdin
+   if sys.version_info.major == 3:
+      infile = sys.stdin.buffer
+   else:
+      infile = sys.stdin
 else:
    infile = open(input_image, "rb")
 
 # Open output (which may be stdout)
 if not output_image or output_image == '-':
-   outfile = sys.stdout.buffer
+   if sys.version_info.major == 3:
+      outfile = sys.stdout.buffer
+   else:
+      outfile = sys.stdout
 else:
    outfile = open(output_image, "wb")
 
