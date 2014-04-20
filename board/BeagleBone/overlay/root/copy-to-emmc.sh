@@ -93,7 +93,7 @@ echo
 echo 'System copied.'
 echo
 echo 'eMMC root filesystem is still mounted on /mnt'
-echo 'You can make changes there now before rebootin if you wish.'
+echo 'You can make changes there now before rebooting if you wish.'
 echo
 echo 'To reboot from eMMC:'
 echo '  * Clean shutdown: shutdown -p now'
