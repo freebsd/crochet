@@ -8,10 +8,11 @@ echo 'Warning: This script erases /dev/mmcsd1'
 echo 'It then copies your FreeBSD system from /dev/mmcsd0'
 echo
 echo 'If you booted from SD:'
-echo '   /dev/mmcsd1 will refer to the eMMC'
 echo '   /dev/mmcsd0 will refer to the micro-SD card'
+echo '   /dev/mmcsd1 will refer to the eMMC'
 echo
 echo 'If you booted from eMMC, it will be the other way around'
+echo '(Check the boot messages to verify your situation.)'
 echo
 echo 'If you are certain you want this script to erase stuff,'
 echo 'edit the script, remove the "exit 1" command, and run it again.'
@@ -60,10 +61,18 @@ tar -c -f - -C / \
 	. \
 | tar -x -f - -C /mnt
 
+echo
+echo 'Cleaning up the copied system'
+# Reset permissions, ensure the required directories
 (cd /mnt ; mtree -Uief /etc/mtree/BSD.root.dist)
 (cd /mnt/usr ; mtree -Uief /etc/mtree/BSD.usr.dist)
 (cd /mnt/usr/include ; mtree -Uief /etc/mtree/BSD.include.dist)
 (cd /mnt/var ; mtree -Uief /etc/mtree/BSD.var.dist)
+# Have the copied system generate its own keys
+# (In particular, if this SD card is used to copy
+# a system onto a bunch of BBBlacks, we do not want
+# them to all have the same SSH keys.)
+rm /mnt/etc/ssh/*key*
 
 echo
 echo 'Replacing fstab on eMMC'
