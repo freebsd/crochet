@@ -21,6 +21,11 @@ strategy_add $PHASE_CHECK mkimage_python_check
 # $1: input boot file
 # $2: output
 mkimage ( ) {
+    if [ ${VERBOSE} -gt 0 ]; then
+        echo "python imagetool-uncompressed.py $1 - > $2"
+    fi 
+    # parens here ensure paths are interpreted relative to the
+    # appropriate current directory
     (
         cd ${BOARDDIR}/mkimage
         python imagetool-uncompressed.py $1 -
