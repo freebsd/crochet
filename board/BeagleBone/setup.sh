@@ -18,7 +18,7 @@ strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 #
 beaglebone_check_uboot ( ) {
     if [ -n "${BEAGLEBONE_UBOOT_PATCH_VERSION}" -a -n `uboot_eabi_port` ]; then
-        echo "Using U-Boot from port: "`u_boot_eabi_port`
+        echo "Using U-Boot from port: "`uboot_eabi_port`
     else
         echo
         echo "Please consider installing sysutils/u-boot-beaglebone-eabi port."

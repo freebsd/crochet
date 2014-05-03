@@ -25,13 +25,19 @@ FREEBSD_INSTALLKERNEL_BOARD_ARGS=""
 
 # Since we're building with special flags, keep
 # the obj tree separate from /usr/obj.
-MAKEOBJDIRPREFIX=${WORKDIR}/obj
-export MAKEOBJDIRPREFIX
 SRCCONF=/dev/null
 __MAKE_CONF=/dev/null
 
 WORLDJOBS=${WORLDJOBS}
 KERNJOBS=${KERNJOBS}
+
+freebsd_default_makeobjdirprefix ( ) {
+    if [ -z "$MAKEOBJDIRPREFIX" ]; then
+       MAKEOBJDIRPREFIX=${WORKDIR}/obj
+    fi
+    export MAKEOBJDIRPREFIX
+}
+strategy_add $PHASE_POST_CONFIG freebsd_default_makeobjdirprefix
 
 freebsd_download_instructions ( ) {
     echo
