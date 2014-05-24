@@ -26,6 +26,7 @@ ident		SOEKRIS
 makeoptions	DEBUG=-g		# Build kernel with gdb(1) debug symbols
 makeoptions	WITH_CTF=1		# Run ctfconvert(1) for DTrace support
 
+options         TMPFS                   # Efficient memory filesystem
 options 	SCHED_ULE		# ULE scheduler
 options 	PREEMPTION		# Enable kernel thread preemption
 options 	INET			# InterNETworking
@@ -230,20 +231,4 @@ options 	CPU_ELAN
 #options 	CPU_ELAN_XTAL=32768000
 options 	CPU_GEODE
 
-#pf
-device 		pf
-device 		pflog
-device 		pfsync
-
-#carp
-device		carp
-
-#altq
-options         ALTQ
-options         ALTQ_CBQ        # Class Based Queuing (CBQ)
-options         ALTQ_RED        # Random Early Detection (RED)
-options         ALTQ_RIO        # RED In/Out
-options         ALTQ_HFSC       # Hierarchical Packet Scheduler (HFSC)
-options         ALTQ_PRIQ       # Priority Queuing (PRIQ)
-options         ALTQ_NOPCC      # Required for SMP build
 
