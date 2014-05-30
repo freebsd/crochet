@@ -91,8 +91,9 @@ radxa_goodbye ( ) {
 	echo
 	echo "Follow these steps to put the device in recovery mode:"
 	echo "1) Power off your Radxa Rock"
-	echo "2) Hold the Recover button"
+	echo "2) Hold the Recovery button"
 	echo "3) Connect USB OTG port to your computer"
+	echo "4) Hold the Recovery button for 5 seconds"
 	echo
 	echo "Before we boot FreeBSD for the first time, we need to change"
 	echo "the KERNEL_IMG parameter.  This only needs to happen once."
