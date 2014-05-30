@@ -26,7 +26,7 @@ read foo
 
 PARAM_TXT=`mktemp`
 PARAM_BIN=`mktemp`
-$RKFLASHTOOL p | sed -e 's/0x60400000/0x60408000/' > $PARAM_TXT &&
+$RKFLASHTOOL p | sed -e 's/0x60408000/0x60400000/' > $PARAM_TXT &&
 $RKCRC -p $PARAM_TXT $PARAM_BIN &&
 $RKFLASHTOOL w 0x0 0x2 < $PARAM_BIN 
 rm -f $PARAM_TXT
