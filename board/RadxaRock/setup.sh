@@ -99,11 +99,18 @@ radxa_goodbye ( ) {
 	echo "3) Connect USB OTG port to your computer"
 	echo "4) Hold the Recovery button for 5 seconds"
 	echo
+	#
+	# TODO: provide a proper parameter definition for FreeBSD 
+	# instead of changing what's there.
+	#
 	echo "Before we boot FreeBSD for the first time, we need to change"
 	echo "the KERNEL_IMG parameter.  This only needs to happen once."
 	echo "Run the following script after the board is in recovery mode:"
 	echo "   ${BOARDDIR}/change-param.sh"
 	echo 
+	#
+	# TODO: this assumes the kernel MTD partition is at a fixed address.
+	#
 	echo "To install the kernel in the NAND:"
 	echo "  ${RADXA_RKFLASHTOOLS_SRC}/rkflashtool w 0x4000 0x5000 \\"
 	echo "      < ${KERNIMG}"
