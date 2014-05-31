@@ -45,7 +45,7 @@ strategy_add $PHASE_BUILD_OTHER radxa_build_rkcrc ${RADXA_RKUTILS_SRC}
 
 radxa_create_kernel_image ( ) {
 	echo "Creating kernel image at: ${KERNIMG}"
-	$1/rkcrc -k ${FREEBSD_OBJDIR}/sys/RADXA/kernel.bin ${KERNIMG}
+	$1/rkcrc -k ${FREEBSD_OBJDIR}/sys/$KERNCONF/kernel.bin ${KERNIMG}
 }
 strategy_add $PHASE_BUILD_OTHER radxa_create_kernel_image ${RADXA_RKUTILS_SRC}
 
