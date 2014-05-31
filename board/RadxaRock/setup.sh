@@ -1,4 +1,8 @@
-KERNCONF=RADXA
+if [ `basename $BOARDDIR` = "RadxaRock" ]; then
+	KERNCONF=RADXA
+else
+	KERNCONF=RADXA-LITE
+fi
 KERNIMG=${WORKDIR}/kernel.img
 RADXA_RKUTILS_SRC=${TOPDIR}/rkutils
 RADXA_RKFLASHTOOLS_SRC=${TOPDIR}/rkflashtools
