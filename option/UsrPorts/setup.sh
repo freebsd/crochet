@@ -37,6 +37,7 @@ option_usrports_copydir ( ) {
             -not \( -type d -name work -prune \)        \
             -not \( -path ./.svn -prune \)              \
             -not \( -path ./distfiles -prune \)         \
+	    -not \( -path ./.git -prune \)		\
             -o -name distfiles                          \
             | cpio -pdmu ${BOARD_FREEBSD_MOUNTPOINT}/usr/ports
     #fi
