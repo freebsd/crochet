@@ -172,10 +172,12 @@ uboot_build ( ) (
 )
 
 
-uboot_eabi_port ( ) {
-    if u-boot-beaglebone-eabi-install -v >/dev/null 2>&1; then
-	echo `u-boot-beaglebone-eabi-install -v`
-    fi
+uboot_eabi_port_version ( ) {
+    pkg query '%n-%v' u-boot-beaglebone-eabi
+}
+
+uboot_eabi_port_location ( ) {
+    pkg query '%p' u-boot-beaglebone-eabi
 }
 
 
