@@ -18,6 +18,14 @@ strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 #
 # BeagleBone uses U-Boot.
 #
+uboot_eabi_port_version ( ) {
+    pkg query '%n-%v' u-boot-beaglebone-eabi
+}
+
+uboot_eabi_port_location ( ) {
+    pkg query '%p' u-boot-beaglebone-eabi
+}
+
 beaglebone_check_uboot ( ) {
     if [ -n "${BEAGLEBONE_UBOOT}" ]; then
 	echo "Using U-Boot from location: ${BEAGLEBONE_UBOOT}"

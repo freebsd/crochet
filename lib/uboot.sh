@@ -171,16 +171,6 @@ uboot_build ( ) (
     touch $1/_.uboot.built
 )
 
-
-uboot_eabi_port_version ( ) {
-    pkg query '%n-%v' u-boot-beaglebone-eabi
-}
-
-uboot_eabi_port_location ( ) {
-    pkg query '%p' u-boot-beaglebone-eabi
-}
-
-
 # uboot_version_from_dir
 #
 # $1: base dir of U-Boot sources
