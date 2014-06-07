@@ -1,4 +1,5 @@
 KERNCONF=BEAGLEBONE
+BEAGLEBONE_UBOOT=
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2013.04
 #BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2014.04
 IMAGE_SIZE=$((1000 * 1000 * 1000))
@@ -17,10 +18,21 @@ strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 #
 # BeagleBone uses U-Boot.
 #
+uboot_eabi_port_version ( ) {
+    pkg query '%n-%v' u-boot-beaglebone-eabi
+}
+
+uboot_eabi_port_location ( ) {
+    pkg query '%p' u-boot-beaglebone-eabi
+}
+
 beaglebone_check_uboot ( ) {
-    if [ -n "${BEAGLEBONE_UBOOT_PATCH_VERSION}" -a -n `uboot_eabi_port` ]; then
-        echo "Using U-Boot from port: "`uboot_eabi_port`
-    else
+    if [ -n "${BEAGLEBONE_UBOOT}" ]; then
+	echo "Using U-Boot from location: ${BEAGLEBONE_UBOOT}"
+    elif [ -n `uboot_eabi_port_version` ]; then
+        echo "Using U-Boot from port: "`uboot_eabi_port_version`
+	BEAGLEBONE_UBOOT=`uboot_eabi_port_location`/share/u-boot/beaglebone-eabi/
+    elif [ -n "${BEAGLEBONE_UBOOT_SRC}" ]; then
         echo
         echo "Please consider installing sysutils/u-boot-beaglebone-eabi port."
         echo "That will avoid the need for Crochet to build U-Boot."
@@ -36,6 +48,13 @@ beaglebone_check_uboot ( ) {
         strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_evm
 #        strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_boneblack_config
         strategy_add $PHASE_BUILD_OTHER uboot_build $BEAGLEBONE_UBOOT_SRC
+    else
+	echo
+	echo "Don't know where to find U-Boot."
+	echo "Please set $BEAGLEBONE_UBOOT_SRC, $BEAGLEBONE_UBOOT"
+	echo "or install sysutils/u-boot-beaglebone-eabi port."
+	echo
+	exit 1
     fi
 
 }
@@ -43,9 +62,11 @@ strategy_add $PHASE_CHECK beaglebone_check_uboot
 
 
 beaglebone_uboot_install ( ) {
-    if [ -n "${BEAGLEBONE_UBOOT_PATCH_VERSION}" -a -n `uboot_eabi_port` ]; then
-        echo "Installing U-Boot from port: "`uboot_eabi_port`
-        u-boot-beaglebone-eabi-install .
+    if [ -n "${BEAGLEBONE_UBOOT}" ]; then
+        echo "Installing U-Boot from : ${BEAGLEBONE_UBOOT}"
+	cp ${BEAGLEBONE_UBOOT}/MLO .
+	cp ${BEAGLEBONE_UBOOT}/bb-uboot.img .
+	cp ${BEAGLEBONE_UBOOT}/bb-uenv.txt .
     else
         echo "Installing U-Boot onto the FAT partition"
         # Note that all of the BeagleBone boot files

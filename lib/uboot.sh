@@ -171,14 +171,6 @@ uboot_build ( ) (
     touch $1/_.uboot.built
 )
 
-
-uboot_eabi_port ( ) {
-    if u-boot-beaglebone-eabi-install -v >/dev/null 2>&1; then
-	echo `u-boot-beaglebone-eabi-install -v`
-    fi
-}
-
-
 # uboot_version_from_dir
 #
 # $1: base dir of U-Boot sources
