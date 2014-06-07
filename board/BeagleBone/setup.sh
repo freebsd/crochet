@@ -29,7 +29,7 @@ uboot_eabi_port_location ( ) {
 beaglebone_check_uboot ( ) {
     if [ -n "${BEAGLEBONE_UBOOT}" ]; then
 	echo "Using U-Boot from location: ${BEAGLEBONE_UBOOT}"
-    elif [ -n `uboot_eabi_port_version` ]; then
+    elif [ -n ""`uboot_eabi_port_version` ]; then
         echo "Using U-Boot from port: "`uboot_eabi_port_version`
 	BEAGLEBONE_UBOOT=`uboot_eabi_port_location`/share/u-boot/beaglebone-eabi/
     elif [ -n "${BEAGLEBONE_UBOOT_SRC}" ]; then
