@@ -1,0 +1,7 @@
+These files are copies of files distributed by the
+Raspberry Pi project.  They are provided here purely
+for convenience.
+
+Please check with the Raspberry Pi software authors
+for any questions about licensing or distribution of
+these files.
