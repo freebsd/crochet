@@ -378,7 +378,7 @@ disk_ufs_create ( ) {
     NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
     gpart create -s BSD ${NEW_UFS_SLICE}
-    NEW_UFS_PARTITION=`gpart add -t freebsd-ufs ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    NEW_UFS_PARTITION=`gpart add -t freebsd-ufs -a 64k ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
 
     NEW_UFS_DEVICE=/dev/${NEW_UFS_PARTITION}
 
