@@ -244,6 +244,7 @@ freebsd_installworld ( ) {
     if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${CONF}.log 2>&1
     then
         # success
+        echo "Installworld success."
     else
         echo "Installworld failed."
         echo "    Log: ${WORKDIR}/_.installworld.${CONF}.log"
@@ -253,6 +254,7 @@ freebsd_installworld ( ) {
     if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${CONF}.log 2>&1
     then
         # success
+        echo "distrib-dirs success."
     else
         echo "distrib-dirs failed"
         echo "    Log: ${WORKDIR}/_.distrib-dirs.${CONF}.log"
@@ -262,6 +264,7 @@ freebsd_installworld ( ) {
     if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${CONF}.log 2>&1
     then
         # success
+        echo "distribution success."
     else
         echo "distribution failed"
         echo "    Log: ${WORKDIR}/_.distribution.${CONF}.log"
@@ -290,6 +293,7 @@ freebsd_installkernel ( ) {
     if /bin/sh -e ${WORKDIR}/_.installkernel.${CONF}.sh > ${WORKDIR}/_.installkernel.${CONF}.log 2>&1
     then
         # success
+        echo "installkernel success."
     else
         echo "installkernel failed"
         echo "    Log: ${WORKDIR}/_.installkernel.${CONF}.log"

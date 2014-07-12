@@ -110,6 +110,7 @@ uboot_patch ( ) (
             echo "   Applying patch $p"
             if patch -N -p1 < $p >> ${_UBOOT_SRC}/_.uboot.patch.log 2>&1; then
                 # success
+                echo "Applying patch success."
             else
                 echo "Patch didn't apply: $p"
                 echo "  Log in ${_UBOOT_SRC}/_.uboot.patch.log"
@@ -139,6 +140,7 @@ uboot_configure ( ) {
     echo "    (Logging to $1/_.uboot.configure.log)"
     if gmake CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
         # success
+        echo "Configuring U-Boot success."
     else
         echo "  Failed to configure U-Boot."
         echo "  Log in $1/_.uboot.configure.log"
@@ -162,6 +164,7 @@ uboot_build ( ) (
     echo "    (Logging to $1/_.uboot.build.log)"
     if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} > $1/_.uboot.build.log 2>&1; then
         # success
+        echo "Building U-Boot success."
     else
         echo "  Failed to build U-Boot."
         echo "  Log in $1/_.uboot.build.log"
