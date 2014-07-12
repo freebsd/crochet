@@ -10,7 +10,7 @@ load_config ( ) {
 
     if [ -f $1 ]; then
         echo "Loading configuration from $1"
-        . $1
+        . ${TOPDIR}/$1
     else
         echo "Could not load $1"
         exit 1
