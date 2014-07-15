@@ -1,0 +1,11 @@
+--- a/include/configs/ti_armv7_common.h	2014-04-10 09:19:02.000000000 +0800
++++ b/include/configs/ti_armv7_common.h	2014-04-10 09:19:18.000000000 +0800
+@@ -197,7 +197,7 @@
+ 
+ /* FAT sd card locations. */
+ #define CONFIG_SYS_MMC_SD_FAT_BOOT_PARTITION	1
+-#define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"u-boot.img"
++#define CONFIG_SPL_FAT_LOAD_PAYLOAD_NAME	"bb-uboot.img"
+ 
+ #ifdef CONFIG_SPL_OS_BOOT
+ #define CONFIG_SYS_SPL_ARGS_ADDR		0x80F80000

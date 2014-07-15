@@ -25,9 +25,10 @@ freebsd_xdev_test ( ) {
     CC=${FREEBSD_XDEV_PREFIX}cc
     if [ -z `which ${CC}` ]; then
         echo "Can't find appropriate FreeBSD xdev tools."
+        echo "Tested: ${CC}"
         echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
         echo
-        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 WITHOUT_CLANG=1 WITHOUT_CLANG_IS_CC=1 xdev"
+        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 WITH_GCC_BOOTSTRAP=1 WITHOUT_CLANG=1 WITHOUT_CLANG_BOOTSTRAP=1 WITHOUT_CLANG_IS_CC=1 xdev"
         echo
         echo "Run this script again after you have the xdev tools installed."
         exit 1
@@ -35,8 +36,8 @@ freebsd_xdev_test ( ) {
     _INCLUDE_DIR=`${CC} -print-file-name=include`
     if [ ! -e "${_INCLUDE_DIR}/stdarg.h" ]; then
         echo "FreeBSD xdev tools are broken."
-        echo "The following command should print the full path to the crossbuild"
-        echo "include directory (containing stdarg.h, for example):"
+        echo "The following command should print the full path to a directory"
+        echo "containing stdarg.h and other basic headers suitable for this target:"
         echo "  $ ${CC} -print-file-name=include"
         echo "Please install a newer version of the xdev tools."
         exit 1

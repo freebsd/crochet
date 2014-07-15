@@ -13,7 +13,7 @@ WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2013.10
 wandboard_partition_image ( ) {
     disk_partition_mbr
     wandboard_uboot_install
-    disk_fat_create 50m 32 16384
+    disk_fat_create 50m 16 16384
     disk_ufs_create
 }
 strategy_add $PHASE_PARTITION_LWW wandboard_partition_image

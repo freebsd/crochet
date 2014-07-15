@@ -1,5 +1,4 @@
-/dev/ada0s1	/		ufs rw,noatime		1 1
 tmpfs           /tmp            tmpfs rw,size=31457280  0 0
-tmpfs           /var/log        tmpfs rw,,size=15728640 0 0
+tmpfs           /var/log        tmpfs rw,size=15728640 0 0
 tmpfs           /var/tmp        tmpfs rw,size=5242880   0 0
 

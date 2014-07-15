@@ -1,3 +1,4 @@
+#!/bin/sh
 #
 # Shell script to copy FreeBSD system from SDCard to eMMC
 #
@@ -36,13 +37,15 @@ echo
 echo 'Copying boot files to eMMC boot partition'
 mount_msdosfs /dev/mmcsd1s1 /mnt
 cp /boot/msdos/* /mnt
+echo 'loaderdev=disk1' >>/mnt/bb-uenv.txt
 sync
 umount /mnt
 
 echo
 echo 'Creating FreeBSD partition on eMMC'
 gpart add -t freebsd mmcsd1
-bsdlabel -w mmcsd1s2
+gpart create -s BSD mmcsd1s2
+gpart add -t freebsd-ufs -a 32k mmcsd1s2
 newfs /dev/mmcsd1s2a
 tunefs -N enable -j enable -t enable -L 'eMMCroot' /dev/mmcsd1s2a
 mount /dev/mmcsd1s2a /mnt
@@ -79,7 +82,7 @@ echo 'Replacing fstab on eMMC'
 cat <<EOF >/mnt/etc/fstab
 /dev/msdosfs/EMMCBOOT /boot/msdos msdosfs rw,noatime       0 0
 /dev/ufs/eMMCroot     /           ufs     rw,noatime       1 1
-md                    /tmp        mfs     rw,noatime,-s30m 0 0
+#md                    /tmp        mfs     rw,noatime,-s30m 0 0
 md                    /var/log    mfs     rw,noatime,-s15m 0 0
 md                    /var/tmp    mfs     rw,noatime,-s5m  0 0
 EOF

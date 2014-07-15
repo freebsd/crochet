@@ -33,7 +33,7 @@ KERNJOBS=${KERNJOBS}
 
 freebsd_default_makeobjdirprefix ( ) {
     if [ -z "$MAKEOBJDIRPREFIX" ]; then
-	MAKEOBJDIRPREFIX=${WORKDIR}/obj
+        MAKEOBJDIRPREFIX=${WORKDIR}/obj
     fi
     export MAKEOBJDIRPREFIX
 }
@@ -422,7 +422,7 @@ freebsd_install_fdt ( ) (
     buildenv_machine=`eval $buildenv _freebsd_get_machine`;
     _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
     if [ -f ${_FDTDIR}/${buildenv_machine}/${1} ]; then
-	_FDTDIR=${_FDTDIR}/${buildenv_machine}
+        _FDTDIR=${_FDTDIR}/${buildenv_machine}
     fi
     case $1 in
         *.dtb)

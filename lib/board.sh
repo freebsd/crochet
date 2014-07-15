@@ -5,16 +5,16 @@
 # Boards that need more than this can define their own.
 board_mountpoint_defaults ( ) {
     if [ -z "${BOARD_UFS_MOUNTPOINT_PREFIX}" ]; then
-	BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
+        BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
     fi
     if [ -z "${BOARD_FREEBSD_MOUNTPOINT_PREFIX}" ]; then
-	BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
+        BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
     fi
     if [ -z "${BOARD_FAT_MOUNTPOINT_PREFIX}" ]; then
-	BOARD_FAT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.fat
+        BOARD_FAT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.fat
     fi
     if [ -z "${BOARD_BOOT_MOUNTPOINT_PREFIX}" ]; then
-	BOARD_BOOT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.boot
+        BOARD_BOOT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.boot
     fi
 }
 strategy_add $PHASE_POST_CONFIG board_mountpoint_defaults
