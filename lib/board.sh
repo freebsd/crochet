@@ -3,10 +3,22 @@
 #
 
 # Boards that need more than this can define their own.
-BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
-BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
-BOARD_FAT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.fat
-BOARD_BOOT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.boot
+board_mountpoint_defaults ( ) {
+    if [ -z "${BOARD_UFS_MOUNTPOINT_PREFIX}" ]; then
+	BOARD_UFS_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.ufs
+    fi
+    if [ -z "${BOARD_FREEBSD_MOUNTPOINT_PREFIX}" ]; then
+	BOARD_FREEBSD_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.freebsd
+    fi
+    if [ -z "${BOARD_FAT_MOUNTPOINT_PREFIX}" ]; then
+	BOARD_FAT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.fat
+    fi
+    if [ -z "${BOARD_BOOT_MOUNTPOINT_PREFIX}" ]; then
+	BOARD_BOOT_MOUNTPOINT_PREFIX=${WORKDIR}/_.mount.boot
+    fi
+}
+strategy_add $PHASE_POST_CONFIG board_mountpoint_defaults
+
 
 # Default is to install world ...
 FREEBSD_INSTALL_WORLD=y
