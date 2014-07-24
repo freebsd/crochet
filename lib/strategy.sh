@@ -10,6 +10,17 @@
 # strategy list.  After configuration, the strategy list is sorted and
 # then the items are run to actually do the work.
 
+# This function sets the description for a phase.
+set_phase ( ) {
+    eval "$1=$2"
+    eval "PHASE_DESCRIPTION_$2=$1"
+}
+
+# This function prints the description of a phase to stdout.
+print_phase_description ( ) {
+    eval "THIS_PHASE_DESCRIPTION=\$PHASE_DESCRIPTION_$1" && echo "$THIS_PHASE_DESCRIPTION"
+}
+
 # The strategy list for this run is kept in ${STRATEGYDIR}.
 # Note: ${STRATEGYDIR} cannot be under ${WORKDIR} since WORKDIR
 # hasn't been set yet.
@@ -47,63 +58,63 @@ STRATEGYDIR=`mktemp -d ${STRATEGYBASE}/${_DATE}-XXXXXX`
 # POST_CONFIG phase is a chance to update internal configuration
 # after the user configuration has been completely read but before
 # any real work is attempted.
-PHASE_POST_CONFIG=100
+set_phase PHASE_POST_CONFIG 100
 
 # CHECK is for testing that sources and necessary tools are available.
-PHASE_CHECK=110
+set_phase PHASE_CHECK 110
 
 # BUILD phases are for actually compiling stuff
 # Use BUILD_TOOLS for anything that's required by other build stages.
-PHASE_BUILD_TOOLS=200
-PHASE_BUILD_WORLD=210
-PHASE_BUILD_KERNEL=220
-PHASE_BUILD_OTHER=230
+set_phase PHASE_BUILD_TOOLS 200
+set_phase PHASE_BUILD_WORLD 210
+set_phase PHASE_BUILD_KERNEL 220
+set_phase PHASE_BUILD_OTHER 230
 
 # Actually build the image and partition it.
 # These are all LWW so they can be replaced by board or user code.
-PHASE_IMAGE_BUILD_LWW=301
-PHASE_PARTITION_LWW=311
-PHASE_MOUNT_LWW=321
+set_phase PHASE_IMAGE_BUILD_LWW 301
+set_phase PHASE_PARTITION_LWW 311
+set_phase PHASE_MOUNT_LWW 321
 
 # PHASE_BOOT items run with cwd set to root of boot filesystem (if any).
-PHASE_BOOT_START=500
-PHASE_BOOT_INSTALL=510
-PHASE_BOOT_DONE=599
+set_phase PHASE_BOOT_START 500
+set_phase PHASE_BOOT_INSTALL 510
+set_phase PHASE_BOOT_DONE 599
 
 # PHASE_FREEBSD items run with cwd set to root of freebsd filesystem
-PHASE_FREEBSD_START=700
+set_phase PHASE_FREEBSD_START 700
 # Basic freebsd installworld, which is registered in lib/board.sh but can be overridden
-PHASE_FREEBSD_INSTALLWORLD_LWW=711
+set_phase PHASE_FREEBSD_INSTALLWORLD_LWW 711
 # "Board" is reserved for board definitions
-PHASE_FREEBSD_BOARD_INSTALL=720
+set_phase PHASE_FREEBSD_BOARD_INSTALL 720
 # "Board post-install is for configuration that happens in the board, after the board install"
-PHASE_FREEBSD_BOARD_POST_INSTALL=721
+set_phase PHASE_FREEBSD_BOARD_POST_INSTALL 721
 # "Option" is reserved for options
-PHASE_FREEBSD_OPTION_INSTALL=760
+set_phase PHASE_FREEBSD_OPTION_INSTALL 760
 # "User" is reserved for user customization and should not be used
 # by any board or option definition.
-PHASE_FREEBSD_USER_CUSTOMIZATION=790
-PHASE_FREEBSD_DONE=799
+set_phase PHASE_FREEBSD_USER_CUSTOMIZATION 790
+set_phase PHASE_FREEBSD_DONE 799
 
-PHASE_REPLICATE_FREEBSD=800
+set_phase PHASE_REPLICATE_FREEBSD 800
 
-PHASE_CUSTOMIZE_PARTITION=850
+set_phase PHASE_CUSTOMIZE_PARTITION 850
 
 # Do not override: This is for the lib/disk.sh "unmount everything" function.
 # TODO: This should go away in favor of PHASE_UNMOUNT
-PHASE_UNMOUNT_LWW=891
+set_phase PHASE_UNMOUNT_LWW 891
 
 # TODO: Rework unmount handling so that mount functions add an
 # operation to PHASE_UNMOUNT.  That should remove the need for
 # lib/disk.sh to track what partitions have been mounted.
-PHASE_UNMOUNT=892
+set_phase PHASE_UNMOUNT 892
 
 # PHASE_POST_UNMOUNT runs after the filesystems are unmounted.
-PHASE_POST_UNMOUNT=900
+set_phase PHASE_POST_UNMOUNT 900
 
 # Prints the final status message with instructions for using the
 # image.  Can be replaced by boards that need special instructions.
-PHASE_GOODBYE_LWW=991
+set_phase PHASE_GOODBYE_LWW 991
 
 # This is the default priority used for all commands that
 # don't specify one.
@@ -164,7 +175,7 @@ run_phase ( ) {
     sort < ${_PHASE_FILE} > ${_PHASE_FILE}.sorted
     if [ $VERBOSE -gt 0 ]; then
 	# TODO: Print a description, not just the number.
-	echo "====================> Phase $P <===================="
+	echo "====================> Phase $P `print_phase_description $P` <===================="
     fi
     . ${_PHASE_FILE}.sorted
 }
