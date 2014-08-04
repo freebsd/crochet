@@ -55,9 +55,18 @@ disk_create_image ( ) {
 # partitioning.)
 #
 disk_partition_mbr ( ) {
-    echo "Partitioning the raw disk image at "`date`
+    echo "Partitioning the raw disk image with MBR at "`date`
     echo gpart create -s MBR ${DISK_MD}
     gpart create -s MBR ${DISK_MD}
+}
+
+# Partition the virtual disk using GPT.
+#
+#
+disk_partition_gpt ( ) {
+    echo "Partitioning the raw disk image with GPT at "`date`
+    echo gpart create -s GPT ${DISK_MD}
+    gpart create -s GPT ${DISK_MD}
 }
 
 
