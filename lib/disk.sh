@@ -459,30 +459,3 @@ disk_mount ( ) {
 	    ;;
     esac
 }
-
-# $1: size of partition, uses remainder of disk if not specified
-disk_ext3_create ( ) {
-    local SIZE_ARG
-    local SIZE_DISPLAY="n auto-sized"
-    local NEW_EXT3_SLICE
-    local NEW_EXT3_SLICE_NUMBER
-    local NEW_EXT3_PARTITION
-    local NEW_EXT3_DEVICE
-    
-    if [ -n "$1" ]; then
-    SIZE_ARG="-s $1"
-    SIZE_DISPLAY=" $1"
-    fi
-
-    echo "Creating a${SIZE_DISPLAY} EXT3 partition at "`date`
-
-    NEW_EXT3_SLICE=`gpart add -t MBR ${SIZE_ARG} ${DISK_MD} | sed -e 's/ .*//'` || exit 1
-    NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
-
-    gpart create -s BSD ${NEW_EXT3_SLICE}
-    NEW_EXT3_PARTITION=`gpart add -t freebsd-ufs -a 64k ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-
-    NEW_EXT3_DEVICE=/dev/${NEW_EXT3_PARTITION}
-
-    disk_created_new EXT3 ${NEW_EXT3_PARTITION}
-}
