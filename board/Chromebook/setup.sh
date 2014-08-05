@@ -8,9 +8,9 @@ CHROMEBOOK_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
 #
 chromebook_partition_image ( ) {
     disk_partition_gpt
-  #  chromebook_uboot_install
-  #  disk_fat_create 50m 16 16384
-  #  disk_ufs_create
+    disk_ext3_create 16m
+    disk_ext3_create 16m
+    disk_ext3_create 16m
 }
 strategy_add $PHASE_PARTITION_LWW chromebook_partition_image
 
