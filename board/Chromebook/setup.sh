@@ -22,15 +22,14 @@ strategy_add $PHASE_PARTITION_LWW chromebook_partition_image
 # Chromebook uses U-Boot.
 #
 chromebook_check_uboot ( ) {
-	# Crochet needs to build U-Boot.
+    # Crochet needs to build U-Boot.
+    uboot_set_patch_version ${CHROMEBOOK_UBOOT_SRC} ${CHROMEBOOK_UBOOT_PATCH_VERSION}
 
-    	uboot_set_patch_version ${CHROMEBOOK_UBOOT_SRC} ${CHROMEBOOK_UBOOT_PATCH_VERSION}
-
-        uboot_test \
-            CHROMEBOOK_UBOOT_SRC \
-            "$CHROMEBOOK_UBOOT_SRC/board/samsung/smdk5250/Makefile"
-        strategy_add $PHASE_BUILD_OTHER uboot_configure $CHROMEBOOK_UBOOT_SRC snow_config
-        strategy_add $PHASE_BUILD_OTHER uboot_build $CHROMEBOOK_UBOOT_SRC
+    uboot_test \
+        CHROMEBOOK_UBOOT_SRC \
+        "$CHROMEBOOK_UBOOT_SRC/board/samsung/smdk5250/Makefile"
+    strategy_add $PHASE_BUILD_OTHER uboot_configure $CHROMEBOOK_UBOOT_SRC snow_config
+    strategy_add $PHASE_BUILD_OTHER uboot_build $CHROMEBOOK_UBOOT_SRC
 }
 strategy_add $PHASE_CHECK chromebook_check_uboot
 
