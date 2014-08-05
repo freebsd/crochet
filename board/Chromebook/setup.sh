@@ -9,8 +9,10 @@ CHROMEBOOK_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
 chromebook_partition_image ( ) {
     # disk is gpt
     disk_partition_gpt
-    # ChromeOS kernel
-    gpart add -t "!fe3a2a5d-4f32-41a7-b725-accc3285a309" -s 16M ${DISK_MD}
+    # ChromeOS kernel parition
+    gpart add -t "!fe3a2a5d-4f32-41a7-b725-accc3285a309" -s 16M -l U-Boot ${DISK_MD}
+    # drop u-boot onto the ChromeOS kernel partition
+    chromebook_uboot_install
     # FreeBSD root
     disk_ufs_create
 }
@@ -36,8 +38,8 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 # install uboot
 #
 chromebook_uboot_install ( ) {
-        echo Installing U-Boot to /dev/${DISK_MD}
-        dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD} bs=512 seek=2
+        echo Installing U-Boot to /dev/${DISK_MD}p1
+        #dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD}p1 bs=512 seek=2
 }
 
 #
