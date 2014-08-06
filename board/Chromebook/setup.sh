@@ -13,6 +13,8 @@ chromebook_partition_image ( ) {
     chromebook_uboot_install
     # FreeBSD root
     disk_ufs_create
+    # show
+ #   gpart show ${DISK_MD}
 }
 strategy_add $PHASE_PARTITION_LWW chromebook_partition_image
 
@@ -35,12 +37,14 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 # install uboot onto the ChromeOS Kernel parition
 #
 chromebook_uboot_install ( ) {
+    echo Creating ChromeOS Kernel partition
     # Add ChromeOS kernel parition
-    CHROMEOS_KERNEL_PARTITION=`gpart add -t "!fe3a2a5d-4f32-41a7-b725-accc3285a309" -s 16M -l U-Boot ${DISK_MD} | sed -e 's/ .*//'`
+    CHROMEOS_KERNEL_PARTITION=`gpart add -b 1m -s 15m -t '!fe3a2a5d-4f32-41a7-b725-accc3285a309' /dev/md0 | sed -e 's/ .*//'`
+    gpart show /dev/md0
     CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
-    #dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=512
+    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/md0p1`
 }
 
 #

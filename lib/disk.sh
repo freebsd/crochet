@@ -64,11 +64,9 @@ disk_partition_mbr ( ) {
 #
 #
 disk_partition_gpt ( ) {
-    echo "Partitioning the raw disk image with GPT at "`date`
-    echo gpart create -s GPT ${DISK_MD}
+    echo "Partitioning the raw disk image with EFI/GPT at "`date`
     gpart create -s GPT ${DISK_MD}
 }
-
 
 # $1: mount directory
 disk_prep_mountdir ( ) {
