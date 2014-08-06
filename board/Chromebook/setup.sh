@@ -32,7 +32,7 @@ chromebook_check_uboot ( ) {
 strategy_add $PHASE_CHECK chromebook_check_uboot
 
 #
-# install uboot
+# install uboot onto the ChromeOS Kernel parition
 #
 chromebook_uboot_install ( ) {
     # Add ChromeOS kernel parition
@@ -40,7 +40,7 @@ chromebook_uboot_install ( ) {
     CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
-    #dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD}p1 bs=512 seek=2
+    #dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=512
 }
 
 #
