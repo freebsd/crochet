@@ -1,2 +1,2 @@
-setenv fdt_file wandboard-quad.dtb;fatload mmc 0:1 88000000 ubldr;bootelf 88000000;
+setenv bootcmd "mmc dev 1; mmc rescan 1; fatload mmc 1:2 0x40f00000 kernel.bin; go 0x40f00000"
 
