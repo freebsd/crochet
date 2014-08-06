@@ -44,7 +44,7 @@ chromebook_uboot_install ( ) {
     CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
-    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/md0p1`
+    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/md0p1 bs=1m conv=sync`
 }
 
 #
