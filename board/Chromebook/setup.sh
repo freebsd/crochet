@@ -41,16 +41,16 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 chromebook_uboot_install ( ) {
     echo Creating ChromeOS Kernel partition
     # Add ChromeOS kernel parition
-    CHROMEOS_KERNEL_PARTITION=`gpart add -b 1m -s 15m -t '!fe3a2a5d-4f32-41a7-b725-accc3285a309' /dev/md0 | sed -e 's/ .*//'`
-    gpart show /dev/md0
+    CHROMEOS_KERNEL_PARTITION=`gpart add -b 1m -s 15m -t '!fe3a2a5d-4f32-41a7-b725-accc3285a309' /dev/${DISK_MD} | sed -e 's/ .*//'`
+    gpart show /dev/${DISK_MD}
     CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
-#    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/md0p1 bs=1m conv=sync`
+#    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD}p1 bs=1m conv=sync`
     if [ -f board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart.bz2 ]; then
         `bunzip2 board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart.bz2`
     fi
-    `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=/dev/md0p1 bs=1m conv=sync`
+    `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=/dev/${DISK_MD}p1 bs=1m conv=sync`
 }
 
 #
