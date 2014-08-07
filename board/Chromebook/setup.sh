@@ -47,9 +47,6 @@ chromebook_uboot_install ( ) {
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
 #    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD}p1 bs=1m conv=sync`
-    if [ -f board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart.bz2 ]; then
-        `bunzip2 board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart.bz2`
-    fi
     `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=/dev/${DISK_MD}p1 bs=1m conv=sync`
 }
 
