@@ -53,6 +53,7 @@ chromebook_uboot_install ( ) {
 chromebook_add_fat_partition ( ) {
     CHROMEOS_FAT_PARTITION=`gpart add -s 5m -t '!EBD0A0A2-B9E5-4433-87C0-68B6B72699C7' /dev/${DISK_MD} | sed -e 's/ .*//'`
     echo "FAT partition is /dev/${CHROMEOS_FAT_PARTITION}"
+    newfs_msdos -F 32 /dev/${CHROMEOS_FAT_PARTITION} >/dev/null
 }
 
 #
