@@ -14,7 +14,7 @@ found at:
    http://beagleboard.org/bone
 
 The BeagleBone is an easy way to learn about ARM development: it is
-inexpensive (about $45) and does not require any special skills or
+inexpensive (about $55) and does not require any special skills or
 hardware to use.  You boot it from a MicroSDHC card with the system
 image.
 
@@ -25,8 +25,35 @@ connectors on the board.
 
 ============================================================
 
-How to boot the BeagleBone
---------------------------
+How to boot the BeagleBone Black
+--------------------------------
+
+1. CONNECT the board to your FreeBSD (or other) system
+   using a third-party adapter cable such as:
+     Adafruit 954: http://www.adafruit.com/product/954
+     FTDI TTL-232R-3V3 cable:  Widely available
+     FTDI Friend adapter:  http://www.adafruit.com/products/284
+
+2. ACCESS the serial console
+
+3. INSERT the MicroSDHC card into your BeagleBone Black
+
+4. HOLD the boot switch next to the MicroSDHC slot
+
+5. POWER the board by connecting it to a 5v power supply
+
+Note:  The original BeagleBone has a built-in serial-to-USB
+converter that is not present on the later BeagleBone Black.
+This is why I recommend using a separate adapter cable.
+
+Note:  As of July 2014, the micro-HDMI video output
+on the BeagleBone Black is not supported.  To access the
+board, you'll need to use a serial-to-USB adapter or SSH.
+
+============================================================
+
+How to boot the BeagleBone White
+--------------------------------
 
 1. CONNECT the board to your FreeBSD system using a Mini-USB cable.
    The Mini-USB connector is on the bottom of the BeagleBone.
@@ -43,32 +70,14 @@ How to boot the BeagleBone
 
 ============================================================
 
-How to boot the BeagleBone Black
---------------------------------
+Booting from eMMC for BeagleBone Black
+--------------------------------------
 
-1. CONNECT the board to your FreeBSD (or other) system
-   using a third-party adapter cable such as the Adafruit 954:
-      http://www.adafruit.com/product/954
+Login as root and look at
+   /root/copy-to-emmc.sh
 
-2. ACCESS the serial console
-
-3. INSERT the MicroSDHC card into your BeagleBone Black
-
-4. HOLD the boot switch next to the MicroSDHC slot
-
-5. POWER the board by connecting it to a 5v power supply
-
-Note:  The original BeagleBone has a built-in serial-to-USB
-converter that is not present on the later BeagleBone Black.
-This is why I recommend using a separate adapter cable.
-
-Note:  As of December 2013, the micro-HDMI video output
-on the BeagleBone Black is not supported.  To access the
-board, you'll need to use a serial-to-USB adapter or SSH.
-
-Note:  As of December 2013, the onboard eMMC is accessible
-from FreeBSD but cannot yet be booted.  Boot support should
-be coming soon...
+This script can be used to copy a full FreeBSD system
+from SD card to the eMMC.
 
 ============================================================
 
@@ -175,14 +184,10 @@ be done:
   but the more people use and stress it, the more issues we'll
   be able to shake out.  Report any problems on freebsd-arm
   mailing list.
-* Test ports.  I've tried building a few ports natively with
-  somewhat mixed success.  Try things and let us know what
-  you find.
+* Test ports.  Very many ports are known to work well; help
+  us test and fix the rest!
 * More drivers.  The AM3358 SoC has a lot of hardware
   components that are still unsupported.
-* Memory.  Some recent change reduced available memory quite
-  a bit.  Easy fix is to turn off things in rc.conf.
-  There are probably also kernel tweaks possible.
 * USB client.  The Linux distros have a virtual Ethernet
   client that allows true single-cable development.  I would
   like to do something similar for FreeBSD.
