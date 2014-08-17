@@ -1,6 +1,7 @@
 KERNCONF=CHROMEBOOK
 TARGET_ARCH=armv6
-#IMAGE_SIZE=$((1024 * 1000 * 1000*8))
+
+# This must be the exact size, in bytes, of the SDHC card
 IMAGE_SIZE=8010072064
 CHROMEBOOK_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
 
