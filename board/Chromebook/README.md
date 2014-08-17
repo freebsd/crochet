@@ -6,6 +6,11 @@ Chromebook
 
 This Crochet build was developed for the Samsung [Chromebook](http://www.samsung.com/ca/consumer/office/chrome-devices/chromebooks/XE303C12-A01CA).  
 
+Getting Started
+--------------------------------
+
+You will need to have entered developed mode and enabled boot from USB.  Instructions are [here](http://www.chromium.org/chromium-os/developer-information-for-chrome-os-devices/samsung-arm-chromebook)
+
 
 Creating the Image
 --------------------------------
