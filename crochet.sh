@@ -21,6 +21,7 @@ VERBOSE=0
 . ${LIBDIR}/disk.sh
 . ${LIBDIR}/email.sh
 . ${LIBDIR}/freebsd.sh
+. ${LIBDIR}/gpt.sh
 . ${LIBDIR}/scm.sh
 . ${LIBDIR}/uboot.sh
 . ${LIBDIR}/util.sh

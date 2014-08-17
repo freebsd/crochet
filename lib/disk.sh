@@ -60,14 +60,6 @@ disk_partition_mbr ( ) {
     gpart create -s MBR ${DISK_MD}
 }
 
-# Partition the virtual disk using GPT.
-#
-#
-disk_partition_gpt ( ) {
-    echo "Partitioning the raw disk image with EFI/GPT at "`date`
-    gpart create -s GPT ${DISK_MD}
-}
-
 # $1: mount directory
 disk_prep_mountdir ( ) {
     if [ -d "$1" ]; then

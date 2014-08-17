@@ -12,9 +12,9 @@ chromebook_partition_image ( ) {
     # create ChromeOS partition and put U-Boot on it
     chromebook_uboot_install
     # FAT partition
-    chromebook_add_fat_partition
+    gpt_add_fat_partition
     # FreeBSD root
-    disk_ufs_create
+    gpt_add_ufs_partition
     # show
     gpart show ${DISK_MD}
 }
@@ -41,19 +41,12 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 chromebook_uboot_install ( ) {
     echo Creating ChromeOS Kernel partition
     # Add ChromeOS kernel parition
-    CHROMEOS_KERNEL_PARTITION=`gpart add -s 5m -t '!fe3a2a5d-4f32-41a7-b725-accc3285a309' /dev/${DISK_MD} | sed -e 's/ .*//'`
+    CHROMEOS_KERNEL_PARTITION=`gpart add -s 15m -t '!fe3a2a5d-4f32-41a7-b725-accc3285a309' /dev/${DISK_MD} | sed -e 's/ .*//'`
     CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
-#    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=/dev/${DISK_MD}p1 bs=1m conv=sync`
-    `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=/dev/${DISK_MD}p1 bs=1m conv=sync`
-}
-#
-# add a GPT FAT parition
-chromebook_add_fat_partition ( ) {
-    CHROMEOS_FAT_PARTITION=`gpart add -s 5m -t '!EBD0A0A2-B9E5-4433-87C0-68B6B72699C7' /dev/${DISK_MD} | sed -e 's/ .*//'`
-    echo "FAT partition is /dev/${CHROMEOS_FAT_PARTITION}"
-    newfs_msdos -F 32 /dev/${CHROMEOS_FAT_PARTITION} >/dev/null
+#    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=1m conv=sync`
+    `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=1m conv=sync`
 }
 
 #
