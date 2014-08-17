@@ -38,6 +38,14 @@ chromebook_check_uboot ( ) {
 strategy_add $PHASE_CHECK chromebook_check_uboot
 
 #
+# install kernel onto the FAT32 parition
+#
+chromebook_kernel_install ( ) {
+    `cp ${WORKDIR}/obj/arm.armv6/storage/home/tom/crochet/src/FreeBSDHead/head/sys/CHROMEBOOK/kernel.bin .`
+}
+strategy_add $PHASE_BOOT_INSTALL chromebook_kernel_install .
+
+#
 # install uboot onto the ChromeOS Kernel parition
 #
 chromebook_uboot_install ( ) {
@@ -56,12 +64,6 @@ chromebook_uboot_install ( ) {
 #
 #strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
 #strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
-
-#
-# kernel
-#
-#strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
-#strategy_add $PHASE_FREEBSD_BOARD_INSTALL freebsd_ubldr_copy_ubldr_help boot
 
 #
 # Make a /boot/msdos directory so the running image
