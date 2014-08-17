@@ -13,13 +13,13 @@ gpt_add_fat_partition ( ) {
     NEW_FAT_SLICE=`gpart add -s 15m -t '!EBD0A0A2-B9E5-4433-87C0-68B6B72699C7' /dev/${DISK_MD} | sed -e 's/ .*//'`
     NEW_FAT_DEVICE=/dev/${NEW_FAT_SLICE}
     echo "FAT partition is ${NEW_FAT_DEVICE}"
-    newfs_msdos -F 32 ${NEW_FAT_DEVICE} >/dev/null
+    newfs_msdos	-F 32 ${NEW_FAT_DEVICE} >/dev/null
     disk_created_new FAT ${NEW_FAT_SLICE}
 }
 
 # add a GPT UFS parition
 gpt_add_ufs_partition ( ) {
-    NEW_UFS_SLICE=`gpart add -s 500m -t freebsd-ufs /dev/${DISK_MD} | sed -e 's/ .*//'`
+    NEW_UFS_SLICE=`gpart add -t freebsd-ufs /dev/${DISK_MD} | sed -e 's/ .*//'`
     NEW_UFS_DEVICE=/dev/${NEW_UFS_SLICE}
     echo "UFS partition is ${NEW_UFS_DEVICE}"
     newfs ${NEW_UFS_DEVICE} >/dev/null

@@ -1,6 +1,7 @@
 KERNCONF=CHROMEBOOK
 TARGET_ARCH=armv6
-IMAGE_SIZE=$((1024 * 1000 * 1000))
+#IMAGE_SIZE=$((1024 * 1000 * 1000*8))
+IMAGE_SIZE=8010072064
 CHROMEBOOK_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
 
 #
@@ -65,7 +66,7 @@ chromebook_uboot_install ( ) {
 # Make a /boot/msdos directory so the running image
 # can mount the FAT partition.  (See overlay/etc/fstab.)
 #
-#strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 
 #
 #  build the u-boot scr file
