@@ -15,7 +15,7 @@ gpt_add_fat_partition ( ) {
     local NEW_FAT_SLICE=`gpart add -s $1 -t '!EBD0A0A2-B9E5-4433-87C0-68B6B72699C7' /dev/${DISK_MD} | sed -e 's/ .*//'`
     local NEW_FAT_DEVICE=/dev/${NEW_FAT_SLICE}
     echo "FAT partition is ${NEW_FAT_DEVICE}"
-    newfs_msdos	-F 32 ${NEW_FAT_DEVICE} >/dev/null
+    newfs_msdos ${NEW_FAT_DEVICE} >/dev/null
     disk_created_new FAT ${NEW_FAT_SLICE}
 }
 
