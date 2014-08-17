@@ -14,7 +14,7 @@ chromebook_partition_image ( ) {
     # create ChromeOS partition and put U-Boot on it
     chromebook_uboot_install
     # FAT partition
-    gpt_add_fat_partition 15m
+    gpt_add_fat_partition 100m
     # FreeBSD root
     gpt_add_ufs_partition
     # show
@@ -38,12 +38,9 @@ chromebook_check_uboot ( ) {
 strategy_add $PHASE_CHECK chromebook_check_uboot
 
 #
-# install kernel onto the FAT32 parition
+# install kernel
 #
-chromebook_kernel_install ( ) {
-    `cp ${WORKDIR}/obj/arm.armv6/storage/home/tom/crochet/src/FreeBSDHead/head/sys/CHROMEBOOK/kernel.bin .`
-}
-strategy_add $PHASE_BOOT_INSTALL chromebook_kernel_install .
+strategy_add $PHASE_BOOT_INSTALL board_default_installkernel .
 
 #
 # install uboot onto the ChromeOS Kernel parition
@@ -74,4 +71,4 @@ strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 #
 #  build the u-boot scr file
 #
-#strategy_add $PHASE_BOOT_INSTALL uboot_mkimage "files/boot.txt" "boot.scr"
+strategy_add $PHASE_BOOT_INSTALL uboot_mkimage ${CHROMEBOOK_UBOOT_SRC} "files/boot.txt" "boot.scr"

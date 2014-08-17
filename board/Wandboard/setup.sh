@@ -93,5 +93,5 @@ strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 #
 #  build the u-boot scr file
 #
-strategy_add $PHASE_BOOT_INSTALL uboot_mkimage "files/boot.txt" "boot.scr"
+strategy_add $PHASE_BOOT_INSTALL uboot_mkimage ${WANDBOARD_UBOOT_SRC} "files/boot.txt" "boot.scr"
 
