@@ -1,4 +1,4 @@
-KERNCONF=CHROMEBOOK
+KERNCONF=CHROMEBOOK-SNOW
 TARGET_ARCH=armv6
 
 # This must be the exact size, in bytes, of the SDHC card
@@ -41,7 +41,7 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 # install kernel
 #
 chromebook_kernel_install ( ) {
-    `cp ${WORKDIR}/obj/arm.armv6/storage/home/tom/crochet/src/FreeBSDHead/head/sys/CHROMEBOOK/kernel.bin .`
+    `cp ${WORKDIR}/obj/arm.armv6/storage/home/tom/crochet/src/FreeBSDHead/head/sys/CHROMEBOOK-SNOW/kernel.bin .`
 }
 strategy_add $PHASE_BOOT_INSTALL chromebook_kernel_install .
 
