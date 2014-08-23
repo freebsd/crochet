@@ -284,7 +284,7 @@ board_mount_all ( ) {
     local ABSINDEX
 
     echo "Mounting all file systems:"
-
+    
     ABSINDEX=1
     while [ $ABSINDEX -le $DISK_COUNT ]; do
 	disk_mount `board_mountpoint ${ABSINDEX}` ${ABSINDEX}

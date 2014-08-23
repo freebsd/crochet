@@ -55,11 +55,10 @@ disk_create_image ( ) {
 # partitioning.)
 #
 disk_partition_mbr ( ) {
-    echo "Partitioning the raw disk image at "`date`
+    echo "Partitioning the raw disk image with MBR at "`date`
     echo gpart create -s MBR ${DISK_MD}
     gpart create -s MBR ${DISK_MD}
 }
-
 
 # $1: mount directory
 disk_prep_mountdir ( ) {
@@ -278,6 +277,7 @@ disk_fat_partition ( ) {
 
     disk_partition FAT ${INDEX:-1}
 }
+
 
 # Add a FAT partition and format it.
 #
