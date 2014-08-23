@@ -1,5 +1,6 @@
 KERNCONF=CHROMEBOOK-SNOW
 TARGET_ARCH=armv6
+FIT_IMAGE=uboot-fit.uimage
 
 # This must be the exact size, in bytes, of the SDHC card
 IMAGE_SIZE=8010072064
@@ -12,9 +13,10 @@ chromebook_partition_image ( ) {
     # disk is gpt
     disk_partition_gpt
     # create ChromeOS partition and put U-Boot on it
+ #   chromebook_make_fit
     chromebook_uboot_install
     # FAT partition
-    gpt_add_fat_partition 15m
+    gpt_add_fat_partition 50m
     # FreeBSD root
     gpt_add_ufs_partition
     # show
@@ -42,8 +44,20 @@ strategy_add $PHASE_CHECK chromebook_check_uboot
 #
 chromebook_kernel_install ( ) {
     `cp ${WORKDIR}/obj/arm.armv6/storage/home/tom/crochet/src/FreeBSDHead/head/sys/CHROMEBOOK-SNOW/kernel.bin .`
+#    cd ${FREEBSD_SRC}/
+#    `echo pwd` 
+
+ #   `cp ${FREEBSD_OBJDIR}sys/CHROMEBOOK-SNOW/kernel.bin .`
 }
 strategy_add $PHASE_BOOT_INSTALL chromebook_kernel_install .
+
+#
+# make the fit image
+#
+chromebook_make_fit ( ) {
+    TEXT_START=$(grep CONFIG_SYS_TEXT_BASE ${CHROMEBOOK_UBOOT_SRC}/include/configs/exynos5250-dt.h | awk '{ print $3 }')
+    (cd $CHROMEBOOK_UBOOT_SRC;tools/mkimage -A arm -O linux -T kernel -C none -a "${TEXT_START}" -e "${TEXT_START}" -n "u-boot" -d u-boot-dtb.bin ${WORKDIR}/${FIT_IMAGE})
+}
 
 #
 # install uboot onto the ChromeOS Kernel parition
@@ -55,8 +69,10 @@ chromebook_uboot_install ( ) {
     local CHROMEOS_KERNEL_MOUNTPOINT=/dev/${CHROMEOS_KERNEL_PARTITION}
     echo ChromeOS Kernel Mountpoint is ${CHROMEOS_KERNEL_MOUNTPOINT}
     echo Installing U-Boot to ${CHROMEOS_KERNEL_MOUNTPOINT}
+    echo U-boot image is ${WORKDIR}/${FIT_IMAGE}
 #    `dd if=${CHROMEBOOK_UBOOT_SRC}/u-boot.bin of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=1m conv=sync`
     `dd if=board/Chromebook/uboot/nv_uboot-snow-simplefb.kpart of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=1m conv=sync`
+#    dd if=${WORKDIR}/${FIT_IMAGE} of=${CHROMEOS_KERNEL_MOUNTPOINT} bs=1m conv=sync`
 }
 
 #
