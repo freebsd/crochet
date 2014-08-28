@@ -24,14 +24,14 @@ strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 wandboard_check_uboot ( ) {
 	# Crochet needs to build U-Boot.
 
-    	uboot_set_patch_version ${WANDBOARD_UBOOT_SRC} ${WANDBOARD_UBOOT_PATCH_VERSION}
+    uboot_set_patch_version ${WANDBOARD_UBOOT_SRC} ${WANDBOARD_UBOOT_PATCH_VERSION}
 
-        uboot_test \
-            WANDBOARD_UBOOT_SRC \
-            "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile"
-        strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} `uboot_patch_files`
-        strategy_add $PHASE_BUILD_OTHER uboot_configure $WANDBOARD_UBOOT_SRC wandboard_quad_config
-        strategy_add $PHASE_BUILD_OTHER uboot_build $WANDBOARD_UBOOT_SRC
+    uboot_test \
+        WANDBOARD_UBOOT_SRC \
+        "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile"
+    strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} `uboot_patch_files`
+    strategy_add $PHASE_BUILD_OTHER uboot_configure $WANDBOARD_UBOOT_SRC wandboard_quad_config
+    strategy_add $PHASE_BUILD_OTHER uboot_build $WANDBOARD_UBOOT_SRC
 }
 strategy_add $PHASE_CHECK wandboard_check_uboot
 
@@ -39,8 +39,8 @@ strategy_add $PHASE_CHECK wandboard_check_uboot
 # install uboot
 #
 wandboard_uboot_install ( ) {
-        echo Installing U-Boot to /dev/${DISK_MD}
-        dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=/dev/${DISK_MD} bs=512 seek=2
+    echo Installing U-Boot to /dev/${DISK_MD}
+    dd if=${WANDBOARD_UBOOT_SRC}/u-boot.imx of=/dev/${DISK_MD} bs=512 seek=2
 }
 
 #
@@ -93,5 +93,5 @@ strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir boot/msdos
 #
 #  build the u-boot scr file
 #
-strategy_add $PHASE_BOOT_INSTALL uboot_mkimage "files/boot.txt" "boot.scr"
+strategy_add $PHASE_BOOT_INSTALL uboot_mkimage ${WANDBOARD_UBOOT_SRC} "files/boot.txt" "boot.scr"
 
