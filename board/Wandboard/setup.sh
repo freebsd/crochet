@@ -1,7 +1,7 @@
 KERNCONF=IMX6
 TARGET_ARCH=armv6
 IMAGE_SIZE=$((1024 * 1000 * 1000))
-WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2013.10
+WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
 
 #
 # 3 partitions, a reserve one for uboot, a FAT one for the boot loader and a UFS one
