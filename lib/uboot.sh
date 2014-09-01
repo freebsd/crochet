@@ -137,7 +137,7 @@ uboot_configure ( ) {
     cd "$1"
     echo "Configuring U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.configure.log)"
-    if gmake CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
+    if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
         true # success
     else
         echo "  Failed to configure U-Boot."
