@@ -345,16 +345,20 @@ disk_fat_mount ( ) {
 
 
 # $1: index of UFS partition
+disk_ufs_slice ( ) {
+    local INDEX=$1
+    disk_device UFS ${INDEX:-1} | sed -e 's/\([0-9]\)[a-z]*$/\1/'
+}
+
+# $1: index of UFS partition
 disk_ufs_device ( ) {
     local INDEX=$1
-
     disk_device UFS ${INDEX:-1} 
 }
 
 # $1: index of UFS partition
 disk_ufs_partition ( ) {
     local INDEX=$1
-
     disk_partition UFS ${INDEX:-1}
 }
 
@@ -386,7 +390,7 @@ disk_ufs_create ( ) {
     # Turn on Softupdates
     tunefs -n enable ${NEW_UFS_DEVICE}
     # Turn on SUJ with a minimally-sized journal.
-    # This makes reboots tolerable if you just pull power on the BB
+    # This makes reboots tolerable if you just pull power
     # Note:  A slow SDHC reads about 1MB/s, so a 30MB
     # journal can delay boot by 30s.
     tunefs -j enable -S 4194304 ${NEW_UFS_DEVICE}
