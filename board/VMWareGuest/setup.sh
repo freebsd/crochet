@@ -190,8 +190,9 @@ EOF
     # this?  Or is it enough for people to open
     # the VM in VMWare and adjust it themselves?
     cat >"${VMWARE_DIR}/VirtualMachine.vmx" <<EOF
+.encoding = "UTF-8"
 config.version = "8"
-virtualHW.version = "10"
+virtualHW.version = "9"
 displayName = "${VMWARE_NAME}"
 ethernet0.connectionType = "nat"
 ethernet0.present= "true"
@@ -209,7 +210,13 @@ ehci.pciSlotNumber = "0"
 isolation.tools.dnd.disable = "TRUE"
 isolation.tools.copy.disable = "TRUE"
 isolation.tools.paste.disable = "TRUE"
+virtualHW.productCompatibility = "hosted"
 floppy0.present = "FALSE"
+ethernet0.addressType = "generated"
+ethernet0.pciSlotNumber = "-1"
+usb.pciSlotNumber = "-1"
+replay.supported = "FALSE"
+replay.filename = ""
 EOF
 }
 
