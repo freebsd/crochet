@@ -45,7 +45,7 @@ disk_create_image ( ) {
     echo "    $1"
     [ -f $1 ] && rm -f $1
     dd if=/dev/zero of=$1 bs=512 seek=$(($2 / 512)) count=0 >/dev/null 2>&1
-    DISK_MD=`mdconfig -a -t vnode -f $1`
+    DISK_MD=`mdconfig -a -t vnode -f $1 -x 63 -y 255`
     disk_record_md ${DISK_MD}
 }
 
@@ -55,11 +55,10 @@ disk_create_image ( ) {
 # partitioning.)
 #
 disk_partition_mbr ( ) {
-    echo "Partitioning the raw disk image at "`date`
+    echo "Partitioning the raw disk image with MBR at "`date`
     echo gpart create -s MBR ${DISK_MD}
     gpart create -s MBR ${DISK_MD}
 }
-
 
 # $1: mount directory
 disk_prep_mountdir ( ) {
@@ -279,6 +278,7 @@ disk_fat_partition ( ) {
     disk_partition FAT ${INDEX:-1}
 }
 
+
 # Add a FAT partition and format it.
 #
 # $1: size of partition, can use 'k', 'm', 'g' suffixes, or whole disk if -1 or not specified
@@ -345,16 +345,20 @@ disk_fat_mount ( ) {
 
 
 # $1: index of UFS partition
+disk_ufs_slice ( ) {
+    local INDEX=$1
+    disk_device UFS ${INDEX:-1} | sed -e 's/\([0-9]\)[a-z]*$/\1/'
+}
+
+# $1: index of UFS partition
 disk_ufs_device ( ) {
     local INDEX=$1
-
     disk_device UFS ${INDEX:-1} 
 }
 
 # $1: index of UFS partition
 disk_ufs_partition ( ) {
     local INDEX=$1
-
     disk_partition UFS ${INDEX:-1}
 }
 
@@ -386,7 +390,7 @@ disk_ufs_create ( ) {
     # Turn on Softupdates
     tunefs -n enable ${NEW_UFS_DEVICE}
     # Turn on SUJ with a minimally-sized journal.
-    # This makes reboots tolerable if you just pull power on the BB
+    # This makes reboots tolerable if you just pull power
     # Note:  A slow SDHC reads about 1MB/s, so a 30MB
     # journal can delay boot by 30s.
     tunefs -j enable -S 4194304 ${NEW_UFS_DEVICE}

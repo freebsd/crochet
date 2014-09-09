@@ -1,6 +1,6 @@
 TARGET_ARCH=i386
 KERNCONF=GENERIC
-IMAGE_SIZE=$((600 * 1000 * 1000))
+IMAGE_SIZE=$((800 * 1000 * 1000))
 
 #
 # Builds a basic i386 image.
@@ -22,25 +22,60 @@ VMWARE_MEMSIZE=1024
 
 generic_i386_build_mbr ( ) {
     echo "Building MBR"
-    cd ${FREEBSD_SRC}/sys/boot/i386/mbr
-    make TARGET_ARCH=i386 > ${WORKDIR}/_.i386.mbr.log || exit 1
-    make TARGET_ARCH=i386 DESTDIR=${WORKDIR} install || exit 1
+    cd ${FREEBSD_SRC}
+    buildenv=`make TARGET_ARCH=${TARGET_ARCH} buildenvvars`
+    cd sys/boot/i386/mbr
+    if eval $buildenv make > ${WORKDIR}/_.i386.mbr.log 2>&1
+    then
+	true
+    else
+	echo "Failed to build MBR:"
+	tail ${WORKDiR}/_.i386.mbr.log
+	exit 1
+    fi
+    eval $buildenv make DESTDIR=${WORKDIR} install || exit 1
 }
 strategy_add $PHASE_BUILD_OTHER generic_i386_build_mbr
 
 generic_i386_build_boot2 ( ) {
     echo "Building Boot2"
-    cd ${FREEBSD_SRC}/sys/boot/i386/boot2
-    make TARGET_ARCH=i386 > ${WORKDIR}/_.i386.boot2.log || exit 1
-    make TARGET_ARCH=i386 DESTDIR=${WORKDIR} install || exit 1
+    cd ${FREEBSD_SRC}
+    buildenv=`make TARGET_ARCH=${TARGET_ARCH} buildenvvars`
+    cd sys/boot/i386/boot2
+    if eval $buildenv make > ${WORKDIR}/_.i386.boot2.log 2>&1
+    then
+	true
+    else
+	echo "Failed to build boot2:"
+	tail ${WORKDiR}/_.i386.boot2.log
+	exit 1
+    fi
+    eval $buildenv make DESTDIR=${WORKDIR} install || exit 1
 }
 strategy_add $PHASE_BUILD_OTHER generic_i386_build_boot2
 
 generic_i386_build_loader ( ) {
     echo "Building Loader"
-    cd ${FREEBSD_SRC}/sys/boot/i386/loader
-    make TARGET_ARCH=i386 > ${WORKDIR}/_.i386_loader.log || exit 1
-    make TARGET_ARCH=i386 DESTDIR=${WORKDIR} NO_MAN=t install || exit 1
+    cd ${FREEBSD_SRC}
+    buildenv=`make TARGET_ARCH=${TARGET_ARCH} buildenvvars`
+    cd sys/boot/i386/loader
+    if eval $buildenv make > ${WORKDIR}/_.i386_loader_build.log 2>&1
+    then
+	true
+    else
+	echo "Failed to build i386 loader:"
+	tail ${WORKDiR}/_.i386_loader_build.log
+	exit 1
+    fi
+    if eval $buildenv make DESTDIR=${WORKDIR} NO_MAN=t install > ${WORKDIR}/_.i386_loader_install.log 2>&1
+    then
+	true
+    else
+	echo "Failed to copy i386 loader into workdir:"
+	tail ${WORKDiR}/_.i386_loader_install.log
+	exit 1
+    fi
+
 }
 strategy_add $PHASE_BUILD_OTHER generic_i386_build_loader
 
@@ -53,7 +88,7 @@ generic_i386_partition_image ( ) {
     echo "Installing bootblocks"
     gpart bootcode -b ${WORKDIR}/boot/mbr ${DISK_MD} || exit 1
     gpart set -a active -i 1 ${DISK_MD} || exit 1
-    bsdlabel -B -b ${WORKDIR}/boot/boot `disk_ufs_partition` || exit 1
+    bsdlabel -B -b ${WORKDIR}/boot/boot `disk_ufs_slice` || exit 1
 }
 strategy_add $PHASE_PARTITION_LWW generic_i386_partition_image
 
@@ -95,7 +130,7 @@ vmware_guest_post_config_names ( ) {
     IMG="${VMWARE_DIR}/Disk0.hdd"
     strategy_add $PHASE_POST_UNMOUNT vmware_guest_build_vm  ${IMG}
 }
-strategy_add $PHASE_POST_CONFIG vmware_guest_post_config_names
+PRIORITY=200 strategy_add $PHASE_POST_CONFIG vmware_guest_post_config_names
 
 # Build the VMWare virtual machine directory:
 #   FreeBSD-i386-GENERIC.vmwarevm/
@@ -155,8 +190,9 @@ EOF
     # this?  Or is it enough for people to open
     # the VM in VMWare and adjust it themselves?
     cat >"${VMWARE_DIR}/VirtualMachine.vmx" <<EOF
+.encoding = "UTF-8"
 config.version = "8"
-virtualHW.version = "10"
+virtualHW.version = "9"
 displayName = "${VMWARE_NAME}"
 ethernet0.connectionType = "nat"
 ethernet0.present= "true"
@@ -174,7 +210,13 @@ ehci.pciSlotNumber = "0"
 isolation.tools.dnd.disable = "TRUE"
 isolation.tools.copy.disable = "TRUE"
 isolation.tools.paste.disable = "TRUE"
+virtualHW.productCompatibility = "hosted"
 floppy0.present = "FALSE"
+ethernet0.addressType = "generated"
+ethernet0.pciSlotNumber = "-1"
+usb.pciSlotNumber = "-1"
+replay.supported = "FALSE"
+replay.filename = ""
 EOF
 }
 

@@ -137,7 +137,7 @@ uboot_configure ( ) {
     cd "$1"
     echo "Configuring U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.configure.log)"
-    if gmake CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
+    if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
         true # success
     else
         echo "  Failed to configure U-Boot."
@@ -220,20 +220,21 @@ uboot_patch_files ( ) {
 }
 
 #
-#  $1 name of script file
-#  $2 output file
+#  $1 location of uboot source
+#  $2 name of script file
+#  $3 output file
 # 
 uboot_mkimage ( ) (
     echo "Building and Installing U-Boot script"
     
     # location of input file
-    MKIMAGE_INPUT="$BOARDDIR/$1";
+    MKIMAGE_INPUT="$BOARDDIR/$2";
  
     # location of output file.  This will end up being the FAT filesystem
-    MKIMAGE_OUTPUT="$2" 
+    MKIMAGE_OUTPUT="$3" 
 
     # location of mkimage
-    MKIMAGE="$WANDBOARD_UBOOT_SRC/tools/mkimage"
+    MKIMAGE="$1/tools/mkimage"
 
     # execute mkimage
     eval "$MKIMAGE -A arm -O FreeBSD -T script -C none -d $MKIMAGE_INPUT $MKIMAGE_OUTPUT" > ${WORKDIR}/_.mkimage.log
