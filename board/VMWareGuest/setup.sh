@@ -30,7 +30,7 @@ generic_i386_build_mbr ( ) {
 	true
     else
 	echo "Failed to build MBR:"
-	tail ${WORKDiR}/_.i386.mbr.log
+	tail ${WORKDIR}/_.i386.mbr.log
 	exit 1
     fi
     eval $buildenv make DESTDIR=${WORKDIR} install || exit 1
@@ -47,7 +47,7 @@ generic_i386_build_boot2 ( ) {
 	true
     else
 	echo "Failed to build boot2:"
-	tail ${WORKDiR}/_.i386.boot2.log
+	tail ${WORKDIR}/_.i386.boot2.log
 	exit 1
     fi
     eval $buildenv make DESTDIR=${WORKDIR} install || exit 1
@@ -64,7 +64,7 @@ generic_i386_build_loader ( ) {
 	true
     else
 	echo "Failed to build i386 loader:"
-	tail ${WORKDiR}/_.i386_loader_build.log
+	tail ${WORKDIR}/_.i386_loader_build.log
 	exit 1
     fi
     if eval $buildenv make DESTDIR=${WORKDIR} NO_MAN=t install > ${WORKDIR}/_.i386_loader_install.log 2>&1
@@ -72,7 +72,7 @@ generic_i386_build_loader ( ) {
 	true
     else
 	echo "Failed to copy i386 loader into workdir:"
-	tail ${WORKDiR}/_.i386_loader_install.log
+	tail ${WORKDIR}/_.i386_loader_install.log
 	exit 1
     fi
 
