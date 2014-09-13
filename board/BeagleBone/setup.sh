@@ -18,25 +18,10 @@ strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
 #
 # BeagleBone uses U-Boot.
 #
-uboot_eabi_port_version ( ) {
-    pkg query '%n-%v' u-boot-beaglebone-eabi
-}
-
-uboot_eabi_port_location ( ) {
-    pkg query '%p' u-boot-beaglebone-eabi
-}
-
 beaglebone_check_uboot ( ) {
     if [ -n "${BEAGLEBONE_UBOOT}" ]; then
 	echo "Using U-Boot from location: ${BEAGLEBONE_UBOOT}"
-    elif [ -n ""`uboot_eabi_port_version` ]; then
-        echo "Using U-Boot from port: "`uboot_eabi_port_version`
-	BEAGLEBONE_UBOOT=`uboot_eabi_port_location`/share/u-boot/beaglebone-eabi/
     elif [ -n "${BEAGLEBONE_UBOOT_SRC}" ]; then
-        echo
-        echo "Please consider installing sysutils/u-boot-beaglebone-eabi port."
-        echo "That will avoid the need for Crochet to build U-Boot."
-        echo
         # Crochet needs to build U-Boot.
 
 	uboot_set_patch_version ${BEAGLEBONE_UBOOT_SRC} ${BEAGLEBONE_UBOOT_PATCH_VERSION}
@@ -51,8 +36,7 @@ beaglebone_check_uboot ( ) {
     else
 	echo
 	echo "Don't know where to find U-Boot."
-	echo "Please set $BEAGLEBONE_UBOOT_SRC, $BEAGLEBONE_UBOOT"
-	echo "or install sysutils/u-boot-beaglebone-eabi port."
+	echo "Please set \$BEAGLEBONE_UBOOT_SRC"
 	echo
 	exit 1
     fi
