@@ -1,6 +1,5 @@
 KERNCONF=BEAGLEBONE
 BEAGLEBONE_UBOOT=
-#BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2013.04
 BEAGLEBONE_UBOOT_SRC=${TOPDIR}/u-boot-2014.04
 IMAGE_SIZE=$((1000 * 1000 * 1000))
 TARGET_ARCH=armv6
@@ -30,7 +29,6 @@ beaglebone_check_uboot ( ) {
             BEAGLEBONE_UBOOT_SRC \
             "$BEAGLEBONE_UBOOT_SRC/board/ti/am335x/Makefile"
         strategy_add $PHASE_BUILD_OTHER uboot_patch ${BEAGLEBONE_UBOOT_SRC} `uboot_patch_files`
-#        strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_evm
         strategy_add $PHASE_BUILD_OTHER uboot_configure $BEAGLEBONE_UBOOT_SRC am335x_boneblack_config
         strategy_add $PHASE_BUILD_OTHER uboot_build $BEAGLEBONE_UBOOT_SRC
     else
