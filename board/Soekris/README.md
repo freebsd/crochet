@@ -13,7 +13,7 @@ Soekris is a family of reliable, robust, superior quality communications compute
 How to Boot the Soekris
 --------------------------------
 
-1. Connect the DB-9 serial port on the Soekris to your system.  This 
+1. Connect the DB-9 serial port at 9600 8-n-1 on the Soekris to your system.  This 
    will allow you to view the console output
 
 2. Insert the CF card into your Soekris
