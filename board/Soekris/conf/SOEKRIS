@@ -1,0 +1,19 @@
+#
+# SOEKRIS -- Generic Kernel configuration file for FreeBSD/i386 on SOEKRIS
+#
+# $FREEBSD
+
+include GENERIC
+
+ident SOEKRIS
+
+# To Make a SOEKRIS Kernel, the next options are needed
+options  CPU_SOEKRIS
+options  CPU_ELAN
+options  CPU_ELAN_PPS
+options  CPU_ELAN_XTAL=32768000
+options  CPU_GEODE
+
+# Include TMPFS
+options  TMPFS
+

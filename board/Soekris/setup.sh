@@ -6,7 +6,7 @@ IMAGE_SIZE=$((1024 * 1000 * 1000))
 
 # copy the build config
 soekris_copy_buildconfig ( ) {
-    KERNEL_CONFIG_FILE="SOEKRIS${FREEBSD_MAJOR_VERSION}"
+    KERNEL_CONFIG_FILE="SOEKRIS"
     echo "Copying build config ${KERNEL_CONFIG_FILE} to source tree"
     cp ${BOARDDIR}/conf/${KERNEL_CONFIG_FILE} ${FREEBSD_SRC}/sys/i386/conf/${KERNCONF}
 }
