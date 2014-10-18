@@ -1,0 +1,17 @@
+commit (bootcode.bin) = 6eda68af0e3f0897c5b72a3d44003f16ecdc9110
+commit-date (bootcode.bin) = Wed Aug 20 23:10:26 2014 +0100
+
+commit (fixup.dat) = c23c0022740bb4531e841bd1321d2a652c8b3b0d
+commit-date (fixup.dat) = Fri Oct 17 18:56:09 2014 +0100
+
+commit (fixup_cd.dat) = f2275b92477d1a01f45f321d648f0eeeeeb0a67e
+commit-date (fixup_cd.dat) = Wed Oct 1 23:20:21 2014 +0100
+
+commit (fixup_cd.dat) = c23c0022740bb4531e841bd1321d2a652c8b3b0d
+commit-date (fixup_cd.dat) = Fri Oct 17 18:56:09 2014 +0100
+
+commit (start.elf) = c23c0022740bb4531e841bd1321d2a652c8b3b0d
+commit-date (start.eld) = Fri Oct 17 18:56:09 2014 +0100
+
+commit (start_cd.elf) = c23c0022740bb4531e841bd1321d2a652c8b3b0d
+commit-date (start_cd.elf) = Fri Oct 17 18:56:09 2014 +0100
