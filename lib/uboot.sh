@@ -137,6 +137,7 @@ uboot_configure ( ) {
     cd "$1"
     echo "Configuring U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.configure.log)"
+    unset VENDOR
     if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
         true # success
     else
@@ -160,6 +161,7 @@ uboot_build ( ) (
     cd "$1"
     echo "Building U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.build.log)"
+    unset VENDOR
     if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} > $1/_.uboot.build.log 2>&1; then
         true # success
     else
