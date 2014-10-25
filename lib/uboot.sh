@@ -137,6 +137,8 @@ uboot_configure ( ) {
     cd "$1"
     echo "Configuring U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.configure.log)"
+    # U-Boot 2014.10 chokes when csh sets VENDOR; fixed in U-Boot 2015.01
+    # This can be removed when U-Boot 2014.10 is ancient history.
     unset VENDOR
     if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} $2 > $1/_.uboot.configure.log 2>&1; then
         true # success
@@ -161,6 +163,7 @@ uboot_build ( ) (
     cd "$1"
     echo "Building U-Boot at "`date`
     echo "    (Logging to $1/_.uboot.build.log)"
+    # U-Boot 2014.10 chokes when csh sets VENDOR
     unset VENDOR
     if gmake SED=gsed HOSTCC=cc CROSS_COMPILE=${FREEBSD_XDEV_PREFIX} > $1/_.uboot.build.log 2>&1; then
         true # success
