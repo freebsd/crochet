@@ -64,7 +64,7 @@ wandboard_install_uenvtxt(){
 wandboard_install_dts_fat(){
     echo "Installing DTS to FAT"
     freebsd_install_fdt wandboard-quad.dts wandboard-quad.dts
-    freebsd_install_fdt wandboard-quad.dts wandboard-quad.dtb
+    freebsd_install_fdt wandboard-quad.dtb wandboard-quad.dtb
 }
 #strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts_fat
 
@@ -74,7 +74,7 @@ wandboard_install_dts_fat(){
 wandboard_install_dts_ufs(){
     echo "Installing DTS to UFS"
     freebsd_install_fdt wandboard-quad.dts boot/kernel/wandboard-quad.dts
-    freebsd_install_fdt wandboard-quad.dts boot/kernel/wandboard-quad.dtb
+    freebsd_install_fdt wandboard-quad.dtb boot/kernel/wandboard-quad.dtb
 }
 strategy_add $PHASE_FREEBSD_BOARD_POST_INSTALL wandboard_install_dts_ufs
 
