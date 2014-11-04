@@ -21,14 +21,14 @@ freebsd_xdev_test ( ) {
             ;;
     esac
 
-    FREEBSD_XDEV_PREFIX=${XDEV_ARCH}-freebsd-
+    FREEBSD_XDEV_PREFIX=/usr/${XDEV_ARCH}-freebsd/usr/bin/
     CC=${FREEBSD_XDEV_PREFIX}cc
     if [ -z `which ${CC}` ]; then
         echo "Can't find appropriate FreeBSD xdev tools."
         echo "Tested: ${CC}"
         echo "If you have FreeBSD-CURRENT sources in /usr/src, you can build these with the following command:"
         echo
-        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 WITH_GCC_BOOTSTRAP=1 WITHOUT_CLANG=1 WITHOUT_CLANG_BOOTSTRAP=1 WITHOUT_CLANG_IS_CC=1 xdev"
+        echo "cd /usr/src && sudo make XDEV=${XDEV} XDEV_ARCH=${XDEV_ARCH} WITH_GCC=1 WITH_GCC_BOOTSTRAP=1 WITHOUT_CLANG=1 WITHOUT_CLANG_BOOTSTRAP=1 WITHOUT_CLANG_IS_CC=1 WITHOUT_TESTS=1 xdev"
         echo
         echo "Run this script again after you have the xdev tools installed."
         exit 1
