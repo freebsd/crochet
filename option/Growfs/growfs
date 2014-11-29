@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# PROVIDE: autosize
+# PROVIDE: growfs
 # BEFORE: sysctl
 # KEYWORD: firstbootonly
 
@@ -27,12 +27,12 @@
 
 . /etc/rc.subr
 
-name="autosize"
-start_cmd="autosize_start"
+name="growfs"
+start_cmd="growfs_start"
 stop_cmd=":"
-rcvar="autosize_enable"
+rcvar="growfs_enable"
 
-autosize_start ()
+growfs_start ()
 {
     echo "Enlarging root partition"
     gpart resize -i 2 mmcsd0

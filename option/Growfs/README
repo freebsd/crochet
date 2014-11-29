@@ -1,4 +1,4 @@
-The AutoSize option adds a startup command that will attempt to use
+The Growfs option adds a startup command that will attempt to use
 growfs to enlarge the FreeBSD partition.
 
 This allows you to create and distribute a relatively small image that
