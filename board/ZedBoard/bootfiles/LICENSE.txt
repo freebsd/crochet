@@ -1,6 +1,0 @@
-The precompiled boot loader in this directory
-is based on U-Boot boot loader code as distributed
-by Xilinx.
-
-Please refer to U-Boot and Xilinx documentation for
-details on the licensing of these files.
