@@ -1,0 +1,32 @@
+From c8cad9fdebe7bb29d082b1f0a4411fd26fe356bc Mon Sep 17 00:00:00 2001
+From: Scott Ellis <scott@jumpnowtek.com>
+Date: Sat, 8 Nov 2014 07:45:00 -0500
+Subject: [PATCH] Add api and elf support to wandboard config
+
+---
+ include/configs/wandboard.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/include/configs/wandboard.h b/include/configs/wandboard.h
+index 9fb501a..6b1aef9 100644
+--- a/include/configs/wandboard.h
++++ b/include/configs/wandboard.h
+@@ -18,6 +18,15 @@
+ #define CONFIG_DISPLAY_CPUINFO
+ #define CONFIG_DISPLAY_BOARDINFO
+ 
++#define CONFIG_SYS_ICACHE_OFF
++#define CONFIG_SYS_DCACHE_OFF
++
++#ifndef CONFIG_SPL_BUILD
++#define CONFIG_CMD_ELF
++#define CONFIG_SYS_MMC_MAX_DEVICE 4
++#define CONFIG_API
++#endif
++
+ #define MACH_TYPE_WANDBOARD		4412
+ #define CONFIG_MACH_TYPE		MACH_TYPE_WANDBOARD
+ 
+-- 
+2.1.2
+
