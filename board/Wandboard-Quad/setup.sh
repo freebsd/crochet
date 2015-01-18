@@ -1,7 +1,9 @@
 KERNCONF=IMX6
 TARGET_ARCH=armv6
 IMAGE_SIZE=$((1024 * 1000 * 1000))
-WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
+WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2014.10
+WANDBOARD_UBOOT_CONFIG=wandboard_quad_config
+WANDBOARD_DT_BASENAME=wandboard-quad
 
 #
 # 3 partitions, a reserve one for uboot, a FAT one for the boot loader and a UFS one
@@ -30,7 +32,7 @@ wandboard_check_uboot ( ) {
         WANDBOARD_UBOOT_SRC \
         "$WANDBOARD_UBOOT_SRC/board/wandboard/Makefile"
     strategy_add $PHASE_BUILD_OTHER uboot_patch ${WANDBOARD_UBOOT_SRC} `uboot_patch_files`
-    strategy_add $PHASE_BUILD_OTHER uboot_configure $WANDBOARD_UBOOT_SRC wandboard_quad_config
+    strategy_add $PHASE_BUILD_OTHER uboot_configure $WANDBOARD_UBOOT_SRC $WANDBOARD_UBOOT_CONFIG 
     strategy_add $PHASE_BUILD_OTHER uboot_build $WANDBOARD_UBOOT_SRC
 }
 strategy_add $PHASE_CHECK wandboard_check_uboot
@@ -63,8 +65,8 @@ wandboard_install_uenvtxt(){
 #
 wandboard_install_dts_fat(){
     echo "Installing DTS to FAT"
-    freebsd_install_fdt wandboard-quad.dts wandboard-quad.dts
-    freebsd_install_fdt wandboard-quad.dts wandboard-quad.dtb
+    freebsd_install_fdt $WANDBOARD_DT_BASENAME.dts $WANDBOARD_DT_BASENAME.dts
+    freebsd_install_fdt $WANDBOARD_DT_BASENAME.dts $WANDBOARD_DT_BASENAME.dtb
 }
 #strategy_add $PHASE_BOOT_INSTALL wandboard_install_dts_fat
 
@@ -73,8 +75,8 @@ wandboard_install_dts_fat(){
 #
 wandboard_install_dts_ufs(){
     echo "Installing DTS to UFS"
-    freebsd_install_fdt wandboard-quad.dts boot/kernel/wandboard-quad.dts
-    freebsd_install_fdt wandboard-quad.dts boot/kernel/wandboard-quad.dtb
+    freebsd_install_fdt $WANDBOARD_DT_BASENAME.dts boot/kernel/$WANDBOARD_DT_BASENAME.dts
+    freebsd_install_fdt $WANDBOARD_DT_BASENAME.dts boot/kernel/$WANDBOARD_DT_BASENAME.dtb
 }
 strategy_add $PHASE_FREEBSD_BOARD_POST_INSTALL wandboard_install_dts_ufs
 
