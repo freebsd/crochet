@@ -8,7 +8,7 @@
 KERNCONF=ZEDBOARD
 ZYNQ_UBOOT_PATCH_VERSION="xlnx"
 ZYNQ_UBOOT_SRC=${TOPDIR}/u-boot-${ZYNQ_UBOOT_PATCH_VERSION}
-ZYNQ_PS7_INIT=ps7_init_gpl
+ZYNQ_PS7_INIT=ps7_init
 IMAGE_SIZE=$((1000 * 1000 * 1000))	# 1 GB default
 TARGET_ARCH=armv6
 
@@ -23,10 +23,10 @@ zynq_check_uboot ( ) {
     # Apply patches
     strategy_add $PHASE_BUILD_OTHER uboot_patch ${ZYNQ_UBOOT_SRC} `uboot_patch_files`
 
-    # Copy over GPL version of automatically generated ps7 initialization routines.
-    # These are Zedboard specific.
+    # Copy over automatically generated ps7 initialization routines into
+    # u-boot build directory.  These files are Zedboard specific.
     strategy_add $PHASE_BUILD_OTHER cp ${BOARDDIR}/files/${ZYNQ_PS7_INIT}.h \
-	${ZYNQ_UBOOT_SRC}/board/xilinx/zynq/ps7_init_gpl.h
+	${ZYNQ_UBOOT_SRC}/board/xilinx/zynq/ps7_init.h
     strategy_add $PHASE_BUILD_OTHER cp ${BOARDDIR}/files/${ZYNQ_PS7_INIT}.c \
 	${ZYNQ_UBOOT_SRC}/board/xilinx/zynq/ps7_init.c
 
