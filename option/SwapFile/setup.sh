@@ -1,20 +1,15 @@
-#
 # Create a swap file and set it up correctly.
 #
 # Usage:
-#   option AddSwap 768m
+#   option SwapFile 768m
 #
 # Creates a 768m swap file as usr/swap0 and
 # adds the correct configuration entries for
 # it to be used as a swap file.
 #
-#
-# TODO: expand the command line options here so that
-# the following all work:
-#
-#  option AddSwap 768m
-#  option AddSwap 768m file=/custom/filename
-#  option AddSwap 768m deferred
+#  option SwapFile 768m
+#  option SwapFile 768m file=/custom/filename
+#  option SwapFile 768m deferred
 #
 # The last would causes the swap file to actually get created
 # on first boot.  (By adding a start script to /usr/local/etc/rc.d
@@ -25,28 +20,65 @@
 # at that time.
 #
 option_swapfile_install ( ) {
-    echo "Creating $1 swap file"
+    _SWAPFILE_DEFERRED=false
+    _SWAPFILE_FILE=usr/swap0
+    _SWAPFILE_SIZE_MB=512
     S=`echo $1 | tr '[:upper:]' '[:lower:]'`
     N=`echo $S | tr -cd '[0-9]'`
     case $S in
         *.*)
-            echo "Swapfile size cannot include a Decimal point"
+            echo "SwapFile: Swapfile size cannot include a Decimal point"
             exit 2
             ;;
         *m|*mb|*mi|*mib)
-	    dd if=/dev/zero of="usr/swap0" bs=1024k count=$N
+	    _SWAPFILE_SIZE_MB=$N
             ;;
         *g|*gb|*gi|*gib)
-	    dd if=/dev/zero of="usr/swap0" bs=1024k count=$(($N * 1024))
+	    _SWAPFILE_SIZE_MB=$(($N * 1024))
             ;;
         *)
-            echo "Size argument $1 not supported"
+            echo "SwapFile: Size argument $S not supported"
             exit 2
             ;;
     esac
+    echo "SwapFile: Swapfile will be ${_SWAPFILE_SIZE_MB} MB"
 
-    chmod 0600 "usr/swap0"
-    echo 'md none swap sw,file=/usr/swap0 0 0' >> etc/fstab
+    while shift; do
+	case $1 in
+	    file=*)
+		_SWAPFILE_FILE=`echo $1 | sed -e 'sXfile=/*XX'`
+		echo "SwapFile: swap file will be created in ${_SWAPFILE_FILE}"
+		;;
+	    deferred)
+		echo "SwapFile: swap file will be created on first boot"
+		_SWAPFILE_DEFERRED=true
+		;;
+	    *)
+		if [ -n "$1" ]; then
+		    echo "SwapFile: Unrecognized parameter '$1'"
+		    exit 2
+		fi
+		;;
+	esac
+    done
+
+    if $_SWAPFILE_DEFERRED; then
+	mkdir -p usr/local/etc/rc.d
+	cp ${OPTIONDIR}/swapfile_create usr/local/etc/rc.d/swapfile_create
+	cat >>etc/rc.conf <<"EOF"
+# On first boot, create a swap file
+swapfile_create_enable="YES"
+swapfile_create_file="/${_SWAPFILE_FILE}"
+swapfile_create_size_mb="/${_SWAPFILE_SIZE_MB}"
+EOF
+	echo "SwapFile: installed rc.d/swapfile_create"
+    else
+	echo "SwapFile: initializing swap file..."
+	dd if=/dev/zero of=${_SWAPFILE_FILE} bs=1024k count=${_SWAPFILE_SIZE_MB}
+	chmod 0600 "${_SWAPFILE_FILE}"
+	echo "md none swap sw,file=/${_SWAPFILE_FILE} 0 0" >> etc/fstab
+	echo "SwapFile: swap file created and configured."
+    fi
 }
 
-strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_swapfile_install $1
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL option_swapfile_install "$@"

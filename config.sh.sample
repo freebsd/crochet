@@ -36,14 +36,15 @@
 
 # Size of the disk image that will be built.  This is usually the same
 # size as your memory card or disk drive, but it can be smaller.
-# Each board setup above defines a default value, but it's deliberately
-# chosen to be very small.
+# Each board setup above defines a default value, but the default is
+# deliberately chosen to be just barely big enough to hold a minimal
+# FreeBSD system.
 #
 # 'mb' = 10 ^ 6,  'gb' = 10 ^ 9, 'mib' = 2 ^ 20 and 'gib' = 2 ^ 30
 #
-# Typically 5%-10% of the flash on a memory card is
+# From 2%-10% of the flash on a typical memory card is
 # reserved for the hardware controller, so the filesystem
-# image size needs to be a bit smaller than you might expect:
+# image size needs to be a bit smaller than the card size:
 #
 # Suggested: option ImageSize
 #option ImageSize 100mb # for kernel-only images
@@ -58,7 +59,9 @@
 # 1) "options" provide canned functionality.  If there is not
 #   an option that provides what you want, consider contributing
 #   a new one.  There's a template in option/Sample that explains
-#   how to write a new one.
+#   how to write a new one.  Note that board definitions can include
+#   their own options; a few of the options below are only defined
+#   for certain boards.
 # 2) There are a large number of shell variables that control
 #   how various internal features work.  A very few are described
 #   below; you can find many more by skimming the source code.
@@ -79,7 +82,7 @@
 # and we'll see if we can add something else.
 #
 
-# "AutoSize" adds a startup item that will use "growfs" to grow the
+# "Growfs" adds a startup item that will use "growfs" to grow the
 # UFS partition as large as it can.  This can be used to construct
 # small (e.g., 1GB) images that can be copied onto larger (e.g., 32GB)
 # media.  At boot, such images will automatically resize to fully
@@ -88,7 +91,7 @@
 # couple of extra reboots, which can make this occasionally perplexing
 # to use.
 #
-#option AutoSize
+#option Growfs
 
 # Enable emailed status notifications.
 # This can also be enabled via the -e command-line flag.
@@ -107,8 +110,13 @@
 # Takes a size argument (e.g., "768mb") and adds a swap file
 # to the UFS partition of the indicated size.  This also adds
 # the appropriate rc.conf and fstab entries to use the swap file.
+# The size argument is required.  There are two optional arguments:
+#   deferred - swap file will be created on first boot; this
+#          works well in conjunction with Growfs above
+#   file=/usr/swap0 - Set the filename of the swap file.  The default
+#          name is /usr/swap0.
 #
-#option SwapFile <size>
+#option SwapFile <size> [deferred] [file=/usr/swap0]
 
 # Uses "portsnap" to download an up-to-date ports tree and
 # install it on the image.

@@ -1,0 +1,31 @@
+#!/bin/sh
+
+# PROVIDE: swapfile_create
+# REQUIRES: mountlate
+# BEFORE: swaplate
+# KEYWORD: firstbootonly
+
+# Create a swap file.
+
+. /etc/rc.subr
+
+name="swapfile_create"
+start_cmd="swapfile_create_start"
+stop_cmd=":"
+rcvar="swapfile_create_enable"
+
+swapfile_create_start ()
+{
+    echo "Creating swap file"
+    swapfile_create_file=${swapfile_create_file:-/usr/swap0}
+    swapfile_create_size=${swapfile_create_size:-512}
+    dd if=/dev/zero of=${swapfile_create_file} bs=1024k count=${swapfile_create_size_mb}
+    chmod 0600 "${swapfile_create_file}
+    echo "md none swap sw,file=/${swapfile_create_file} 0 0" >> etc/fstab
+
+    echo "# Disabled by swapfile_create after initial success" >> /etc/rc.conf
+    echo "$rcvar='NO'" >> /etc/rc.conf
+}
+
+load_rc_config $name
+run_rc_command "$1"
