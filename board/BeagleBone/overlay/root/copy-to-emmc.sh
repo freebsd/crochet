@@ -57,6 +57,7 @@ tar -c -f - -C / \
 	--exclude usr/src \
 	--exclude usr/ports \
 	--exclude usr/obj \
+	--exclude 'usr/swap*' \
 	--exclude mnt \
 	--exclude .sujournal \
 	--exclude var/run \
