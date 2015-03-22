@@ -29,7 +29,7 @@ dd if=/dev/zero of=/dev/mmcsd1 bs=64k count=1
 echo
 echo 'Creating MSDOS FAT12 boot partition on eMMC'
 gpart create -s mbr mmcsd1
-gpart add -a 63 -b 63 -s 2m -t '!12' mmcsd1
+gpart add -s 2m -t '!12' mmcsd1
 gpart set -a active -i 1 mmcsd1
 newfs_msdos -L 'EMMCBOOT' -F 12 /dev/mmcsd1s1
 
