@@ -76,7 +76,7 @@ echo 'Cleaning up the copied system'
 # (In particular, if this SD card is used to copy
 # a system onto a bunch of BBBlacks, we do not want
 # them to all have the same SSH keys.)
-rm /mnt/etc/ssh/*key*
+rm -f /mnt/etc/ssh/*key*
 
 echo
 echo 'Replacing fstab on eMMC'
