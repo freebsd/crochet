@@ -6,12 +6,12 @@ This tool was formerly known as "freebsd-beaglebone" or
 But it now supports more boards and should easily extend
 to support many more.
 
-[FAQ](https://github.com/kientzle/crochet-freebsd/wiki/FAQ)
+[FAQ](https://github.com/freebsd/crochet/wiki/FAQ)
 
-[Supported Platforms](https://github.com/kientzle/crochet-freebsd/wiki/Supported-Platforms)
+[Supported Platforms](https://github.com/freebsd/crochet/wiki/Supported-Platforms)
 
-[How to Build a Disk Image](https://github.com/kientzle/crochet-freebsd/wiki/How-to-Build-a-Disk-Image)
+[How to Build a Disk Image](https://github.com/freebsd/crochet/wiki/How-to-Build-a-Disk-Image)
 
-[Command-line Options](https://github.com/kientzle/crochet-freebsd/wiki/Command-Line-Options)
+[Command-line Options](https://github.com/freebsd/crochet/wiki/Command-Line-Options)
 
-[Potential Projects](https://github.com/kientzle/crochet-freebsd/wiki/Projects)
+[Potential Projects](https://github.com/freebsd/crochet/wiki/Projects)
