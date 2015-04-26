@@ -98,9 +98,10 @@
 #
 #option Email me@gmail.com
 
-# Gzip the final image.
+# Compress the final image.
+# Takes an optional argument of xz or gzip. Defaults to xz.
 #
-#option GzipImage
+#option CompressImage <xz|gzip>
 
 # Create a user account with the specified username.
 # Password will be the same as the user name.
