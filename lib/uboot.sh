@@ -220,6 +220,21 @@ uboot_patch_files ( ) {
 }
 
 #
+# $1: u-boot port name
+# $2: u-boot binary or image name
+#
+uboot_port_test ( ) {
+
+    UBOOT_PATH="/usr/local/share/u-boot/${1}"
+    if [ ! -f "${UBOOT_PATH}/${2}" ]; then
+	echo "Please install sysutils/$1 and re-run this script."
+	exit 1
+    fi
+    echo "Found U-Boot port in:"
+    echo "    ${UBOOT_PATH}"
+}
+
+#
 #  $1 location of uboot source
 #  $2 name of script file
 #  $3 output file
