@@ -19,5 +19,5 @@ compress_image() {
             ;;
     esac
 }
-strategy_add $PHASE_POST_UNMOUNT compress_image
+strategy_add $PHASE_POST_UNMOUNT compress_image $1
 
