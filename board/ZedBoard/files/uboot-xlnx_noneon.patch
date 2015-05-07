@@ -3,9 +3,9 @@ index 9640433..f53a9f2 100644
 --- a/arch/arm/cpu/armv7/zynq/config.mk
 +++ b/arch/arm/cpu/armv7/zynq/config.mk
 @@ -2,9 +2,5 @@
- # Copyright (C) 2013 - 2015 Xilinx, Inc. All rights reserved.
+ # Copyright (C) 2013 Xilinx, Inc. All rights reserved.
  #
- # SPDX-License-Identifier:      GPL-2.0
+ # SPDX-License-Identifier:	GPL-2.0+
  #
  PLATFORM_RELFLAGS += -fno-strict-aliasing
 -# Xilinx, added to prevent unaligned accesses which started happening # with GCC 4.5.2 tools
