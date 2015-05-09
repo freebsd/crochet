@@ -31,9 +31,9 @@ scm_get_revision ( ) {
 	fi
     elif [ -d .svn ]; then
 	if svn info > /dev/null 2>&1; then
-	    SOURCE_VERSION="r`svn info |grep Revision: |cut -c11-`"
+	    SOURCE_VERSION=`svnversion ${FREEBSD_SRC}`
 	elif svnlite info > /dev/null 2>&1; then
-	    SOURCE_VERSION="r`svnlite info |grep Revision: |cut -c11-`"
+	    SOURCE_VERSION=`svnliteversion ${FREEBSD_SRC}`
 	else
 	    SOURCE_VERSION="svn-rev-error"
 	fi
