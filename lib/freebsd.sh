@@ -312,6 +312,7 @@ freebsd_ubldr_build ( ) {
     LOGFILE=${UBLDR_DIR}/_.ubldr.${CONF}.build.log
     ubldr_makefiles=`pwd`/share/mk
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
+    buildenv="$buildenv SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF}"
 
     mkdir -p ${UBLDR_DIR}
 
