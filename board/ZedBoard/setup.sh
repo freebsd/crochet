@@ -18,7 +18,7 @@ zynq_check_uboot ( ) {
     uboot_test \
     	ZYNQ_UBOOT_SRC \
 	"$ZYNQ_UBOOT_SRC/board/xilinx/zynq/Makefile" \
-	"git clone git://github.com/Xilinx/u-boot-xlnx.git ${ZYNQ_UBOOT_SRC}"
+	"git clone -b xilinx-v2014.4 git://github.com/Xilinx/u-boot-xlnx.git ${ZYNQ_UBOOT_SRC}"
 
     # Apply patches
     strategy_add $PHASE_BUILD_OTHER uboot_patch ${ZYNQ_UBOOT_SRC} `uboot_patch_files`
