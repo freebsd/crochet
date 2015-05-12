@@ -424,22 +424,24 @@ _freebsd_get_machine ( ) {
 freebsd_install_fdt ( ) (
     buildenv=`cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     buildenv_machine=`eval $buildenv _freebsd_get_machine`;
+    _OUTDIR=`pwd`
     _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
     if [ -f ${_FDTDIR}/${buildenv_machine}/${1} ]; then
         _FDTDIR=${_FDTDIR}/${buildenv_machine}
     fi
+    _FDTOUT=$2
     case $1 in
         *.dtb)
-            case $2 in
+            case _FDTOUT in
                 *.dtb)
-                    (cd $_FDTDIR; cat $1) > $2
+                    (cd $_FDTDIR; cat $1) > ${_FDTOUT}
                     ;;
                 *.dts)
-                    (cd $_FDTDIR; eval $buildenv dtc -I dtb -O dts -p 8192 $1) > $2
+                    (cd $_FDTDIR; eval $buildenv dtc -I dtb -O dts -p 8192 $1) > ${_FDTOUT}
                     ;;
                 *)
-                    if [ -d $2 ]; then
-                        (cd $_FDTDIR; cat $1) > $2/`basename $1`
+                    if [ -d ${_FDTOUT} ]; then
+                        (cd $_FDTDIR; cat $1) > ${_FDTOUT}/`basename $1`
                     else
                         echo "Can't compile $1 to $2"
                         exit 1
@@ -448,22 +450,30 @@ freebsd_install_fdt ( ) (
             esac
             ;;
         *.dts)
-            case $2 in
+            case ${_FDTOUT} in
                 *.dts)
-                    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2
+		    _FDTFMT=dts
                     ;;
                 *.dtb)
-                    (cd $_FDTDIR; eval $buildenv dtc -I dts -O dtb -p 8192 $1) > $2
+		    _FDTFMT=dtb
                     ;;
                 *)
-                    if [ -d $2 ]; then
-                        (cd $_FDTDIR; eval $buildenv dtc -I dts -O dts -p 8192 $1) > $2/`basename $1`
+                    if [ -d ${_FDTOUT} ]; then
+			_FDTOUT=$2/`basename $1`
                     else
                         echo "Can't compile $1 to $2"
                         exit 1
                     fi
                     ;;
             esac
+	    (
+		cat <<EOF
+cd $_FDTDIR
+cpp -P -x assembler-with-cpp -I ${FREEBSD_SRC}/sys/gnu/dts/include -I ${FREEBSD_SRC}/sys/boot/fdt/dts/${buildenv_machine} -I ${FREEBSD_SRC}/sys/gnu/dts/${buildenv_machine} -include $1 /dev/null \
+    | dtc -I dts -O ${_FDTFMT} -b 0 -p 8192 -i ${FREEBSD_SRC}/sys/boot/fdt/dts/${buildenv_machine} -i ${FREEBSD_SRC}/sys/gnu/dts/${buildenv_machine} \
+    > ${_OUTDIR}/${_FDTOUT}
+EOF
+	    ) | (cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenv > /dev/null)
             ;;
     esac
 )
