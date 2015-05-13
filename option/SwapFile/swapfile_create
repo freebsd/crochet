@@ -16,14 +16,33 @@ rcvar="swapfile_create_enable"
 
 swapfile_create_start ()
 {
+    # Apply configuration defaults:
+
+    # Name of swap file to create
     swapfile_create_file=${swapfile_create_file:-/swapfile0}
-    swapfile_create_size=${swapfile_create_size:-512}
+    # Size of swap file in MiB
+    swapfile_create_size_mb=${swapfile_create_size_mb:-512}
+    # Free space after swap file is created, in MiB
+    swapfile_create_free_mb=${swapfile_create_free_mb:-2048}
 
-    echo "Preallocating ${swapfile_create_size} MiB for swap file ${swapfile_create_file} ..."
-    dd if=/dev/zero of=${swapfile_create_file} count=${swapfile_create_size} bs=1024k
-    chmod 0600 "${swapfile_create_file}"
+    # Figure out free space on the partition that will hold the swap file.
+    required_mb=$(( $swapfile_create_free_mb + $swapfile_create_size_mb ))
+    required_blocks=$(( $required_mb * 2048 ))
+    swapfile_dir=`dirname ${swapfile_create_file}`
+    freeblocks=`df -b ${swapfile_dir} | tail -n 1 | awk '{print $4}'`
+    freemb=$(( $freeblocks / 2048 ))
 
-    echo "md none swap sw,late,file=${swapfile_create_file} 0 0" >> /etc/fstab
+    if [ ! -e ${swapfile_create_file} ]; then
+	if [ ${freeblocks} -gt ${required_blocks} ]; then
+	    echo "Preallocating ${swapfile_create_size_mb} MiB for swap file ${swapfile_create_file} ..."
+	    dd if=/dev/zero of=${swapfile_create_file} count=${swapfile_create_size_mb} bs=1024k
+	    chmod 0600 "${swapfile_create_file}"
+
+	    echo "md none swap sw,late,file=${swapfile_create_file} 0 0" >> /etc/fstab
+	else
+	    echo "Not enough free space to create swap file:  Need ${swapfile_create_free_mb} MB + ${swapfile_create_size_mb} MB, but only have ${freemb} MB"
+	fi
+    fi
 }
 
 load_rc_config $name

@@ -72,6 +72,7 @@ option_swapfile_install ( ) {
 swapfile_create_enable="YES"
 swapfile_create_file="/${_SWAPFILE_FILE}"
 swapfile_create_size_mb="${_SWAPFILE_SIZE_MB}"
+swapfile_create_free_mb=2048
 EOF
 	echo "SwapFile: installed rc.d/swapfile_create"
     else
