@@ -76,7 +76,7 @@ EOF
 	echo "SwapFile: initializing swap file..."
 	dd if=/dev/zero of=${_SWAPFILE_FILE} bs=1024k count=${_SWAPFILE_SIZE_MB}
 	chmod 0600 "${_SWAPFILE_FILE}"
-	echo "md none swap sw,file=/${_SWAPFILE_FILE} 0 0" >> etc/fstab
+	echo "md none swap sw,late,file=/${_SWAPFILE_FILE} 0 0" >> etc/fstab
 	echo "SwapFile: swap file created and configured."
     fi
 }

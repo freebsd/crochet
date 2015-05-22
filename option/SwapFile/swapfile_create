@@ -21,7 +21,7 @@ swapfile_create_start ()
     swapfile_create_size=${swapfile_create_size:-512}
     dd if=/dev/zero of=${swapfile_create_file} bs=1024k count=${swapfile_create_size_mb}
     chmod 0600 "${swapfile_create_file}
-    echo "md none swap sw,file=/${swapfile_create_file} 0 0" >> etc/fstab
+    echo "md none swap sw,late,file=/${swapfile_create_file} 0 0" >> etc/fstab
 
     echo "# Disabled by swapfile_create after initial success" >> /etc/rc.conf
     echo "$rcvar='NO'" >> /etc/rc.conf
