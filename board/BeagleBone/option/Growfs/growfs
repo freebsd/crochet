@@ -1,21 +1,26 @@
 #!/bin/sh
 
-# PROVIDE: autosize
+# PROVIDE: growfs
 # BEFORE: sysctl
 # KEYWORD: firstbootonly
 
-# Special for BeagleBone.
-#
 # Automatically grow mmcsd0s2a to fill the
 # entire SD card.
 #
 # This allows us to distribute a single image
 # and have it work on essentially any size SD card.
 #
+# TODO: Make this more generic; it currently has
+# the partition name(s) hardcoded.
+#
+# TODO: Figure out a clean way to have this run
+# only on first boot.  (We can't write anything to
+# disk here since the root disk is still mounted
+# read-only at this point.)  Fortunately, it completes
+# very quickly if it can't actually grow the partition.
+#
 # TODO: Figure out where this should really be ordered.
 # I suspect it should go just after fsck but before mountcritlocal
-# but it's hard to tell for sure because of the bug described
-# below.
 # 
 
 . /etc/rc.subr
