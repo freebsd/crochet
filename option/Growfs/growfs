@@ -21,8 +21,6 @@
 #
 # TODO: Figure out where this should really be ordered.
 # I suspect it should go just after fsck but before mountcritlocal
-# but it's hard to tell for sure because of the bug described
-# below.
 # 
 
 . /etc/rc.subr
