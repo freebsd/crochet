@@ -21,7 +21,7 @@
 #
 option_swapfile_install ( ) {
     _SWAPFILE_DEFERRED=false
-    _SWAPFILE_FILE=usr/swap0
+    _SWAPFILE_FILE=swapfile0
     _SWAPFILE_SIZE_MB=512
     S=`echo $1 | tr '[:upper:]' '[:lower:]'`
     N=`echo $S | tr -cd '[0-9]'`
@@ -64,17 +64,19 @@ option_swapfile_install ( ) {
 
     if $_SWAPFILE_DEFERRED; then
 	mkdir -p usr/local/etc/rc.d
-	cp ${OPTIONDIR}/swapfile_create usr/local/etc/rc.d/swapfile_create
-	cat >>etc/rc.conf <<"EOF"
+	_RCDIR=usr/local/etc/rc.d
+	cp ${OPTIONDIR}/swapfile_create ${_RCDIR}/swapfile_create
+	chmod 555 ${_RCDIR}/swapfile_create
+	cat >>etc/rc.conf <<EOF
 # On first boot, create a swap file
 swapfile_create_enable="YES"
 swapfile_create_file="/${_SWAPFILE_FILE}"
-swapfile_create_size_mb="/${_SWAPFILE_SIZE_MB}"
+swapfile_create_size_mb="${_SWAPFILE_SIZE_MB}"
 EOF
 	echo "SwapFile: installed rc.d/swapfile_create"
     else
-	echo "SwapFile: initializing swap file..."
-	dd if=/dev/zero of=${_SWAPFILE_FILE} bs=1024k count=${_SWAPFILE_SIZE_MB}
+	echo "SwapFile: sizing swap file to ${_SWAPFILE_SIZE_MB} MiB"
+	truncate -s ${_SWAPFILE_SIZE_MB}M ${_SWAPFILE_FILE}
 	chmod 0600 "${_SWAPFILE_FILE}"
 	echo "md none swap sw,late,file=/${_SWAPFILE_FILE} 0 0" >> etc/fstab
 	echo "SwapFile: swap file created and configured."
