@@ -270,6 +270,9 @@ freebsd_installworld ( ) {
 
     # Touch up /etc/src.conf so that native "make buildkernel" will DTRT:
     echo "KERNCONF=${KERNCONF}" >> $1/etc/src.conf
+
+    # Add /firstboot marker so /etc/rc will DTRT
+    touch $1/firstboot
 }
 
 # freebsd_installkernel: Install FreeBSD kernel to image
