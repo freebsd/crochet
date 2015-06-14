@@ -237,8 +237,7 @@ uboot_port_test ( ) {
 	echo "  $ sudo pkg install sysutils/$1"
 	echo "or by building the port:"
 	echo "  $ cd /usr/ports/sysutils/$1"
-	echo "  $ make -DBATCH"
-	echo "  $ make -DBATCH install"
+	echo "  $ make -DBATCH all install"
 	exit 1
     fi
     echo "Found U-Boot port in:"
