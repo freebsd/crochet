@@ -21,13 +21,15 @@ scm_get_revision ( ) {
 	if git rev-parse > /dev/null 2>&1; then
 	    SOURCE_VERSION=`git rev-parse --verify --short HEAD`
 	else
-	    SOURCE_VERSION="git-rev-error"
+	    echo "Warning: ${FREEBSD_SRC} appears to be a git checkout, but 'git rev-parse' is not giving us a commit ID"
+	    SOURCE_VERSION="git-rUNKNOWN"
 	fi
     elif [ -d .hg ]; then
 	if hg id -i > /dev/null 2>&1; then
 	    SOURCE_VERSION=`hg id -i`
 	else
-	    SOURCE_VERSION="hg-rev-error"
+	    echo "Warning: ${FREEBSD_SRC} appears to be a mercurial checkout, but 'hg id' is not giving us a commit ID"
+	    SOURCE_VERSION="hg-rUNKNOWN"
 	fi
     elif [ -d .svn ]; then
 	if svn info > /dev/null 2>&1; then
@@ -35,7 +37,8 @@ scm_get_revision ( ) {
 	elif svnlite info > /dev/null 2>&1; then
 	    SOURCE_VERSION=`svnliteversion ${FREEBSD_SRC}`
 	else
-	    SOURCE_VERSION="svn-rev-error"
+	    echo "Warning: ${FREEBSD_SRC} appears to be a subversion checkout, but 'svnversion' is not giving us a revision ID"
+	    SOURCE_VERSION="svn-rUNKNOWN"
 	fi
     fi
     cd $_PWD
