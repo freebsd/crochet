@@ -433,7 +433,17 @@ freebsd_install_fdt ( ) (
     case $1 in
         *.dts)
 	    _DTSIN=${_FDTDIR}/$1
-	    echo ${FREEBSD_SRC}/sys/tools/fdt/make_dtb.sh ${FREEBSD_SRC}/sys ${_DTSIN} ${_DTBINTERMEDIATEDIR} | (cd ${FREEBSD_SRC}; make TARGET_ARCH=$TARGET_ARCH buildenv > /dev/null)
+	    case ${FREEBSD_VERSION} in
+		10.0|10.1) _DTBINTERMEDIATE=${_DTBINTERMEDIATEDIR}/out.dtb
+		    ;;
+		1*.*) _DTBINTERMEDIATE=${_DTBINTERMEDIATEDIR}
+		    ;;
+		*)
+		    echo "ERROR: Crochet can only build images for FreeBSD 10.0 or later"
+		    exit 1
+		    ;;
+	    esac
+	    echo ${FREEBSD_SRC}/sys/tools/fdt/make_dtb.sh ${FREEBSD_SRC}/sys ${_DTSIN} ${_DTBINTERMEDIATE} | (cd ${FREEBSD_SRC}; make TARGET_ARCH=$TARGET_ARCH buildenv > /dev/null)
             case $2 in
                 *.dts)
 		    _DTSOUT=$2
