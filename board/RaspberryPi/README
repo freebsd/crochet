@@ -58,12 +58,20 @@ The FreeBSD bootable image for RaspberryPi has both FAT
 and UFS partitions containing the following files:
 
   FAT Partition
-     bootcode.bin - First stage boot
-     start.elf - Second stage boot
-     config.txt - configuration for start.elf
-     uboot.bin - Third stage: U-Boot loader
-     uEnv.txt - configuration file for U-Boot
-     ubldr - Fourth stage: FreeBSD bootloader
+     LICENCE.BRO - Broadcom copyright and license
+     BOOTCODE.BIN - Second stage boot (First stage is ROM code)
+     CONFIG.TXT - Configuration file used by start.elf
+     RPI.DTB - Binary FDT, loaded by start.elf
+     RPI.DTS - Source version of FDT, for reference
+     START.ELF - GPU firmware
+     FIXUP.DAT - Used by start.elf to partition SDRAM between GPU and CPU
+     U-BOOT.IMG - Third stage: U-Boot loader
+     UENV.TXT - Configuration file for U-Boot (empty by default)
+     UBLDR - FreeBSD bootloader
+
+The following are used if the GPU video memory is configured to be 16MB:
+     START_CD.ELF - Alternate version of START.ELF
+     FIXUP_CD.DAT - Alternate version of FIXUP.DAT
 
   UFS Partition
      /boot/kernel - dynamic kernel
