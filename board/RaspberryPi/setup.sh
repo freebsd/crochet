@@ -33,6 +33,7 @@ strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
 raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi boot files to FAT partition
     cp ${RPI_FIRMWARE_SRC}/* .
+    touch uEnv.txt
 
     # Configure Raspberry Pi boot files
     echo "gpu_mem=${RPI_GPU_MEM}" >> config.txt
