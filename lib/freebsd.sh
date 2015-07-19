@@ -366,7 +366,7 @@ freebsd_ubldr_copy ( ) {
 freebsd_ubldr_copy_ubldr ( ) {
     echo "Installing ubldr in $1"
     CONF=${TARGET_ARCH}-${KERNCONF}
-    cp ${WORKDIR}/ubldr-${CONF}/boot/ubldr $1 || exit 1
+    cp ${WORKDIR}/ubldr-${CONF}/boot/ubldr* $1 || exit 1
 }
 
 freebsd_ubldr_copy_ubldr_help ( ) {
