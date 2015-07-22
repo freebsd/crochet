@@ -34,7 +34,7 @@ strategy_add $PHASE_BOOT_INSTALL beaglebone_uboot_install
 
 # Build and install a suitable ubldr
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .

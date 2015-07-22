@@ -50,7 +50,7 @@ strategy_add $PHASE_BOOT_INSTALL pandaboard_install_uboot
 # PandaBoard uses ubldr
 #
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.

@@ -69,7 +69,7 @@ zedboard_populate_boot_partition ( ) {
     freebsd_install_fdt zedboard.dts zedboard.dtb
 
     # ubldr
-    freebsd_ubldr_copy_ubldr ubldr
+    freebsd_ubldr_copy_ubldr .
 
     # Extra boot files (uEnvt.txt is all for now)
     cp ${BOARDDIR}/bootfiles/* .

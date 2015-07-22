@@ -79,7 +79,7 @@ chromebook_uboot_install ( ) {
 # ubldr
 #
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x88000000
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 #
 # Make a /boot/msdos directory so the running image

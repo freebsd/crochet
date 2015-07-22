@@ -204,7 +204,7 @@ strategy_add $PHASE_CHECK freebsd_current_test
 
 # If you built ubldr:
 #
-# strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ${BOARD_BOOT_MOUNTPOINT}/ubldr
+# strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ${BOARD_BOOT_MOUNTPOINT}
 
 # Copy an FDT file.  The file is read from the FreeBSD source tree by
 # default.  If the suffixes don't match, this function will
