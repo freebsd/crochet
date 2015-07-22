@@ -1,0 +1,5 @@
+ttyv0	"/usr/libexec/getty Pc"		xterm	on  secure
+ttyv1	"/usr/libexec/getty Pc"		xterm	on  secure
+ttyv2	"/usr/libexec/getty Pc"		xterm	on  secure
+ttyv3	"/usr/libexec/getty Pc"		xterm	on  secure
+ttyu0	"/usr/libexec/getty 3wire.115200"	dialup	on secure

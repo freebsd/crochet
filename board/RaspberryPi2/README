@@ -1,0 +1,208 @@
+RaspberryPi 2 is supported by FreeBSD-CURRENT as of
+March, 2015.  Support is improving very rapidly
+and the system is now at a point where many people
+should be able to actually use the system.
+
+========================================================================
+
+What is RaspberryPi?
+--------------------
+
+RaspberryPi launched in early 2012 as an inexpensive ($35) PC
+based on a Broadcom BCM2835 SoC.   It was developed by the
+UK-based RaspberryPi foundation as an inexpensive system for
+educational use.
+
+Having been designed as a PC (rather than as a development/experimenter
+board), it has a slightly different focus than some similar
+systems:
+ * Emphasis on low cost.
+ * Built-in video (HDMI and composite)
+ * Relies on standard consumer accessories:  can be powered from
+   a common micro-USB charger, uses USB keyboard, consumer television
+   display, etc.
+
+The RaspberryPi has been wildly successful (over a million
+units sold) and has attracted a large following.
+
+The RaspberryPi2 Model B is the next-generation board with
+1 GB RAM, a quad-core ARMv7 processor, and other enhancements.
+Due to the significant processor change (ARMv7 vs ARMv6), it
+is not currently possible to use the same FreeBSD kernel for
+both RaspberryPi and RaspberryPi 2.
+
+========================================================================
+
+How to Boot the RaspberryPi2
+----------------------------
+
+As of January 2013, FreeBSD-CURRENT fully supports either
+a video console (you'll need a USB keyboard and display
+connected) or it can be configured to use a serial console
+(you'll need a serial adapter cable such as the one sold by
+Adafruit.com).
+
+After connecting video, keyboard, and inserting the SDHC card,
+you connect power to actually boot.
+
+============================================================
+
+IF SOMETHING GOES WRONG
+-----------------------
+
+If the image fails to boot:
+  * Look at the build and install logs under the 'work' directory.
+  * Ask on the freebsd-arm@freebsd.org or freebsd-current@freebsd.org
+    mailing list for help.
+
+============================================================
+
+Anatomy of a RaspberryPi2 Boot Image
+------------------------------------
+
+The FreeBSD bootable image for RaspberryPi has both FAT
+and UFS partitions containing the following files:
+
+  FAT Partition
+     bootcode.bin - First stage boot
+     start.elf - Second stage boot
+     config.txt - configuration for start.elf
+     rpi.dtb - FDT file
+     uboot.bin - Third stage: U-Boot loader
+     uEnv.txt - configuration file for U-Boot
+     ubldr - Fourth stage: FreeBSD bootloader
+
+  UFS Partition
+     /boot/kernel - dynamic kernel
+     ... rest of FreeBSD ...
+
+========================================================================
+Overview of Raspberry PI boot Sequence for FreeBSD
+
+There is an initial "Phase One" that is the same regardless
+of what OS you are booting.  The following "Phase Two" varies
+considerably.
+
+
+PHASE ONE: Initialize the hardware
+==================================
+
+This first boot phase is common to any use of RaspberryPi, whether
+you're booting Linux, FreeBSD, or any other software.  It loads a
+series of proprietary boot loader files that initialize the
+hardware and ultimately load and run some executable.
+
+These initial bits are loaded from the first partition on the SD card.
+That partition must be formatted as FAT16 or FAT32.
+
+* At power on, the ARM core is off and the GPU is on.  SDRAM is disabled.
+
+* GPU ROM code reads bootcode.bin from SD card and executes it on the GPU.
+
+* bootcode.bin enables SDRAM and loads start.elf
+
+  (Note:  bootcode.bin used to execute loader.bin and loader.bin then
+  loaded start.elf.  This is no longer true since Oct 2012; loader.bin
+  is gone and bootcode.bin now loads start.elf directly.)
+
+  (If gpu_mem is set very low, then bootcode.bin reads start_cd.elf
+  instead.  This is a stripped-down version which lacks the
+  video support; suitable for systems that run purely with serial
+  console.)
+
+  (Q: Does bootcode.bin read config.txt?  Seems like it
+  must if it loads start_cd.elf depending on the memory config.)
+
+* bootcode.bin executes start.elf on the GPU (start.elf is
+  the "GPU firmware" that remains resident.)
+
+* start.elf reads config.txt and uses it to configure the hardware.
+
+* start.elf loads an FDT machine description into memory
+  at a fixed address.
+
+* Optional: start.elf reads cmdline.txt with arguments for kernel.img
+
+The next part depends on what OS you are loading.  In any
+case, start.elf remains in place on the GPU.  Video drivers
+in the OS talk to start.elf (they don't communicate directly
+with the GPU).
+
+Note:  The most recent boot files are available from
+github.com/raspberrypi/firmware  (Warning:  git clone
+of this project is very time-consuming!)
+
+
+PHASE TWO for LINUX:
+====================
+
+If you're booting Linux, start.elf loads a file called
+kernel.img containing the Linux kernel.
+
+
+PHASE TWO for "bare-metal" programming:
+=======================================
+
+There are some examples of bare-metal RaspberryPi programming
+at github.com/dwelch67/raspberrypi.
+
+These use the same boot process as for Linux, but replace
+kernel.img with simple freestanding executables.
+
+
+PHASE TWO for FreeBSD with U-Boot and ubldr:
+============================================
+
+The config.txt file specifies "kernel=u-boot.bin", so
+start.elf loads the u-boot.bin file:
+
+* u-boot loads and initializes
+
+* U-Boot loads either uEnv.txt or uBoot.scr to configure
+  itself.  Among other things, these files should tell
+  U-Boot where the FDT file is located in memory.
+
+* u-boot loads ubldr from the FAT partition.
+  ubldr is a version of the FreeBSD standard loader(8) which
+  uses the u-boot API to access the hardware.
+
+* ubldr initializes, finds U-Boot in memory so it
+  can use U-Boot API for hardware access
+
+* ubldr gets the FDT address from U-Boot
+
+* ubldr locates a UFS partition on the SD card.
+
+* ubldr loads /boot/loader.rc from the UFS partition and
+  uses it to set up some boot-time parameters.
+
+* ubldr loads the FreeBSD kernel from UFS
+
+* ubldr attaches the FDT to the kernel so the
+  the kernel will find it.
+
+* The FreeBSD kernel initializes and runs.
+
+
+
+PHASE TWO for FreeBSD without ubldr:
+====================================
+
+It should be possible to load the FreeBSD kernel directly from U-Boot
+or even directly from start.elf.  This might require teaching the
+FreeBSD kernel how to more fully utilize the Linux-format boot
+information provided by U-Boot.
+
+Pro: Potentially faster booting by eliminating the U-Boot and
+ubldr phases.
+
+Con: U-Boot and ubldr support debugging and configuring
+the early kernel initialization.  Booting without those would
+reduce some of the customizability.
+
+Con: Requires kernel to live on the MSDOS partition.  (There
+may be ways to make this less awkward.)
+
+For now, being able to debug and configure the early
+boot stages is very valuable, but as FreeBSD gets
+more stable this may change.

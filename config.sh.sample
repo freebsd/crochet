@@ -117,10 +117,10 @@
 # The size argument is required.  There are two optional arguments:
 #   deferred - swap file will be created on first boot; this
 #          works well in conjunction with Growfs above
-#   file=/usr/swap0 - Set the filename of the swap file.  The default
-#          name is /usr/swap0.
+#   file=/swapfile0 - Set the filename of the swap file.  The default
+#          name is /swapfile0.
 #
-#option SwapFile <size> [deferred] [file=/usr/swap0]
+#option SwapFile <size> [deferred] [file=/swapfile0]
 
 # Uses "portsnap" to download an up-to-date ports tree and
 # install it on the image.

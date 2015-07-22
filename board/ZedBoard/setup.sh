@@ -6,6 +6,7 @@
 #
 
 KERNCONF=ZEDBOARD
+UBLDR_LOADADDR=0x2000000
 ZYNQ_UBOOT_PATCH_VERSION="xlnx"
 ZYNQ_UBOOT_SRC=${TOPDIR}/u-boot-${ZYNQ_UBOOT_PATCH_VERSION}
 ZYNQ_PS7_INIT=ps7_init
@@ -18,7 +19,7 @@ zynq_check_uboot ( ) {
     uboot_test \
     	ZYNQ_UBOOT_SRC \
 	"$ZYNQ_UBOOT_SRC/board/xilinx/zynq/Makefile" \
-	"git clone git://github.com/Xilinx/u-boot-xlnx.git ${ZYNQ_UBOOT_SRC}"
+	"git clone -b xilinx-v2014.4 git://github.com/Xilinx/u-boot-xlnx.git ${ZYNQ_UBOOT_SRC}"
 
     # Apply patches
     strategy_add $PHASE_BUILD_OTHER uboot_patch ${ZYNQ_UBOOT_SRC} `uboot_patch_files`
@@ -76,7 +77,7 @@ zedboard_populate_boot_partition ( ) {
 strategy_add $PHASE_BOOT_INSTALL zedboard_populate_boot_partition
 
 # Build and install ubldr from source
-strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x80000
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=${UBLDR_LOADADDR}
 
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos

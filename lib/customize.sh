@@ -29,6 +29,10 @@ strategy_add $PHASE_POST_CONFIG install_customize_hooks
 # Typically, people want to copy static files and then
 # tweak them afterwards.
 customize_overlay_files ( ) {
+    if [ -d ${TOPDIR}/overlay ]; then
+        echo "Overlaying files from ${TOPDIR}/overlay"
+        (cd ${TOPDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})
+    fi
     if [ -d ${WORKDIR}/overlay ]; then
         echo "Overlaying files from ${WORKDIR}/overlay"
         (cd ${WORKDIR}/overlay; find . | cpio -pmud ${BOARD_FREEBSD_MOUNTPOINT})

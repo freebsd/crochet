@@ -99,11 +99,11 @@ and UFS partitions containing the following files:
 
   FAT Partition
      MLO  - First stage boot, from U-Boot
-     BB-uboot.img - Second stage: U-Boot
-     BB-uEnv.txt - configuration for U-Boot
+     uboot.img - Second stage: U-Boot
+     uEnv.txt - configuration for U-Boot
      BBONE.DTB - Binary FDT
      BBONE.DTS - Source FDT for reference
-     BBubldr - Third stage: FreeBSD bootloader
+     ubldr - Third stage: FreeBSD bootloader
 
   UFS Partition
      /boot/kernel - dynamic kernel
@@ -118,14 +118,14 @@ The boot process works like this:
     under 110k to fit within the on-chip RAM.  MLO here is a
     stripped-down version of U-Boot.
 
- 2) MLO loads BB-UBOOT.IMG from the first FAT partition.
+ 2) MLO loads UBOOT.IMG from the first FAT partition.
 
     U-Boot is a highly modular boot loader system that can be used on
     a wide variety of systems.  The loader is configured with built-in
     script commands that can be partially overridden by additional
-    commands in the BB-uEnv.txt file.
+    commands in the uEnv.txt file.
 
- 3) U-Boot loads BB-uEnv.txt and follows those commands to load BBubldr at
+ 3) U-Boot loads uEnv.txt and follows those commands to load ubldr at
     address 0x88000000.
 
     ubldr is a variant of FreeBSD's standard loader(8) program that is
@@ -135,13 +135,6 @@ The boot process works like this:
 
  4) ubldr locates the UFS partition, loads /boot/kernel/kernel from
     UFS to address 0x80200000 and executes it.
-
-Note: Except for MLO, which must have exactly that name
-in order to be found and loaded by the ROM code, all the
-FAT partition boot files begin with "BB."  This was done
-to allow more than one boot system to reside on the same
-disk image.  See the BeagleBonePlusRaspberryPi board definition
-for more details about this.
 
 ============================================================
 
@@ -173,23 +166,3 @@ install a ports tree, build the subversion port, and checkout the
 FreeBSD source code using that.  This works, I've done it.
 
 ================================================================
-
-PROJECTS
---------------------------------
-
-If you're interested, there are a lot of things still to
-be done:
-
-* Use the system.  The stability has been generally improving
-  but the more people use and stress it, the more issues we'll
-  be able to shake out.  Report any problems on freebsd-arm
-  mailing list.
-* Test ports.  Very many ports are known to work well; help
-  us test and fix the rest!
-* More drivers.  The AM3358 SoC has a lot of hardware
-  components that are still unsupported.
-* USB client.  The Linux distros have a virtual Ethernet
-  client that allows true single-cable development.  I would
-  like to do something similar for FreeBSD.
-
-============================================================
