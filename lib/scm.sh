@@ -33,9 +33,9 @@ scm_get_revision ( ) {
 	fi
     elif [ -d .svn ]; then
 	if svn info > /dev/null 2>&1; then
-	    SOURCE_VERSION=`svnversion ${FREEBSD_SRC}`
+	    SOURCE_VERSION=`svnversion ${FREEBSD_SRC} | tr ":" "_"`
 	elif svnlite info > /dev/null 2>&1; then
-	    SOURCE_VERSION=`svnliteversion ${FREEBSD_SRC}`
+	    SOURCE_VERSION=`svnliteversion ${FREEBSD_SRC} | tr ":" "_"`
 	else
 	    echo "Warning: ${FREEBSD_SRC} appears to be a subversion checkout, but 'svnversion' is not giving us a revision ID"
 	    SOURCE_VERSION="svn-rUNKNOWN"
