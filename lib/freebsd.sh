@@ -10,6 +10,7 @@ FREEBSD_INSTALLWORLD_EXTRA_ARGS=""
 FREEBSD_KERNEL_EXTRA_ARGS=""
 FREEBSD_BUILDKERNEL_EXTRA_ARGS=""
 FREEBSD_INSTALLKERNEL_EXTRA_ARGS=""
+FREEBSD_MAKE_JOBS="-j "`sysctl -n hw.ncpu`
 
 # Make non-empty to override the usual build-avoidance
 FREEBSD_FORCE_BUILDKERNEL=""
@@ -206,7 +207,7 @@ freebsd_buildworld ( ) {
         _FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
     fi
     CONF=${TARGET_ARCH}
-    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" ${WORLDJOBS} buildworld > ${WORKDIR}/_.buildworld.${CONF}.sh
+    echo make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_BUILDWORLD_EXTRA_ARGS} ${FREEBSD_BUILDWORLD_BOARD_ARGS} "$@" ${WORLDJOBS} buildworld ${FREEBSD_MAKE_JOBS} > ${WORKDIR}/_.buildworld.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDWORLD}" ]; then
         rm -f ${WORKDIR}/_.built-world.${CONF}
     fi
@@ -224,7 +225,7 @@ freebsd_buildkernel ( ) {
         _FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
     fi
     CONF=${TARGET_ARCH}-${KERNCONF}
-    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
+    echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" $KERNJOBS buildkernel ${FREEBSD_MAKE_JOBS} > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
         rm -f ${WORKDIR}/_.built-kernel.${CONF}
     fi

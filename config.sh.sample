@@ -221,6 +221,10 @@
 #
 #FREEBSD_EXTRA_ARGS=""
 
+# By default -j is set to the number of CPU (sysctl -n hw.ncpu)
+# You can overide this with this variable.
+#FREEBSD_MAKE_JOBS="-j 4"
+
 # You can specify a custom src.conf or make.conf; the defaults are:
 #
 #SRCCONF="/dev/null"
