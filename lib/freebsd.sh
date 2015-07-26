@@ -28,8 +28,16 @@ FREEBSD_INSTALLKERNEL_BOARD_ARGS=""
 SRCCONF=/dev/null
 __MAKE_CONF=/dev/null
 
-WORLDJOBS=${WORLDJOBS}
-KERNJOBS=${KERNJOBS}
+if [ -z ${WORLDJOBS} ]; then
+	WORLDJOBS="-j $(sysctl -n hw.ncpu)"
+else
+	WORLDJOBS="-j${WORLDJOBS}"
+fi
+if [ -z ${KERNJOBS} ]; then
+	KERNJOBS="-j $(sysctl -n hw.ncpu)"
+else
+	KERNJOBS="-j${KERNJOBS}"
+fi
 
 freebsd_default_makeobjdirprefix ( ) {
     if [ -z "$MAKEOBJDIRPREFIX" ]; then
