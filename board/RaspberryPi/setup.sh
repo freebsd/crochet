@@ -15,6 +15,21 @@ TARGET_ARCH=armv6
 
 raspberry_pi_check_uboot ( ) {
     uboot_port_test ${RPI_UBOOT_PORT} ${RPI_UBOOT_BIN}
+
+    # Suggest the user clean old u-boot checkouts
+    if [ -n ${TOPDIR} -a -d ${TOPDIR}/u-boot-rpi ]; then
+        echo "Old u-boot git checkout found in: ${TOPDIR}/u-boot-rpi"
+        echo -n 'Would you like it removed? [y/N] '
+	read $UBOOT
+        case ${UBOOT} in
+            y|Y)
+                rm -fr ${TOPDIR}/u-boot-rpi
+                ;;
+            *)
+                echo 'Not removing old u-boot git checkout'
+                ;;
+        esac
+    fi
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_uboot
 
