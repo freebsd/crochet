@@ -154,6 +154,9 @@
 #option NanoBSD '/dev/sd0' 1g
 #option NanoBSD /dev/mmcsd0 1g 2 16m
 
+# Enable NTP daemon
+#option Ntpd
+
 # Each board picks a default KERNCONF but you can override it.
 #
 #KERNCONF=MYCONF
