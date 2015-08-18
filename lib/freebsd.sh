@@ -372,7 +372,11 @@ freebsd_ubldr_copy ( ) {
 }
 
 freebsd_ubldr_copy_ubldr ( ) {
-    echo "Installing ubldr in $1"
+    if [ $1 = "." ]; then
+	echo "Installing ubldr in ${PWD}"
+    else
+	echo "Installing ubldr in $1"
+    fi
     CONF=${TARGET_ARCH}-${KERNCONF}
     cp ${WORKDIR}/ubldr-${CONF}/boot/ubldr* $1 || exit 1
 }
