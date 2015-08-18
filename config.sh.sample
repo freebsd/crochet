@@ -21,7 +21,9 @@
 # about configuring for your particular board.
 #
 #board_setup Alix
+#board_setup BananaPi
 #board_setup BeagleBone
+#board_setup CubieBoard2
 #board_setup Chromebook
 #board_setup GenericI386
 #board_setup PandaBoard
