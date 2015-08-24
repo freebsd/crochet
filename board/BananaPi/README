@@ -1,0 +1,134 @@
+BananaPi is supported by FreeBSD-CURRENT.
+
+============================================================
+
+What is a BananaPi?
+--------------------
+
+The BananaPi and BananaPi Pro are ARM-based development/test
+boards.  They feature a modern ARMv7 processor and a wealth
+of on-chip peripheral support.  Details can be found at:
+
+   http://bananapi.org/
+
+The BananaPi is an easy way to learn about ARM development: it is
+inexpensive (about $40) and does not require any special skills or
+hardware to use.  You boot it from a SD card with the system image.
+
+Once you have the BananaPi working, you can expand it by connecting
+it to Ethernet, adding USB peripherals (such as external disk drives
+or wireless network interfaces) or attaching new hardware to the
+connectors on the board.
+
+============================================================
+
+How to boot the BananaPi
+--------------------------------
+
+1. CONNECT the board to your FreeBSD (or other) system
+   using a third-party adapter cable such as:
+     Adafruit 954: http://www.adafruit.com/product/954
+     FTDI TTL-232R-3V3 cable:  Widely available
+     FTDI Friend adapter:  http://www.adafruit.com/products/284
+
+2. ACCESS the serial console at 9600 baud.  Note: The Tx/Rx pins
+   may be reversed.
+
+3. INSERT the SD card into your BananaPi
+
+4. POWER the board by connecting it to a 5v power supply
+
+============================================================
+
+IF SOMETHING GOES WRONG
+-----------------------
+
+If the image fails to boot:
+  * Look at the build and install logs under the 'work' directory.
+  * Ask on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
+help.
+
+============================================================
+
+Anatomy of a BananaPi Boot Image
+----------------------------------
+
+The FreeBSD bootable image for BeagleBone has both FAT
+and UFS partitions containing the following files:
+
+  FAT Partition
+     sunxi-spl.bin - First stage boot, from U-Boot
+     uboot.img - Second stage: U-Boot
+
+  UFS Partition
+     /boot/kernel - dynamic kernel
+     ... rest of FreeBSD ...
+
+The boot process works like this:
+
+ 1) AM3358 SoC ROM code inspects the SD card, finds the MBR
+    partition table and loads "sunxi-spl.bin" from the first FAT
+    partition.
+
+ 2) sunxi-spl.bin loads uboot.img from the first FAT partition.
+
+    U-Boot is a highly modular boot loader system that can be used on
+    a wide variety of systems.  The loader is configured with built-in
+    script commands that can be partially overridden by additional
+    commands in the BB-uEnv.txt file.
+
+ 3) ubldr is a variant of FreeBSD's standard loader(8) program that is
+    designed to be chain-loaded from U-Boot.  It calls into U-Boot for
+    low-level device access, which allows ubldr to load FreeBSD on any
+    system that supports U-Boot.
+
+ 4) ubldr locates the UFS partition, loads /boot/kernel/kernel from
+    UFS to address 0x80200000 and executes it.
+
+============================================================
+
+NATIVE SOURCE REBUILDS
+---------------------------------------
+
+The usual "make buildworld", "make installworld",
+"make buildkernel", and "make installkernel" all work
+natively on the BananaPi.  Due to limited memory and
+slow speed of SD, a full buildworld can take 30-40 hours:
+
+ $ make buildworld
+ $ make installworld
+ $ make KERNCONF=CUBIEBOARD2 buildkernel
+ $ make KERNCONF=CUBIEBOARD2 installkernel
+
+If you want to try this, you'll want an 8G image.  You can put the
+source tree into the image when you build it by including the
+following in your config.sh:
+
+  option UsrSrc
+  option SwapFile 768mb
+
+After you boot the resulting image, you'll have a fully populated
+/usr/src and can try rebuilding the system natively.
+
+Alternatively, of course, you can use "portsnap" to download and
+install a ports tree, build the subversion port, and checkout the
+FreeBSD source code using that.  This works, I've done it.
+
+================================================================
+
+PROJECTS
+--------------------------------
+
+If you're interested, there are a lot of things still to
+be done:
+
+* Use the system.  The stability has been generally improving
+  but the more people use and stress it, the more issues we'll
+  be able to shake out.  Report any problems on freebsd-arm
+  mailing list.
+* Test ports.  Many ports are known to work well; help us test
+  and fix the rest!
+* More drivers.  The A20 SoC has a lot of hardware
+  components that are still unsupported.
+
+============================================================
