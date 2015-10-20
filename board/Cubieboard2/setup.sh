@@ -1,4 +1,4 @@
-KERNCONF=CUBIEBOARD2
+KERNCONF=A20
 UBLDR_LOADADDR=0x42000000
 SUNXI_UBOOT="u-boot-cubieboard2"
 SUNXI_UBOOT_BIN="u-boot.img"
@@ -24,7 +24,7 @@ allwinner_check_uboot ( ) {
 strategy_add $PHASE_CHECK allwinner_check_uboot
 
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=${UBLDR_LOADADDR}
-strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr ubldr
+strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 # BeagleBone puts the kernel on the FreeBSD UFS partition.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
