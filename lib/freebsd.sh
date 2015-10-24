@@ -249,7 +249,7 @@ freebsd_installworld ( ) {
     CONF=${TARGET_ARCH}
     echo "Installing FreeBSD world at "`date`
     echo "    Destination: $1"
-    if make ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${CONF}.log 2>&1
+    if make SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${_FREEBSD_WORLD_ARGS} ${FREEBSD_INSTALLWORLD_EXTRA_ARGS} ${FREEBSD_INSTALLWORLD_BOARD_ARGS} DESTDIR=$1 installworld > ${WORKDIR}/_.installworld.${CONF}.log 2>&1
     then
         true # success
     else
@@ -258,7 +258,7 @@ freebsd_installworld ( ) {
         exit 1
     fi
 
-    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${CONF}.log 2>&1
+    if make SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distrib-dirs > ${WORKDIR}/_.distrib-dirs.${CONF}.log 2>&1
     then
         true # success
     else
@@ -267,7 +267,7 @@ freebsd_installworld ( ) {
         exit 1
     fi
 
-    if make TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${CONF}.log 2>&1
+    if make SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} TARGET_ARCH=$TARGET_ARCH DESTDIR=$1 distribution > ${WORKDIR}/_.distribution.${CONF}.log 2>&1
     then
         true # success
     else
