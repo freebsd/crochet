@@ -35,7 +35,8 @@ videocore_build ( ) {
 	return 0;
     fi
 
-    echo "Building VideoCore kernel module"
+    echo "Building VideoCore kernel module at `date`"
+    echo "    (Logging to ${WORKDIR}/_.videocore.build.log)"
     cd ${FREEBSD_SRC}
     buildenv=`make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     cd ${RPI_VC_SRC}
