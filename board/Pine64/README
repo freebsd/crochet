@@ -1,0 +1,30 @@
+Pine64 is supported as of May 2016.
+
+============================================================
+
+What is a Pine64?
+--------------------
+
+The Pine64 is a quad-core 64-bit A53 single board computer.
+Details can be found at:
+
+   http://www.pine64.com/
+
+You boot it from a MicroSDHC card with the system image.
+
+Once you have the Pine64 working, you can expand it by connecting
+it to Ethernet, adding USB peripherals (such as external disk drives
+or wireless network interfaces) or attaching new hardware to the
+connectors on the board.
+
+============================================================
+
+How to boot the Pine64
+--------------------------------
+
+1. Connect the board to a HDMI display, network, and USB keyboard.
+   Network alone will work if you wish to boot headless.
+
+2. Insert a microSD card with this generated image.
+
+3. Power on the board by connecting it to a 5v power supply
