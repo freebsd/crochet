@@ -1,0 +1,14 @@
+--- u-boot-2014.10/include/configs/wandboard.h	2014-10-14 02:47:15.000000000 -0600
++++ wandboard.h	2016-06-04 18:12:20.565639803 -0600
+@@ -14,6 +14,11 @@
+ #include <asm/imx-common/gpio.h>
+ #include <linux/sizes.h>
+ 
++/* Crochet-BSD Wandboard */
++#define CONFIG_CMD_ELF
++#define CONFIG_API 
++#define CONFIG_SYS_MMC_MAX_DEVICE 4
++
+ #define CONFIG_MX6
+ #define CONFIG_DISPLAY_CPUINFO
+ #define CONFIG_DISPLAY_BOARDINFO

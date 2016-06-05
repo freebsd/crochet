@@ -1,7 +1,7 @@
 KERNCONF=IMX6
 TARGET_ARCH=armv6
 IMAGE_SIZE=$((1024 * 1000 * 1000))
-WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2014.07
+WANDBOARD_UBOOT_SRC=${TOPDIR}/u-boot-2014.10
 
 #
 # 3 partitions, a reserve one for uboot, a FAT one for the boot loader and a UFS one
@@ -23,7 +23,6 @@ strategy_add $PHASE_PARTITION_LWW wandboard_partition_image
 #
 wandboard_check_uboot ( ) {
 	# Crochet needs to build U-Boot.
-
     uboot_set_patch_version ${WANDBOARD_UBOOT_SRC} ${WANDBOARD_UBOOT_PATCH_VERSION}
 
     uboot_test \
