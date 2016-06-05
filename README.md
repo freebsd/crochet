@@ -169,4 +169,174 @@ be improved:
   kernel bugs; I'm not sure.  It should also be possible to directly
   build Bhyve, Parallels, VirtualBox, or OVF VM images.
 
+## Tracking FreeBSD-CURRENT with VMWare Fusion and Crochet
+
+Some time back, I added some code to Crochet to build VMWare images directly.  I recently had a spare MacBook sitting in my office and decided to try using this as a way to track FreeBSD-CURRENT.
+
+So far, it seems to work pretty well; I thought I'd share what I've done so far and see if other people have ideas for improving this.
+
+Warning:  I've tried to be complete, but I know the following instructions omit a lot of details.  I've listed some of the known bugs at the bottom of this article.  Help in fixing them is appreciated.
+
+Basic idea:
+* Share /Users between Mac OS and FreeBSD VMs.
+* Run Crochet inside a FreeBSD VM to build the next FreeBSD VM.
+
+Since /Users is shared, this allows you to build and boot a new
+VM with a new FreeBSD version and then run the new system
+with the same work environment.
+
+### Get your first FreeBSD VM running with shared /Users
+
+1) Configure Mac OS with a case-sensitive filesystem. This generally requires reinstalling Mac OS completely from scratch; please ask on a Mac forum if you don't know how to do this.
+
+2) Install VMWare Fusion.  (No reason this shouldn't be feasible with Parallels or VirtualBox, but Crochet doesn't yet build correct Parallels or VirtualBox VMs.)
+
+3) Set up NFS export of /Users on the Mac to VMWare images. My /etc/exports on the Mac looks like this:
+
+    /Users -alldirs -maproot=root -network 192.168.177.0 -mask 255.255.255.0
+    /Users -alldirs -maproot=root -network 172.16.158.0 -mask 255.255.255.0
+
+4) Get the first FreeBSD VM running somehow.  (I installed from DVD image.)
+
+5) Edit FreeBSD /etc/fstab to mount /Users from the Mac by adding this line:
+
+    192.168.177.1:/Users /Users hfs rw 0 0
+
+6) Enable NFSv3 client support on FreeBSD (Mac OS doesn't serve NFSv4) by enabling lockd/statd on FreeBSD in rc.conf:
+
+    rpc_lockd_enable="YES"
+    rpc_statd_enable="YES"
+    nfs_client_enable="YES"
+
+7) Add an account to FreeBSD that matches your home account on the Mac:
+* Same name
+* Same UID, GID
+* Same home directory: /Users/_account_/
+
+Verify:  After rebooting the FreeBSD VM, you should be able to log into the same account on FreeBSD or Mac, edit files in either place, etc.
+
+Verify: Make sure you can do SVN checkouts and updates in either place.  You'll need to verify you have the same version of SVN on either side.  Mysterious SVN failures are probably due to NFS locking; SVN does not have clear error messages when it can't get file locks.
+
+A twist:  You can also build your first FreeBSD VM on any other FreeBSD system you happen to have available instead of installing a new VM from DVD.  Recently, I built a FreeBSD VMWare image on my BeagleBone (cross-building i386 from ARM) and then copied the result over to my Mac.
+
+### Build a new FreeBSD VM with your old FreeBSD VM
+
+1) Get a copy of Crochet:
+
+    git clone https://github.com/kientzle/crochet-freebsd.git
+
+2) Adjust the vmware.config.sh file at the bottom of this article to match your expectations.
+
+3) Check out FreeBSD source into the Crochet directory:
+
+    cd crochet-freebsd
+    svn co http://svn.freebsd.org/base/head src
+
+Note:  If you have everything set up properly, you should be able to perform the above three steps from Mac OS or FreeBSD.  (On FreeBSD, use the built-in 'svnlite' command instead of installing the standard subversion package.)
+
+4) Build a new VM on FreeBSD:
+
+    ./crochet -c vmware.config.sh
+
+This should put the new VM into a directory called
+
+    FreeBSD-CURRENT-i386-GENERIC-r<revision>.vmwarevm
+
+This may take a couple of hours depending on how fast your machine is.
+
+At this point, you should be able to open the new VM from the Mac side and have it "just work."
+
+### Keep Climbing
+
+In particular, you can now log into the VM you just built and use it to build the next one:
+
+    cd crochet-freebsd
+    svnlite up src
+    rm -rf work/*
+    ./crochet -c vmware.config.sh
+
+Each new VM is a completely clean "from scratch" system
+build, so this approach avoids propagating any leftover
+detritus from old systems.
+
+You can keep the old VMs around as long as you like (simplifies bisecting
+to find bugs) and even have multiple versions running at once.
+If you have a problem with one, you can suspend it until
+you have time to dig into that issue.
+
+This does require a fair bit of disk space for each VM, you
+should probably experiment with the ImageSize setting to
+see how small you can make it while still having a useful
+system.
+
+### Known Issues with the Above
+
+* I've not yet come up with a completely satisfactory way to share ports/packages across VMs.
+
+* VMWare launches VMs with a big "VMWare" boot splash that doesn't go away.  I've found it necessary to start a new VM and immediately suspend/resume it before I can see the FreeBSD console.  If you figure out how to fix this, I'm very interested.  (This problem seems to have gone away since I updated to VMWare Fusion 5.0.5.  Maybe it was a VMWare bug?)
+
+* NFSv3 file locking is not particularly robust and SVN requires good file locking.  Mac OS seems to stop the lock daemon periodically which stalls a lot of NFS requests until it restarts.  As a result, I generally find it easier to do SVN operations from Mac OS rather than FreeBSD.  Alternatively, git seems to work better over NFS than SVN does.
+
+* It needs a little manual effort to keep UIDs, GIDs, etc, consistent across Mac and FreeBSD environments.
+
+* I've gotten confused a few times typing a command into the wrong window.  In particular, Mac OS cannot run Crochet.  :-)
+
+### Crochet configuration file: vmware.config.sh 
+
+    # vmware.config.sh
+
+    # Find out the current FreeBSD revision and decide the
+    # name of the VM and the directory where it will go.
+    SVNVERSION=`svnlite info src | grep "Last Changed Rev" | sed -e 's/.*: *//'`
+    BASEIMG=FreeBSD-CURRENT-i386-GENERIC-r${SVNVERSION}
+    VMDIR=/Users/kientzle/projects/FreeBSD/VMWare/${BASEIMG}.vmwarevm
+
+    # Ask Crochet for a standard I386 build in a VMWare VM    
+    board_setup VMWareGuest
+    option VMWareDir ${VMDIR}
+    option VMWareName ${BASEIMG}
+    option ImageSize 8g
+
+    # Look for FreeBSD src in the Crochet dir.
+    FREEBSD_SRC=${TOPDIR}/src
+
+    IMG=${WORKDIR}/${BASEIMG}.img
+
+    # After the basic image has been assembled, update some of the files.    
+    customize_freebsd_partition ( ) {
+        # TODO: Find a good way to add swap.
+
+        # Use the SVN revision as the hostname.    
+        echo 'hostname="r'$SVNVERSION'"' >> etc/rc.conf
+    
+        # Enable some useful things in /etc/rc.conf
+        cat <<"EOF" >>etc/rc.conf
+    sshd_enable="YES"
+    ntpd_enable="YES"
+    rpc_lockd_enable="YES"
+    rpc_statd_enable="YES"
+    nfs_client_enable="YES"
+    EOF
+    
+        # Mount Mac /Users onto FreeBSD /Users
+        mkdir Users
+        echo '192.168.177.1:/Users /Users nfs rw 0 0' >> etc/fstab
+
+        # Propagate the passwd file to the next VM.
+        cp /etc/master.passwd etc/master.passwd
+        pwd_mkdb -p -d `pwd`/etc etc/master.passwd
+    
+        # Tell ntp to step clock by as much as necessary;
+        # Otherwise, NTP will stop working if a VM is suspended for a while.
+        echo 'tinker panic 0' >> etc/ntp.conf
+    }
+
+    # After the VM is complete, update the ownership.    
+    customize_post_unmount ( ) {
+    	chown -R kientzle:staff ${VMDIR}
+    }
+    
+    # End of file.
+
+
 
