@@ -130,6 +130,8 @@ freebsd_src_test ( ) {
     done
     # Make sure it has the config file we expect under the appropriate arch:
     case ${TARGET_ARCH} in
+        aarch64) ARCH=arm64
+            ;;
         arm*) ARCH=arm
             ;;
         mips*) ARCH=mips
