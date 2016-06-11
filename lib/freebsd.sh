@@ -95,12 +95,13 @@ freebsd_objdir ( ) {
     
     if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
-        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/$TARGET_ARCH${FREEBSD_SRC}
+        FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}${FREEBSD_SRC}
     fi
     if [ "$FREEBSD_MAJOR_VERSION" -ge "9" ]
     then
         buildenv=`make -C $FREEBSD_SRC TARGET_ARCH=$TARGET_ARCH buildenvvars`
-        FREEBSD_OBJDIR=`eval $buildenv printenv MAKEOBJDIRPREFIX`${FREEBSD_SRC}
+        FREEBSD_OBJDIR=`eval $buildenv printenv MAKEOBJDIRPREFIX`
+        FREEBSD_OBJDIR=${FREEBSD_OBJDIR}`realpath ${FREEBSD_SRC}`
     fi
     echo "Object files are at: "${FREEBSD_OBJDIR}
 }

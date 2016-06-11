@@ -429,6 +429,13 @@ disk_ufs_mount ( ) {
 
 
 #
+disk_efi_create ( ) {
+    NEW_EFI_PARTITION=`gpart add -t efi -s 800K ${DISK_MD} | sed -e 's/ .*//'` || exit 1
+    dd if=${FREEBSD_OBJDIR}/sys/boot/efi/boot1/boot1.efifat of=${NEW_EFI_PARTITION}
+}
+
+
+#
 # $1: mount point
 # $2: absolute index of partition to mount
 disk_mount ( ) {
