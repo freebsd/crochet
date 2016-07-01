@@ -1,0 +1,122 @@
+BananaPi BPI-M3 is supported by FreeBSD-CURRENT.
+
+============================================================
+
+What is a BananaPi BPI-M3?
+--------------------------
+
+The BananaPi BPI-M3 is an ARM-based development/test board. It features
+a modern 8-core ARMv7 processor and a wealth of on-chip peripheral support.
+Details can be found at:
+
+   http://www.banana-pi.org/m3.html
+
+============================================================
+
+How to boot the BananaPi BPI-M3
+-------------------------------
+
+1. CONNECT the board to your FreeBSD (or other) system
+   using a third-party adapter cable such as:
+     Adafruit 954: http://www.adafruit.com/product/954
+     FTDI TTL-232R-3V3 cable:  Widely available
+     FTDI Friend adapter:  http://www.adafruit.com/products/284
+
+2. ACCESS the serial console at 115200 baud.  Note: The Tx/Rx pins
+   may be reversed.
+
+3. INSERT the SD card into your BananaPi BPI-M3
+
+4. POWER the board by connecting it to a micro USB power supply
+
+============================================================
+
+IF SOMETHING GOES WRONG
+-----------------------
+
+If the image fails to boot:
+  * Look at the build and install logs under the 'work' directory.
+  * Ask on the arm@freebsd.org or freebsd-current@freebsd.org mailing list for
+help.
+
+============================================================
+
+Anatomy of a BananaPi BPI-M3 Boot Image
+---------------------------------------
+
+The FreeBSD bootable image for BananaPi BPI-M3 has both FAT
+and UFS partitions containing the following files:
+
+  FAT Partition
+     sunxi-spl.bin - First stage boot, from U-Boot
+     uboot.img - Second stage: U-Boot
+
+  UFS Partition
+     /boot/kernel - dynamic kernel
+     ... rest of FreeBSD ...
+
+The boot process works like this:
+
+ 1) A83T SoC BROM code will try to load the SPL ("sunxi-spl.bin") from
+    sector 16 of the SD card.
+
+ 2) sunxi-spl.bin loads uboot.img from sector 64 of the SD card.
+
+    U-Boot is a highly modular boot loader system that can be used on
+    a wide variety of systems.
+
+ 3) ubldr is a variant of FreeBSD's standard loader(8) program that is
+    designed to be chain-loaded from U-Boot.  It calls into U-Boot for
+    low-level device access, which allows ubldr to load FreeBSD on any
+    system that supports U-Boot.
+
+ 4) ubldr locates the UFS partition, loads /boot/kernel/kernel from
+    UFS to address 0x42000000 and executes it.
+
+============================================================
+
+NATIVE SOURCE REBUILDS
+---------------------------------------
+
+The usual "make buildworld", "make installworld",
+"make buildkernel", and "make installkernel" all work
+natively on the BananaPi BPI-M3.  Due to limited memory and
+slow speed of SD, a full buildworld can take 30-40 hours:
+
+ $ make buildworld
+ $ make installworld
+ $ make KERNCONF=ALLWINNER buildkernel
+ $ make KERNCONF=ALLWINNER installkernel
+
+If you want to try this, you'll want an 8G image.  You can put the
+source tree into the image when you build it by including the
+following in your config.sh:
+
+  option UsrSrc
+  option SwapFile 768mb
+
+After you boot the resulting image, you'll have a fully populated
+/usr/src and can try rebuilding the system natively.
+
+Alternatively, of course, you can use "portsnap" to download and
+install a ports tree, build the subversion port, and checkout the
+FreeBSD source code using that.  This works, I've done it.
+
+================================================================
+
+PROJECTS
+--------------------------------
+
+If you're interested, there are a lot of things still to
+be done:
+
+* Use the system.  The stability has been generally improving
+  but the more people use and stress it, the more issues we'll
+  be able to shake out.  Report any problems on freebsd-arm
+  mailing list.
+* Test ports.  Many ports are known to work well; help us test
+  and fix the rest!
+* More drivers.  The A83T SoC has a lot of hardware
+  components that are still unsupported.
+
+============================================================

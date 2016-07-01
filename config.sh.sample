@@ -22,6 +22,7 @@
 #
 #board_setup Alix
 #board_setup BananaPi
+#board_setup BananaPi-M3
 #board_setup BeagleBone
 #board_setup Cubieboard2
 #board_setup Chromebook
