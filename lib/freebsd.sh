@@ -353,7 +353,7 @@ freebsd_ubldr_build ( ) {
     then
         mv ${UBLDR_DIR}/_.ubldr.${CONF}.sh ${UBLDR_DIR}/_.ubldr.${CONF}.built
         cd arm/uboot
-        eval $buildenv make "$@" DESTDIR=${UBLDR_DIR}/ BINDIR=boot NO_MAN=true -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
+        eval $buildenv make "$@" DESTDIR=${UBLDR_DIR}/ BINDIR=boot MK_MAN=no -m $ubldr_makefiles install >> ${LOGFILE} || exit 1
     else
         echo "Failed to build FreeBSD ubldr"
         echo "  Log in ${LOGFILE}"
