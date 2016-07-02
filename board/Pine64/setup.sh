@@ -22,7 +22,7 @@ pine64_partition_image ( ) {
     echo "Installing U-Boot from: ${PINE64_UBOOT_PATH}"
     dd if=${PINE64_UBOOT_PATH}/${PINE64_UBOOT_BIN} of=/dev/${DISK_MD} seek=16
     disk_partition_mbr
-    disk_fat_create 64m
+    disk_fat_create 64m 16 16384
     disk_ufs_create
 }
 strategy_add $PHASE_PARTITION_LWW pine64_partition_image
