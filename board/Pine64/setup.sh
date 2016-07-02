@@ -1,10 +1,10 @@
 KERNCONF=GENERIC
 PINE64_UBOOT_PORT="u-boot-pine64"
-PINE64_UBOOT_BIN="u-boot.img"
+PINE64_UBOOT_BIN="pine64.img"
 PINE64_UBOOT_PATH="/usr/local/share/u-boot/${PINE64_UBOOT_PORT}"
 IMAGE_SIZE=$((1000 * 1000 * 1000))
-TARGET_ARCH=arm64
-TARGET=arm64
+TARGET_ARCH=aarch64
+TARGET=aarch64
 
 pine64_check_uboot ( ) {
     uboot_port_test ${PINE64_UBOOT_PORT} ${PINE64_UBOOT_BIN}
