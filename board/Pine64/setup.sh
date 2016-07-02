@@ -23,15 +23,15 @@ strategy_add $PHASE_PARTITION_LWW pine64_partition_image
 
 pine64_uboot_install ( ) {
     echo "Installing U-Boot from: ${PINE64_UBOOT_PATH}"
-    cp ${PINE64_UBOOT_PATH}/u-boot.img .
+    dd if=${PINE64_UBOOT_PATH}/u-boot.img of=/dev/${DISK_MD} seek=16
     touch uEnv.txt
-    freebsd_install_fdt pine64.dts pine64.dts
-    freebsd_install_fdt pine64.dts pine64.dtb
+    freebsd_install_fdt pine64_plus.dts pine64_plus.dts
 }
 strategy_add $PHASE_BOOT_INSTALL pine64_uboot_install
 
 # Build and install a suitable ubldr
-strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x41000000
+# from 'printenv' in boot0: kernel_addr_r=0x42000000
+strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x42000000
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 # Pine64 puts the kernel on the FreeBSD UFS partition.
