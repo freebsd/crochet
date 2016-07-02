@@ -57,7 +57,7 @@ generic_i386_build_loader ( ) {
     tail ${WORKDIR}/_.i386_loader_build.log
     exit 1
     fi
-    if eval ${buildenv} make DESTDIR=${WORKDIR} NO_MAN=t install > ${WORKDIR}/_.i386_loader_install.log 2>&1
+    if eval ${buildenv} make DESTDIR=${WORKDIR} MK_MAN=no install > ${WORKDIR}/_.i386_loader_install.log 2>&1
     then
     true
     else
