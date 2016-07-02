@@ -425,7 +425,7 @@ freebsd_loader_efi_build ( ) {
     eval $buildenv make "$@" -m $sharemk depend >> ${LOGFILE} 2>&1
     if /bin/sh -e ${EFI_DIR}/_.efi.${CONF}.sh >> ${LOGFILE} 2>&1
     then
-        cd efi
+        cd efi/loader
         eval $buildenv make "$@" DESTDIR=${EFI_DIR}/ BINDIR=boot MK_MAN=no -m $sharemk install >> ${LOGFILE} || exit 1
         mv ${EFI_DIR}/_.efi.${CONF}.sh ${EFI_DIR}/_.efi.${CONF}.built
     else

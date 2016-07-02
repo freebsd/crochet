@@ -16,28 +16,29 @@ pine64_check_uboot ( ) {
 strategy_add $PHASE_CHECK pine64_check_uboot
 
 #
-# Pine64 requires a FAT partition to hold the boot loader bits.
+# Pine64 uses EFI, so the first partition will be a FAT partition.
 #
 pine64_partition_image ( ) {
     echo "Installing U-Boot from: ${PINE64_UBOOT_PATH}"
     dd if=${PINE64_UBOOT_PATH}/${PINE64_UBOOT_BIN} of=/dev/${DISK_MD} seek=16
     disk_partition_mbr
-    disk_fat_create 2m
+    disk_fat_create 64m
     disk_ufs_create
 }
 strategy_add $PHASE_PARTITION_LWW pine64_partition_image
 
 pine64_uboot_install ( ) {
-    touch uEnv.txt
-    freebsd_install_fdt arm/pine64_plus.dts pine64_plus.dts
+    echo bootaa64 > startup.nsh
+    mkdir -p EFI/BOOT dtb
+    freebsd_install_fdt arm/pine64_plus.dts dtb/pine64_plus.dtb
 }
 strategy_add $PHASE_BOOT_INSTALL pine64_uboot_install
 
 # Build & install loader.efi.
 strategy_add $PHASE_BUILD_OTHER freebsd_loader_efi_build
-strategy_add $PHASE_BOOT_INSTALL freebsd_loader_efi_copy .
+strategy_add $PHASE_BOOT_INSTALL freebsd_loader_efi_copy EFI/BOOT/bootaa64.efi
 
 # Pine64 puts the kernel on the FreeBSD UFS partition.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL board_default_installkernel .
-# overlay/etc/fstab mounts the FAT partition at /boot/msdos
-strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/msdos
+# overlay/etc/fstab mounts the FAT partition at /boot/efi
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL mkdir -p boot/efi
