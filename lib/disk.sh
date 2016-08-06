@@ -329,7 +329,11 @@ disk_fat_create ( ) {
         echo "Default to FAT${_FAT_TYPE} for partition size $1"
     fi
 
-    newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+    if [ "${FAT_LABEL}" = "-" ]; then
+        newfs_msdos -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+    else
+        newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+    fi
 
     disk_created_new FAT ${NEW_FAT_SLICE}
 }
