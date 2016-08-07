@@ -425,7 +425,7 @@ freebsd_loader_efi_build ( ) {
     eval $buildenv make "$@" -m $sharemk depend >> ${LOGFILE} 2>&1
     if /bin/sh -e ${EFI_DIR}/_.efi.${CONF}.sh >> ${LOGFILE} 2>&1
     then
-        cd efi/loader
+        cd efi/boot1
         eval $buildenv make "$@" DESTDIR=${EFI_DIR}/ BINDIR=boot MK_MAN=no -m $sharemk install >> ${LOGFILE} || exit 1
         mv ${EFI_DIR}/_.efi.${CONF}.sh ${EFI_DIR}/_.efi.${CONF}.built
     else
@@ -441,8 +441,8 @@ freebsd_loader_efi_copy ( ) {
     target=${PWD}
     LOGFILE=${WORKDIR}/_.loader.efi.install.${CONF}.log
     [ "$1" != "." ] && target="$1"
-    echo "Installing loader.efi in ${TARGET}"
-    cp ${WORKDIR}/efi-${CONF}/boot/loader.efi $1 || exit 1
+    echo "Installing boot1.efi in ${TARGET}"
+    cp ${WORKDIR}/efi-${CONF}/boot/boot1.efi $1 || exit 1
 }
 
 # freebsd_install_usr_src:  Copy FREEBSD_SRC tree
