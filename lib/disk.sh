@@ -382,7 +382,8 @@ disk_ufs_create ( ) {
 
     echo "Creating a${SIZE_DISPLAY} UFS partition at "`date`
 
-    NEW_UFS_SLICE=`gpart add -t freebsd ${SIZE_ARG} ${DISK_MD} | sed -e 's/ .*//'` || exit 1
+    # 512k alignment helps boot1.efi find UFS.
+    NEW_UFS_SLICE=`gpart add -t freebsd -a 512k ${SIZE_ARG} ${DISK_MD} | sed -e 's/ .*//'` || exit 1
     NEW_UFS_SLICE_NUMBER=`echo ${NEW_UFS_SLICE} | sed -e 's/.*[^0-9]//'`
 
     gpart create -s BSD ${NEW_UFS_SLICE}
