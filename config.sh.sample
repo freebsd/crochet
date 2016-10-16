@@ -33,6 +33,7 @@
 #board_setup Soekris
 #board_setup RaspberryPi
 #board_setup RaspberryPi2
+#board_setup RaspberryPi3
 #board_setup VersatilePB
 #board_setup ZedBoard
 #board_setup Wandboard
