@@ -1,25 +1,24 @@
-Pine64 is supported as of May 2016.
+Raspberry Pi 3 is supported as of Oct 2016.
 
 ============================================================
 
-What is a Pine64?
+What is a Raspberry Pi 3?
 --------------------
 
-The Pine64 is a quad-core 64-bit A53 single board computer.
+The Raspberry Pi 3 is a quad-core 64-bit ARM single board computer.
 Details can be found at:
 
-   http://www.pine64.com/
+   https://www.raspberrypi.org/products/raspberry-pi-3-model-b/
 
 You boot it from a MicroSDHC card with the system image.
 
-Once you have the Pine64 working, you can expand it by connecting
-it to Ethernet, adding USB peripherals (such as external disk drives
-or wireless network interfaces) or attaching new hardware to the
-connectors on the board.
+Once you have the Raspberry Pi 3 working, you can expand it by
+connecting it to Ethernet, adding USB peripherals (such as external
+disk drives) or attaching new hardware to the connectors on the board.
 
 ============================================================
 
-How to boot the Pine64
+How to boot the Raspberry Pi 3
 --------------------------------
 
 1. Connect the board to a HDMI display, network, and USB keyboard.
