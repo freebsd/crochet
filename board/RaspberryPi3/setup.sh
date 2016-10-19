@@ -1,4 +1,4 @@
-KERNCONF=RPI3
+KERNCONF=GENERIC-UP
 RPI3_UBOOT_PORT="u-boot-rpi3"
 RPI3_UBOOT_BIN="u-boot.bin"
 RPI3_UBOOT_PATH="/usr/local/share/u-boot/${RPI3_UBOOT_PORT}"
@@ -10,10 +10,10 @@ TARGET=aarch64
 # from 'printenv' in boot0: kernel_addr_r=0x42000000
 #UBLDR_LOADADDR=0x42000000
 
-#rpi3_check_uboot ( ) {
-#    uboot_port_test ${RPI3_UBOOT_PORT} ${RPI3_UBOOT_BIN}
-#}
-#strategy_add $PHASE_CHECK rpi3_check_uboot
+rpi3_check_uboot ( ) {
+    uboot_port_test ${RPI3_UBOOT_PORT} ${RPI3_UBOOT_BIN}
+}
+strategy_add $PHASE_CHECK rpi3_check_uboot
 
 #
 # RPi3 uses EFI, so the first partition will be a FAT partition.
@@ -30,6 +30,17 @@ raspberry_pi_populate_boot_partition ( ) {
     echo bootaa64 > startup.nsh
     mkdir -p EFI/BOOT
 
+    cp ${UBOOT_PATH}/LICENCE.broadcom .
+    cp ${UBOOT_PATH}/README .
+    cp ${UBOOT_PATH}/bootcode.bin .
+    cp ${UBOOT_PATH}/fixup.dat .
+    cp ${UBOOT_PATH}/fixup_cd.dat .
+    cp ${UBOOT_PATH}/fixup_x.dat .
+    cp ${UBOOT_PATH}/start.elf .
+    cp ${UBOOT_PATH}/start_cd.elf .
+    cp ${UBOOT_PATH}/start_x.elf .
+    cp ${UBOOT_PATH}/u-boot.bin .
+
     # Populate config.txt
     echo "arm_control=0x200" > config.txt
     echo "dtparam=audio=on,i2c_arm=on,spi=on" >> config.txt
@@ -37,9 +48,6 @@ raspberry_pi_populate_boot_partition ( ) {
     echo "dtoverlay=pi3-disable-bt" >> config.txt
     echo "device_tree_address=0x100" >> config.txt
     echo "kernel=u-boot.bin" >> config.txt
-
-    # Fetch u-boot.bin from gonzo
-    fetch https://people.freebsd.org/~gonzo/arm/rpi3/u-boot.bin
 
     # Fetch all the firmware files
     firmware="bcm2710-rpi-3-b.dtb bootcode.bin fixup.dat start.elf"
