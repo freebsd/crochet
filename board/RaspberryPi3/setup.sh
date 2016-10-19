@@ -5,6 +5,7 @@ RPI3_UBOOT_PATH="/usr/local/share/u-boot/${RPI3_UBOOT_PORT}"
 IMAGE_SIZE=$((2000 * 1000 * 1000))
 TARGET_ARCH=aarch64
 TARGET=aarch64
+DTB_REPO="https://github.com/raspberrypi/firmware/blob/master/boot/"
 
 # Not used - just in case someone wants to use a manual ubldr.  Obtained
 # from 'printenv' in boot0: kernel_addr_r=0x42000000
@@ -49,17 +50,15 @@ raspberry_pi_populate_boot_partition ( ) {
     echo "device_tree_address=0x100" >> config.txt
     echo "kernel=u-boot.bin" >> config.txt
 
-    # Fetch all the firmware files
-    firmware="bcm2710-rpi-3-b.dtb bootcode.bin fixup.dat start.elf"
-    for i in ${firmware}; do
-        fetch -o ${i} "https://github.com/raspberrypi/firmware/blob/master/boot/${i}?raw=true"
-    done
+    # Fetch the dtb
+    dtb="bcm2710-rpi-3-b.dtb"
+    fetch -o ${dtb} "${DTB_REPO}/${dtb}?raw=true"
 
     # Fetch all the overlays we need
     mkdir overlays
     overlays="mmc.dtbo pi3-disable-bt.dtbo"
     for i in ${overlays}; do
-        fetch -o overlays/${i} "https://github.com/raspberrypi/firmware/blob/master/boot/overlays/${i}?raw=true"
+        fetch -o overlays/${i} "${DTB_REPO}/overlays/${i}?raw=true"
     done
 
 }
