@@ -23,7 +23,7 @@ alix_partition_image ( ) {
         echo "Installing bootblocks"
 	# TODO: This is broken; should use 'make install' to copy
 	# bootfiles to workdir, then install to disk image from there.
-        BOOTFILES=${FREEBSD_OBJDIR}sys/boot/i386
+        BOOTFILES=${FREEBSD_OBJDIR}/sys/boot/i386
         echo "Boot files are at: "${BOOTFILES}
         gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
         gpart set -a active -i 1 ${DISK_MD} || exit 1
