@@ -1,0 +1,2 @@
+load kernel
+load -t dtb boot/dtb/orangepi-plus-2e.dtb
