@@ -1,6 +1,6 @@
 KERNCONF=ALLWINNER
 UBLDR_LOADADDR=0x42000000
-SUNXI_UBOOT="u-boot-orangepi-plus2e"
+SUNXI_UBOOT="u-boot-orangepi-plus-2e"
 SUNXI_UBOOT_BIN="u-boot.img"
 IMAGE_SIZE=$((1000 * 1000 * 1000))
 TARGET_ARCH=armv6
