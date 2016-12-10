@@ -28,17 +28,6 @@ FREEBSD_INSTALLKERNEL_BOARD_ARGS=""
 SRCCONF=/dev/null
 __MAKE_CONF=/dev/null
 
-if [ -z ${WORLDJOBS} ]; then
-	WORLDJOBS="-j $(sysctl -n hw.ncpu)"
-else
-	WORLDJOBS="-j${WORLDJOBS}"
-fi
-if [ -z ${KERNJOBS} ]; then
-	KERNJOBS="-j $(sysctl -n hw.ncpu)"
-else
-	KERNJOBS="-j${KERNJOBS}"
-fi
-
 freebsd_default_makeobjdirprefix ( ) {
     if [ -z "$MAKEOBJDIRPREFIX" ]; then
         MAKEOBJDIRPREFIX=${WORKDIR}/obj
@@ -91,8 +80,8 @@ freebsd_objdir ( ) {
     # really should not need this; we can instead use the following
     # idiom to copy files out of the obj tree without actually
     # knowing where it is:
-    #     "cd src-dir-location; make DESTDIR=XYZ install" 
-    
+    #     "cd src-dir-location; make DESTDIR=XYZ install"
+
     if [ "$FREEBSD_MAJOR_VERSION" -eq "8" ]
     then
         FREEBSD_OBJDIR=${MAKEOBJDIRPREFIX}/${TARGET_ARCH}${FREEBSD_SRC}
@@ -212,6 +201,11 @@ _freebsd_build ( ) {
 # $@: additional make arguments
 #
 freebsd_buildworld ( ) {
+if [ -z ${WORLDJOBS} ]; then
+	WORLDJOBS="-j $(sysctl -n hw.ncpu)"
+else
+	WORLDJOBS="-j${WORLDJOBS}"
+fi
     _FREEBSD_WORLD_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_WORLD_EXTRA_ARGS} ${FREEBSD_WORLD_BOARD_ARGS}"
     if [ -n "${TARGET_CPUTYPE}" ]; then
         _FREEBSD_WORLD_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_WORLD_ARGS}"
@@ -230,6 +224,11 @@ freebsd_buildworld ( ) {
 # $@: arguments to make.
 #
 freebsd_buildkernel ( ) {
+if [ -z ${KERNJOBS} ]; then
+	KERNJOBS="-j $(sysctl -n hw.ncpu)"
+else
+	KERNJOBS="-j${KERNJOBS}"
+fi
     _FREEBSD_KERNEL_ARGS="TARGET_ARCH=${TARGET_ARCH} SRCCONF=${SRCCONF} __MAKE_CONF=${__MAKE_CONF} KERNCONF=${KERNCONF} ${FREEBSD_EXTRA_ARGS} ${FREEBSD_KERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS}"
     if [ -n "${TARGET_CPUTYPE}" ]; then
         _FREEBSD_KERNEL_ARGS="TARGET_CPUTYPE=${TARGET_CPUTYPE} ${_FREEBSD_KERNEL_ARGS}"
@@ -551,5 +550,3 @@ freebsd_replicate ( ) {
     pax -r -w -p e -k . $2
     echo "Replication complete at "`date`
 }
-
-
