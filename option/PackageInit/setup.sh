@@ -56,6 +56,7 @@ if [ -z "$_PACKAGE_INIT" ]; then
     strategy_add $PHASE_CHECK package_test
     # Ensure this happens before any "option Package"
     PRIORITY=50 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init
+    # Ensure this happens after any "option Package"
     PRIORITY=150 strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_init_cleanup
     _PACKAGE_INIT=t
 fi
