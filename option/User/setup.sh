@@ -20,13 +20,13 @@ pw_add_user_to_group ( ) {
 }
 
 # Add the specified account.
-# Ensure it happens before adding user to groups
-PRIORITY=110 strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_create_account $1
+strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_create_account $1
 
 if [ $? > 2 ]; then
 	USER=$1
 	shift
 	for GROUP in $@; do
-		PRIORITY=120 strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_add_user_to_group $USER $GROUP
+		# Group can be added by pkg, ensure this happens after pkg install in "option Package".
+		PRIORITY=110 strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_add_user_to_group $USER $GROUP
 	done
 fi
