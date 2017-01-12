@@ -48,7 +48,7 @@ EOF
 }
 
 package_init_cleanup ( ) {
-	rm 	${BOARD_FREEBSD_MOUNTPOINT}/etc/pkg/tmp.conf
+	rm -f ${BOARD_FREEBSD_MOUNTPOINT}/etc/pkg/tmp.conf
 }
 
 # Only register the package init functions once.
