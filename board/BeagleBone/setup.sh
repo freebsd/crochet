@@ -15,7 +15,7 @@ strategy_add $PHASE_CHECK beaglebone_check_uboot
 #
 beaglebone_partition_image ( ) {
     disk_partition_mbr
-    disk_fat_create 2m
+    disk_fat_create 32m 16
     disk_ufs_create
 }
 strategy_add $PHASE_PARTITION_LWW beaglebone_partition_image
