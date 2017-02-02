@@ -47,7 +47,9 @@ You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD
 * [BeagleBone](http://beagleboard.org/)
 * [Chromebook Snow](http://www.samsung.com/ca/consumer/office/chrome-devices/chromebooks/XE303C12-A01CA)
 * [Cubieboard](http://cubieboard.org/)
+* [OrangePi] (http://www.orangepi.org)
 * [PandaBoard](http://pandaboard.org/)
+* [Pine64](https://www.pine64.org/)
 * [RaspberryPi and RaspberryPi 2](http://www.raspberrypi.org/)
 * [Soekris](http://soekris.com/)
 * generic x86 systems.

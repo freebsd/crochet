@@ -27,7 +27,9 @@
 #board_setup Cubieboard2
 #board_setup Chromebook
 #board_setup GenericI386
+#board_setup OrangePi-Plus2E
 #board_setup PandaBoard
+#board_setup Pine64
 #board_setup RadxaRock
 #board_setup RadxaRockLite
 #board_setup Soekris

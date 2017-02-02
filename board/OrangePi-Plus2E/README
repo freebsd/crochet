@@ -1,0 +1,7 @@
+OrangePi Plus2E is supported by FreeBSD-CURRENT as of
+November, 2016. 
+========================================================================
+
+Prerequisites:
+  u-boot for the board to be installed, see PR# 214729
+       sysutils/u-boot-orangepi-plus-2e

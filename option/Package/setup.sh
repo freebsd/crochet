@@ -6,6 +6,9 @@
 # Make sure package database gets initialized.
 option PackageInit
 
-for p in $@; do
-    strategy_add $PHASE_FREEBSD_OPTION_INSTALL pkg -c . install -y $p
-done
+package_install ( ) {
+    echo "Installing packages (with dependencies): $@"
+	pkg -c ${BOARD_FREEBSD_MOUNTPOINT} install -y -r ${_PACKAGE_REPO} $@
+}
+
+strategy_add $PHASE_FREEBSD_OPTION_INSTALL package_install "$@"
