@@ -54,13 +54,13 @@ disk_ufs_create() {
 
     # CFG Paritition
     #CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} -l cfg ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-    CFG_UFS_PARTITION=`gpart add -t freebsd-ufs ${NANO_CFG_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    CFG_UFS_PARTITION=`gpart add -t freebsd-ufs -i 4 ${NANO_CFG_SIZE} ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
     CFG_UFS_DEVICE=/dev/${CFG_UFS_PARTITION}
     newfs ${CFG_UFS_DEVICE}
 
     # DATA Paritition
     #DATA_UFS_PARTITION=`gpart add -t freebsd-ufs -l data ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
-    DATA_UFS_PARTITION=`gpart add -t freebsd-ufs ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
+    DATA_UFS_PARTITION=`gpart add -t freebsd-ufs -i 5 ${NEW_UFS_SLICE} | sed -e 's/ .*//'` || exit 1
     DATA_UFS_DEVICE=/dev/${DATA_UFS_PARTITION}
     newfs ${DATA_UFS_DEVICE}
     tunefs -n enable ${DATA_UFS_DEVICE}			# Turn on Softupdates
