@@ -96,7 +96,6 @@ nanobsd_install() {
 
     # add /cfg and /data to /etc/fstab
     cp /dev/null etc/fstab
-    echo "${NANO_DEV}s1  /boot/msdos  msdosfs  ro                 1 1" >> etc/fstab
     echo "${NANO_DEV}s2a /            ufs      ro                 1 1" >> etc/fstab
     echo "${NANO_DEV}s2d /cfg         ufs      rw,noatime,noauto  2 2" >> etc/fstab
     echo "${NANO_DEV}s2e /data        ufs      rw,noatime         2 2" >> etc/fstab
