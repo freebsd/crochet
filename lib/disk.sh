@@ -343,7 +343,7 @@ disk_fat_create ( ) {
 disk_fat_mount ( ) {
     echo "Mounting FAT partition ${2:-1} at $1"
     disk_prep_mountdir $1
-    mount_msdosfs `disk_fat_device $2` $1
+    mount_msdosfs -l `disk_fat_device $2` $1
     disk_record_mountdir $1
 }
 
