@@ -131,6 +131,23 @@ Using the script to build an image consists of a few steps:
 * -e <email>: Email address to receive build status
 * -u: Update source tree
 
+## Using pkg
+
+You can use `pkg` to install packages on your final crochet image if you have your own package repository. Add the following to your config:
+
+```
+# Package Installation Information
+
+option PackageInit $pkg-repo
+option Package security/sudo
+
+# If you don't put a custom resolv.conf in your overlay use this
+# Otherwise pkg will not be able to resolv hostnames
+
+option Resolv
+```
+In the example above, change `$pkg-repo` to the full URL of your package repository. Be sure to include the category for the package. Ex: `security/sudo` vs. `sudo`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
+
 ## Potential Projects
 
 There are still plenty of ways this script could
