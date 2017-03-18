@@ -148,15 +148,6 @@ be improved:
   include a tweaked kernel configuration as part of a board
   definition.
 
-* Package Installation.  Pkgng packages can be installed using
-    `option PackageInit <repository>` and
-    `option Package <name>`
-  assuming you have a suitable pkgng repository.  Cross-installs
-  mostly work but there are subtle bugs that need to be tracked down.
-
-  It should be possible to support pkg_add for same-architecture
-  installs, though this requires tricky chroot games to get right.
-
 * Swap.  The script should allow you to specify a swap size and
   automatically adjust the disk layout accordingly.  For now, we
   support creating swap files in the FreeBSD partition, which is easy
