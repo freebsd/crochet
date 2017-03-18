@@ -146,7 +146,7 @@ option Package security/sudo
 
 option Resolv
 ```
-In the example above, change `$pkg-repo` to the full URL of your package repository. Be sure to include the category for the package. Ex: `security/sudo` vs. `sudo`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
+In the example above, change `$pkg-repo` to the full URL of your package repository. Be sure to include the category for the package. Ex: `security/sudo` vs. `sudo`. You can also specify more than one package at a time. Ex: `option Package security/sudo sysutils/tmux`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
 
 ## Potential Projects
 
