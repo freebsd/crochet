@@ -1,4 +1,4 @@
-#Crochet-FreeBSD
+# Crochet-FreeBSD
 
 
 Crochet is a tool for building bootable FreeBSD images.
@@ -7,10 +7,10 @@ This tool was formerly known as "freebsd-beaglebone" or
 But it now supports more boards and should easily extend
 to support many more.
 
-##FAQ
+## FAQ
 
 
-###How do I log in via ssh?
+### How do I log in via ssh?
 
 
 The default configuration of FreeBSD doesn't allow root to log in over ssh.  You have two options
@@ -19,11 +19,11 @@ The default configuration of FreeBSD doesn't allow root to log in over ssh.  You
 
 * If your platform has a serial console, log into the console using a serial cable and create yourself a user other than root.
 
-###Why is nothing showing up on my HDMI or VGA monitor?
+### Why is nothing showing up on my HDMI or VGA monitor?
 
 Not every platform supports HDMI or VGA yet.  Most platforms support RS-232.
 
-###How do I install 3rd party applications?
+### How do I install 3rd party applications?
 
 Packages are available via the normal pkg repos:
 ```
@@ -38,7 +38,7 @@ You can also get a copy of the FreeBSD ports tree with the following commands (a
 
 You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD/ports/.
 
-##Supported Platforms
+## Supported Platforms
 
 
 * [Alix](http://pcengines.ch/alix.htm)
@@ -47,7 +47,7 @@ You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD
 * [BeagleBone](http://beagleboard.org/)
 * [Chromebook Snow](http://www.samsung.com/ca/consumer/office/chrome-devices/chromebooks/XE303C12-A01CA)
 * [Cubieboard](http://cubieboard.org/)
-* [OrangePi] (http://www.orangepi.org)
+* [OrangePi](http://www.orangepi.org)
 * [PandaBoard](http://pandaboard.org/)
 * [Pine64](https://www.pine64.org/)
 * [RaspberryPi and RaspberryPi 2](http://www.raspberrypi.org/)
@@ -58,7 +58,7 @@ You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD
 * [VMWare](http://www.vmware.com/)
 * [ZedBoard](http://www.zedboard.org/)
 
-##How to Build a Disk Image
+## How to Build a Disk Image
 
 The crochet.sh script can build a complete bootable
 FreeBSD image ready to be copied to a suitable device
@@ -124,14 +124,31 @@ Using the script to build an image consists of a few steps:
 
    Again, read board/*board-name*/README for details.
 
-##Command-line Options
+## Command-line Options
 
 * -b <board>: Load standard configuration for board
 * -c <file>: Load configuration from file
 * -e <email>: Email address to receive build status
 * -u: Update source tree
 
-##Potential Projects
+## Using pkg
+
+You can use `pkg` to install packages on your final crochet image if you have your own package repository. Add the following to your config:
+
+```
+# Package Installation Information
+
+option PackageInit $pkg-repo
+option Package security/sudo
+
+# If you don't put a custom resolv.conf in your overlay use this
+# Otherwise pkg will not be able to resolv hostnames
+
+option Resolv
+```
+In the example above, change `$pkg-repo` to the full URL of your package repository. Be sure to include the category for the package. Ex: `security/sudo` vs. `sudo`. You can also specify more than one package at a time. Ex: `option Package security/sudo sysutils/tmux`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
+
+## Potential Projects
 
 There are still plenty of ways this script could
 be improved:
@@ -147,15 +164,6 @@ be improved:
   think config(8) requires this; it would be nice to be able to
   include a tweaked kernel configuration as part of a board
   definition.
-
-* Package Installation.  Pkgng packages can be installed using
-    `option PackageInit <repository>` and
-    `option Package <name>`
-  assuming you have a suitable pkgng repository.  Cross-installs
-  mostly work but there are subtle bugs that need to be tracked down.
-
-  It should be possible to support pkg_add for same-architecture
-  installs, though this requires tricky chroot games to get right.
 
 * Swap.  The script should allow you to specify a swap size and
   automatically adjust the disk layout accordingly.  For now, we
