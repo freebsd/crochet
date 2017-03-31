@@ -4,7 +4,7 @@ RPI_UBOOT_BIN="u-boot.img"
 RPI_FIRMWARE_SRC=/usr/local/share/u-boot/${RPI_UBOOT_PORT}
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
-TARGET_ARCH=armv6
+TARGET_ARCH=armv6hf # compile to target the hard float ABI
 
 #
 # Because of the complexity of the Raspberry Pi boot
