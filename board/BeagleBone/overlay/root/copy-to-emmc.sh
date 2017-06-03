@@ -27,11 +27,11 @@ echo 'Erasing /dev/mmcsd1!  (Hope you meant this!)'
 dd if=/dev/zero of=/dev/mmcsd1 bs=64k count=1
 
 echo
-echo 'Creating MSDOS FAT12 boot partition on eMMC'
+echo 'Creating MSDOS FAT16 boot partition on eMMC'
 gpart create -s mbr mmcsd1
-gpart add -s 2m -t '!12' mmcsd1
+gpart add -s 16m -t '!14' mmcsd1
 gpart set -a active -i 1 mmcsd1
-newfs_msdos -L 'EMMCBOOT' -F 12 /dev/mmcsd1s1
+newfs_msdos -L 'EMMCBOOT' -F 16 /dev/mmcsd1s1
 
 echo
 echo 'Copying boot files to eMMC boot partition'
