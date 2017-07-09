@@ -16,7 +16,7 @@ generic_i386_partition_image ( ) {
         echo "Boot files are at: "${BOOTFILES} 
         gpart bootcode -b ${BOOTFILES}/mbr/mbr ${DISK_MD} || exit 1
         gpart set -a active -i 1 ${DISK_MD} || exit 1
-        bsdlabel -B -b ${BOOTFILES}/boot2/boot `disk_ufs_partition` || exit 1
+        gpart bootcode -b ${BOOTFILES}/boot2/boot ${DISK_MD}s1 || exit 1
 
         #show the disk
         gpart show ${DISK_MD}
