@@ -3,5 +3,5 @@ November, 2016.
 ========================================================================
 
 Prerequisites:
-  u-boot for the board to be installed, see PR# 214729
+  u-boot for the board to be installed
        sysutils/u-boot-orangepi-plus-2e
