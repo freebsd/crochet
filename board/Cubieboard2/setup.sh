@@ -9,7 +9,7 @@ UBOOT_PATH="/usr/local/share/u-boot/${SUNXI_UBOOT}"
 
 allwinner_partition_image ( ) {
     echo "Installing U-Boot files"
-    dd if=${UBOOT_PATH}/sunxi-spl.bin of=/dev/${DISK_MD} bs=1024 seek=8
+    dd if=${UBOOT_PATH}/u-boot-sunxi-with-spl.bin conv=notrunc,sync of=/dev/${DISK_MD} bs=1024 seek=8
     dd if=${UBOOT_PATH}/u-boot.img conv=notrunc,sync of=/dev/${DISK_MD} \
 	bs=1024 seek=40
     disk_partition_mbr
