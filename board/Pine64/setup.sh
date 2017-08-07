@@ -1,6 +1,6 @@
 KERNCONF=GENERIC
 PINE64_UBOOT_PORT="u-boot-pine64"
-PINE64_UBOOT_BIN="pine64.img"
+PINE64_UBOOT_BIN="u-boot-sunxi-with-spl.bin"
 PINE64_UBOOT_PATH="/usr/local/share/u-boot/${PINE64_UBOOT_PORT}"
 IMAGE_SIZE=$((2000 * 1000 * 1000))
 TARGET_ARCH=aarch64
@@ -20,7 +20,7 @@ strategy_add $PHASE_CHECK pine64_check_uboot
 #
 pine64_partition_image ( ) {
     echo "Installing U-Boot from: ${PINE64_UBOOT_PATH}"
-    dd if=${PINE64_UBOOT_PATH}/${PINE64_UBOOT_BIN} of=/dev/${DISK_MD} seek=16
+    dd if=${PINE64_UBOOT_PATH}/${PINE64_UBOOT_BIN} of=/dev/${DISK_MD} conv=notrunc,sync seek=16
     disk_partition_mbr
     disk_fat_create 64m 16 16384 -
     disk_ufs_create
