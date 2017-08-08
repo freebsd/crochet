@@ -57,6 +57,7 @@ You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD
 * [Versatile PB](http://arm.com/products/tools/development-boards/versatile/)
 * [VMWare](http://www.vmware.com/)
 * [ZedBoard](http://www.zedboard.org/)
+* [Zybo](http://digilentinc.com/zybo)
 
 ## How to Build a Disk Image
 
