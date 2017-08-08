@@ -22,7 +22,7 @@ pw_add_user_to_group ( ) {
 # Add the specified account.
 strategy_add $PHASE_FREEBSD_BOARD_INSTALL pw_create_account $1
 
-if [ $? > 2 ]; then
+if [ $? -gt 2 ]; then
 	USER=$1
 	shift
 	for GROUP in $@; do
