@@ -37,8 +37,9 @@
 #board_setup RaspberryPi2
 #board_setup RaspberryPi3
 #board_setup VersatilePB
-#board_setup ZedBoard
 #board_setup Wandboard
+#board_setup ZedBoard
+#board_setup Zybo
 #
 
 # Size of the disk image that will be built.  This is usually the same

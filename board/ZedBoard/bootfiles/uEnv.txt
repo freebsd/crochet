@@ -1,8 +1,0 @@
-kernel_addr=0x100000
-ubldr_addr=0x100000
-dtb_addr=0x1000
-dtb_name=zedboard.dtb
-uenvcmd=echo Booting FreeBSD from SD...; mmcinfo ; fatload mmc 0 ${ubldr_addr} ubldr ; fatload mmc 0 ${dtb_addr} ${dtb_name} ; fdt addr ${dtb_addr} ; bootelf ${ubldr_addr}
-tftpboot=echo Booting FreeBSD via tftp...; tftp ${kernel_addr} kernel.bin ; tftp ${dtb_addr} ${dtb_name} ; fdt addm ${dtb_addr} ; go ${kernel_addr}
-ipaddr=192.168.1.11
-serverip=192.168.1.10
