@@ -44,12 +44,20 @@ board_setup ( ) {
 }
 
 board_generate_image_name ( ) {
+    if [ -z "${IMGDIR}" ]; then
+	_IMGDIR=${WORKDIR}
+    else
+	_IMGDIR=${IMGDIR}
+    fi
+    if [ ! -z "${IMGNAME}" ]; then
+	eval IMG=${_IMGDIR}/${IMGNAME}
+    fi
     if [ -z "${IMG}" ]; then
         if [ -z "${SOURCE_VERSION}" ]; then
-           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
-       else
-           IMG=${WORKDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}.img
-       fi
+           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
+	else
+           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}.img
+	fi
     fi
     echo "Image name is:"
     echo "    ${IMG}"
