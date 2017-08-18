@@ -196,7 +196,20 @@
 # This file will be as large as IMAGE_SIZE above, so make
 # sure it's located somewhere with enough space.
 #
+# IMG specifies the whole path, and the source-specific variables are
+# not available at this time.
+# If IMGDIR is specified, then the image will be put into that directory.
+# If IMGNAME is specified within single apostrophes, it will be evaluated,
+# and the image named accordingly. This way, source-specific variables can
+# be used as well.
+# If the source version (git/svn/hg) is available, then the default image name
+# is the following:
+# FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}
+# If not, then:
+# FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
 #IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
+#IMGDIR=${WORKDIR}
+#IMGNAME='FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}'
 
 # Unset this to suppress installworld.  This is
 # useful when experimenting with boot and kernel
