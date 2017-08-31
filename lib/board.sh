@@ -26,10 +26,14 @@ FREEBSD_INSTALL_WORLD=y
 # List of all board dirs.
 BOARDDIRS=""
 
+# the board's name, later to be used in IMGNAMe
+BOARDNAME=""
+
 # $1: name of board directory
 #
 board_setup ( ) {
     BOARDDIR=${TOPDIR}/board/$1
+    BOARDNAME=$1
     if [ ! -e ${BOARDDIR}/setup.sh ]; then
         echo "Can't setup board $1."
         echo "No setup.sh in ${BOARDDIR}."
@@ -54,9 +58,9 @@ board_generate_image_name ( ) {
     fi
     if [ -z "${IMG}" ]; then
         if [ -z "${SOURCE_VERSION}" ]; then
-           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
+           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}-${BOARDNAME}.img
 	else
-           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}.img
+           IMG=${_IMGDIR}/FreeBSD-${TARGET_ARCH}-${FREEBSD_VERSION}-${KERNCONF}-${SOURCE_VERSION}-${BOARDNAME}.img
 	fi
     fi
     echo "Image name is:"

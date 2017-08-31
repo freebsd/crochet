@@ -209,7 +209,7 @@
 # FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}.img
 #IMG=${WORKDIR}/FreeBSD-${KERNCONF}.img
 #IMGDIR=${WORKDIR}
-#IMGNAME='FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}'
+#IMGNAME='FreeBSD-${TARGET_ARCH}-${FREEBSD_MAJOR_VERSION}-${KERNCONF}-${BOARDNAME}.img'
 
 # Unset this to suppress installworld.  This is
 # useful when experimenting with boot and kernel
