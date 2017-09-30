@@ -97,8 +97,8 @@ slow speed of SD, a full buildworld can take 30-40 hours:
 
  $ make buildworld
  $ make installworld
- $ make KERNCONF=CUBIEBOARD2 buildkernel
- $ make KERNCONF=CUBIEBOARD2 installkernel
+ $ make KERNCONF=GENERIC buildkernel
+ $ make KERNCONF=GENERIC installkernel
 
 If you want to try this, you'll want an 8G image.  You can put the
 source tree into the image when you build it by including the
