@@ -482,7 +482,7 @@ _freebsd_get_machine ( ) {
     echo ${MACHINE}
 }
 
-# $1: name of dts or dtb file, relative to sys/boot/fdt/dts
+# $1: name of dts or dtb file, relative to sys/dts
 # $2: destination dts or dtb file or dir, relative to cwd
 #
 # If $1 and $2 have different extensions (".dts" vs. ".dtb"),
@@ -493,7 +493,7 @@ _freebsd_get_machine ( ) {
 freebsd_install_fdt ( ) (
     buildenv=`cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     buildenv_machine=`eval $buildenv _freebsd_get_machine`;
-    _FDTDIR=$FREEBSD_SRC/sys/boot/fdt/dts
+    _FDTDIR=$FREEBSD_SRC/dts
     if [ -f ${_FDTDIR}/${buildenv_machine}/${1} ]; then
         _FDTDIR=${_FDTDIR}/${buildenv_machine}
     fi
