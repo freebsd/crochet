@@ -344,7 +344,7 @@ freebsd_ubldr_build ( ) {
     rm -rf ${UBLDR_DIR}/boot
     mkdir -p ${UBLDR_DIR}/boot/defaults
 
-    cd sys/boot
+    cd stand
     eval $buildenv make "$@" -m $ubldr_makefiles obj > ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $ubldr_makefiles clean >> ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $ubldr_makefiles depend >> ${LOGFILE} 2>&1
@@ -418,7 +418,7 @@ freebsd_loader_efi_build ( ) {
     rm -rf ${EFI_DIR}/boot
     mkdir -p ${EFI_DIR}/boot/defaults
 
-    cd sys/boot
+    cd stand
     eval $buildenv make "$@" -m $sharemk obj > ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $sharemk clean >> ${LOGFILE} 2>&1
     eval $buildenv make "$@" -m $sharemk depend >> ${LOGFILE} 2>&1
