@@ -13,7 +13,7 @@ generic_i386_build_mbr ( ) {
     echo "Building MBR"
     cd ${FREEBSD_SRC}
     buildenv=`make -C ${FREEBSD_SRC} TARGET_ARCH=${TARGET_ARCH} buildenvvars`
-    cd sys/boot/i386/mbr
+    cd stand/i386/mbr
     if eval ${buildenv} make > ${WORKDIR}/_.i386.mbr.log 2>&1
     then
     true
@@ -30,7 +30,7 @@ generic_i386_build_boot2 ( ) {
     echo "Building Boot2"
     cd ${FREEBSD_SRC}
         buildenv=`make -C ${FREEBSD_SRC} TARGET_ARCH=${TARGET_ARCH} buildenvvars`
-    cd sys/boot/i386/boot2
+    cd stand/i386/boot2
     if eval ${buildenv} make > ${WORKDIR}/_.i386.boot2.log 2>&1
     then
     true
@@ -48,7 +48,7 @@ generic_i386_build_loader ( ) {
     cd ${FREEBSD_SRC}
     export MAKESYSPATH=${FREEBSD_SRC}/share/mk
     buildenv=`make TARGET_ARCH=${TARGET_ARCH} buildenvvars`
-    cd sys/boot/i386/loader
+    cd stand/i386/loader
     if eval ${buildenv} make > ${WORKDIR}/_.i386_loader_build.log 2>&1
     then
     true
