@@ -438,7 +438,7 @@ disk_efi_create ( ) {
     NEW_EFI_PARTITION=`gpart add -t efi -s 800K ${DISK_MD} | sed -e 's/ .*//'` || exit 1
     NEW_EFI_DEVICE=/dev/${NEW_EFI_PARTITION}
 	echo "Writing EFI partition to ${NEW_EFI_DEVICE}"
-    dd if=${FREEBSD_OBJDIR}/sys/boot/efi/boot1/boot1.efifat of=${NEW_EFI_DEVICE}
+    dd if=${FREEBSD_OBJDIR}/stand/efi/boot1/boot1.efifat of=${NEW_EFI_DEVICE}
 }
 
 
