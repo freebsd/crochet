@@ -493,7 +493,7 @@ _freebsd_get_machine ( ) {
 freebsd_install_fdt ( ) (
     buildenv=`cd $FREEBSD_SRC; make TARGET_ARCH=$TARGET_ARCH buildenvvars`
     buildenv_machine=`eval $buildenv _freebsd_get_machine`;
-    _FDTDIR=$FREEBSD_SRC/dts
+    _FDTDIR=$FREEBSD_SRC/sys/dts
     if [ -f ${_FDTDIR}/${buildenv_machine}/${1} ]; then
         _FDTDIR=${_FDTDIR}/${buildenv_machine}
     fi
