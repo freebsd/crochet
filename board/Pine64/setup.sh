@@ -29,8 +29,7 @@ strategy_add $PHASE_PARTITION_LWW pine64_partition_image
 
 pine64_uboot_install ( ) {
     echo bootaa64 > startup.nsh
-    mkdir -p EFI/BOOT dtb
-    freebsd_install_fdt arm64/pine64_plus.dts dtb/pine64_plus.dtb
+    mkdir -p EFI/BOOT
 }
 strategy_add $PHASE_BOOT_INSTALL pine64_uboot_install
 
