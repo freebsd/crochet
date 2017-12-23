@@ -36,6 +36,7 @@
 #board_setup RaspberryPi
 #board_setup RaspberryPi2
 #board_setup RaspberryPi3
+#board_setup RaspberryPiCM3L
 #board_setup VersatilePB
 #board_setup Wandboard
 #board_setup ZedBoard

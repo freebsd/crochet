@@ -1,0 +1,33 @@
+Raspberry Pi 3 is supported as of Oct 2016.
+
+============================================================
+
+What is a Raspberry Pi Compute Module 3 Lite?
+--------------------
+
+The Raspberry Pi Compute Module 3 Lite is a Raspberry Pi in 3 in a DDR2 SODIMM
+form factor. The 'Lite' version DOES NOT have embedded flash memory, and must
+be booted from an MicroSDHC card.
+
+	https://www.raspberrypi.org/products/compute-module-3-lite/
+
+To work with the Compute Module you need a carrier board such as the 'Compute 
+Module IO Board' (CMIO):
+
+	https://www.raspberrypi.org/products/compute-module-io-board-v3/
+	
+Compute Module Data sheet:
+
+	https://www.raspberrypi.org/documentation/hardware/computemodule/cm-designguide.md
+
+============================================================
+
+How to boot the Raspberry Pi Compute Module 3 Lite
+--------------------------------
+
+1. Insert the Compute Module into an appropriate carrier board, and attach
+   peripherals.
+
+2. Insert a microSD card with this generated image.
+
+3. Power on the board by connecting it to a 5v power supply
