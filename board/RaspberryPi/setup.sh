@@ -1,6 +1,6 @@
 KERNCONF=RPI-B
 RPI_UBOOT_PORT="u-boot-rpi"
-RPI_UBOOT_BIN="u-boot.img"
+RPI_UBOOT_BIN="u-boot.bin"
 RPI_FIRMWARE_SRC=/usr/local/share/u-boot/${RPI_UBOOT_PORT}
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
