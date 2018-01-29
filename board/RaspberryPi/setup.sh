@@ -1,7 +1,9 @@
 KERNCONF=RPI-B
 RPI_UBOOT_PORT="u-boot-rpi"
-RPI_UBOOT_BIN="u-boot.img"
-RPI_FIRMWARE_SRC=/usr/local/share/u-boot/${RPI_UBOOT_PORT}
+RPI_UBOOT_BIN="u-boot.bin"
+RPI_UBOOT_PATH="/usr/local/share/u-boot/${RPI_UBOOT_PORT}"
+RPI_FIRMWARE_PORT="start.elf"
+RPI_FIRMWARE_PATH="/usr/local/share/rpi-firmware"
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
 TARGET_ARCH=armv6
@@ -33,6 +35,16 @@ raspberry_pi_check_uboot ( ) {
 }
 strategy_add $PHASE_CHECK raspberry_pi_check_uboot
 
+raspberry_pi_check_firmware( ) {
+    if [ ! -f "${RPI_FIRMWARE_PATH}/${RPI_FIRMWARE_PORT}" ]; then
+        echo "Please install sysutils/rpi-firmware and re-run this script."
+        exit 1
+    fi
+    echo "Found rpi-firmware in:"
+    echo "    ${RPI_FIRMWARE_PATH}"
+}
+strategy_add $PHASE_CHECK raspberry_pi_check_firmware
+
 # Build ubldr.
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=0x2000000
 
@@ -47,7 +59,8 @@ strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
 
 raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi boot files to FAT partition
-    cp ${RPI_FIRMWARE_SRC}/* .
+    cp ${RPI_UBOOT_PATH}/* .
+    cp ${RPI_FIRMWARE_PATH}/* .
     touch uEnv.txt
 
     # Configure Raspberry Pi boot files
@@ -62,7 +75,7 @@ raspberry_pi_populate_boot_partition ( ) {
     echo "device_tree_address=0x100" >> config.txt
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    echo "kernel=u-boot.img" >> config.txt
+    echo "kernel=${RPI_UBOOT_BIN}" >> config.txt
 
     # Install ubldr to FAT partition
     freebsd_ubldr_copy_ubldr .
