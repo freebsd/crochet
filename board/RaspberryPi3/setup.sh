@@ -2,6 +2,9 @@ KERNCONF=GENERIC
 RPI3_UBOOT_PORT="u-boot-rpi3"
 RPI3_UBOOT_BIN="u-boot.bin"
 RPI3_UBOOT_PATH="/usr/local/share/u-boot/${RPI3_UBOOT_PORT}"
+RPI_FIRMWARE_PORT="rpi-firmware"
+RPI_FIRMWARE_BIN="bootcode.bin"
+RPI_FIRMWARE_PATH="/usr/local/share/rpi-firmware"
 IMAGE_SIZE=$((2000 * 1000 * 1000))
 TARGET_ARCH=aarch64
 TARGET=aarch64
@@ -15,6 +18,11 @@ rpi3_check_uboot ( ) {
     uboot_port_test ${RPI3_UBOOT_PORT} ${RPI3_UBOOT_BIN}
 }
 strategy_add $PHASE_CHECK rpi3_check_uboot
+
+rpi_check_firmware ( ) {
+    firmware_port_test ${RPI_FIRMWARE_PORT} ${RPI_FIRMWARE_BIN}
+}
+strategy_add $PHASE_CHECK rpi_check_firmware
 
 #
 # RPi3 uses EFI, so the first partition will be a FAT partition.
@@ -31,15 +39,9 @@ raspberry_pi_populate_boot_partition ( ) {
     echo bootaa64 > startup.nsh
     mkdir -p EFI/BOOT
 
-    cp ${UBOOT_PATH}/LICENCE.broadcom .
+    cp -R ${FIRMWARE_PATH}/ .
+    
     cp ${UBOOT_PATH}/README .
-    cp ${UBOOT_PATH}/bootcode.bin .
-    cp ${UBOOT_PATH}/fixup.dat .
-    cp ${UBOOT_PATH}/fixup_cd.dat .
-    cp ${UBOOT_PATH}/fixup_x.dat .
-    cp ${UBOOT_PATH}/start.elf .
-    cp ${UBOOT_PATH}/start_cd.elf .
-    cp ${UBOOT_PATH}/start_x.elf .
     cp ${UBOOT_PATH}/u-boot.bin .
     cp ${UBOOT_PATH}/armstub8.bin .
 

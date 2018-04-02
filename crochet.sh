@@ -24,6 +24,7 @@ VERBOSE=0
 . ${LIBDIR}/gpt.sh
 . ${LIBDIR}/scm.sh
 . ${LIBDIR}/uboot.sh
+. ${LIBDIR}/firmware.sh
 . ${LIBDIR}/util.sh
 
 crochet_usage ( ) {
