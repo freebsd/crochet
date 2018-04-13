@@ -43,7 +43,6 @@ raspberry_pi_populate_boot_partition ( ) {
     
     cp ${UBOOT_PATH}/README .
     cp ${UBOOT_PATH}/u-boot.bin .
-    cp ${UBOOT_PATH}/armstub8.bin .
 
     # Populate config.txt
     echo "arm_control=0x200" > config.txt
@@ -58,7 +57,7 @@ raspberry_pi_populate_boot_partition ( ) {
     fetch -o ${dtb} "${DTB_REPO}/${dtb}?raw=true"
 
     # Fetch all the overlays we need
-    mkdir overlays
+    mkdir -p overlays
     overlays="mmc.dtbo pi3-disable-bt.dtbo"
     for i in ${overlays}; do
         fetch -o overlays/${i} "${DTB_REPO}/overlays/${i}?raw=true"
