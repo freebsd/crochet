@@ -1,14 +1,13 @@
 KERNCONF=GENERIC
 RPI3_UBOOT_PORT="u-boot-rpi3"
 RPI3_UBOOT_BIN="u-boot.bin"
-RPI3_UBOOT_PATH="/usr/local/share/u-boot/${RPI3_UBOOT_PORT}"
+RPI3_UBOOT_PATH="${SHARE_PATH}/u-boot/${RPI3_UBOOT_PORT}"
 RPI_FIRMWARE_PORT="rpi-firmware"
 RPI_FIRMWARE_BIN="bootcode.bin"
-RPI_FIRMWARE_PATH="/usr/local/share/rpi-firmware"
+RPI_FIRMWARE_PATH="${SHARE_PATH}/${RPI_FIRMWARE_PORT}"
 IMAGE_SIZE=$((2000 * 1000 * 1000))
 TARGET_ARCH=aarch64
 TARGET=aarch64
-DTB_REPO="https://github.com/raspberrypi/firmware/blob/master/boot/"
 
 # Not used - just in case someone wants to use a manual ubldr.  Obtained
 # from 'printenv' in boot0: kernel_addr_r=0x42000000
@@ -38,11 +37,9 @@ strategy_add $PHASE_PARTITION_LWW rpi3_partition_image
 raspberry_pi_populate_boot_partition ( ) {
     echo bootaa64 > startup.nsh
     mkdir -p EFI/BOOT
-
-    cp -R ${FIRMWARE_PATH}/ .
-    
-    cp ${UBOOT_PATH}/README .
+    cp -R ${RPI_FIRMWARE_PATH}/ .
     cp ${UBOOT_PATH}/u-boot.bin .
+    cp ${UBOOT_PATH}/README .
 
     # Populate config.txt
     echo "arm_control=0x200" > config.txt
@@ -51,18 +48,6 @@ raspberry_pi_populate_boot_partition ( ) {
     echo "dtoverlay=pi3-disable-bt" >> config.txt
     echo "device_tree_address=0x4000" >> config.txt
     echo "kernel=u-boot.bin" >> config.txt
-
-    # Fetch the dtb
-    dtb="bcm2710-rpi-3-b.dtb"
-    fetch -o ${dtb} "${DTB_REPO}/${dtb}?raw=true"
-
-    # Fetch all the overlays we need
-    mkdir -p overlays
-    overlays="mmc.dtbo pi3-disable-bt.dtbo"
-    for i in ${overlays}; do
-        fetch -o overlays/${i} "${DTB_REPO}/overlays/${i}?raw=true"
-    done
-
 }
 strategy_add $PHASE_BOOT_INSTALL raspberry_pi_populate_boot_partition
 
