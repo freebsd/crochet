@@ -26,16 +26,7 @@ strategy_add $PHASE_PARTITION_LWW raspberry_pi_partition_image
 
 raspberry_pi_populate_boot_partition ( ) {
     # Copy RaspberryPi 2 boot files to FAT partition
-    cp ${UBOOT_PATH}/LICENCE.broadcom .
     cp ${UBOOT_PATH}/README .
-    cp ${UBOOT_PATH}/bootcode.bin .
-    cp ${UBOOT_PATH}/config.txt .
-    cp ${UBOOT_PATH}/fixup.dat .
-    cp ${UBOOT_PATH}/fixup_cd.dat .
-    cp ${UBOOT_PATH}/fixup_x.dat .
-    cp ${UBOOT_PATH}/start.elf .
-    cp ${UBOOT_PATH}/start_cd.elf .
-    cp ${UBOOT_PATH}/start_x.elf .
     cp ${UBOOT_PATH}/u-boot.bin .
 
     # RPi firmware loads and modify the DTB before pass it to kernel.
