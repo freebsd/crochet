@@ -2,7 +2,7 @@ KERNCONF=GENERIC
 UBLDR_LOADADDR=0x2000000
 RPI_UBOOT="u-boot-rpi2"
 RPI_UBOOT_BIN="u-boot.bin"
-IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
+IMAGE_SIZE=$((3 * 1000 * 1000 * 1000)) # 1 GB too small - go with 3 GB default
 TARGET_ARCH=armv6
 
 UBOOT_PATH="/usr/local/share/u-boot/${RPI_UBOOT}"
