@@ -1,0 +1,6 @@
+#include "sun8i-h3-orangepi-pc-plus.dts"
+
+&codec {
+ status = "disabled";
+};
+ 
