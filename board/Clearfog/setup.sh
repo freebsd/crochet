@@ -38,6 +38,11 @@ clearfog_install_boot-files ( ) {
     mkimage -A arm -O FreeBSD -T script -a 0 -e 0 -d "$BOARDDIR/files/boot.txt" "boot.scr" > ${WORKDIR}/_.mkimage.log
     freebsd_install_fdt ../gnu/dts/arm/armada-388-clearfog-base.dts armada-388-clearfog-base.dtb
     freebsd_install_fdt ../gnu/dts/arm/armada-388-clearfog-pro.dts armada-388-clearfog-pro.dtb
+
+    # out of tree DTBs
+    ln -sv "$BOARDDIR/files/armada-388-helios4.dts" "$FREEBSD_SRC/sys/gnu/dts/arm/armada-388-helios4.dts"
+    freebsd_install_fdt ../gnu/dts/arm/armada-388-helios4.dts armada-388-helios4.dtb
+    rm -f "$FREEBSD_SRC/sys/gnu/dts/arm/armada-388-helios4.dts"
 }
 strategy_add $PHASE_BOOT_INSTALL clearfog_install_boot-files
 
