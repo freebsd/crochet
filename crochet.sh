@@ -6,6 +6,9 @@ echo 'Starting at '`date`
 TOPDIR=`cd \`dirname $0\`; pwd`
 LIBDIR=${TOPDIR}/lib
 WORKDIR=${TOPDIR}/work
+PREFIX="/usr/local"
+SHARE_PATH="${PREFIX}/share"
+PORTS_PATH="/usr/ports"
 CONFIGFILE=
 BOARD=
 UPDATE_SOURCE=
