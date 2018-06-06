@@ -4,7 +4,7 @@ SUNXI_UBOOT="u-boot-orangepi-pc-plus"
 SUNXI_UBOOT_BIN="u-boot.img"
 # image size fits a 2+ GB root image in first UFS partition
 IMAGE_SIZE=$((3 * 1000 * 1000 * 1000))
-TARGET_ARCH=armv6
+TARGET_ARCH=armv7
 
 FREEBSD_SRC=/usr/src
 # BOARD_BOOT_MOUNTPOINT
