@@ -5,8 +5,9 @@ RPI_UBOOT_BIN="u-boot.bin"
 RPI_FIRMWARE_PORT="rpi-firmware"
 RPI_FIRMWARE_BIN="bootcode.bin"
 RPI_FIRMWARE_PATH="${SHARE_PATH}/${RPI_FIRMWARE_PORT}"
-RPI_FIRMWARE_FILES="bootcode.bin config.txt fixup.dat fixup_cd.dat fixup_db.dat \
-    fixup_x.dat start.elf start_cd.elf start_db.elf start_x.elf"
+RPI_FIRMWARE_FILES="bootcode.bin bcm2709-rpi-2-b.dtb config.txt fixup.dat \
+    fixup_cd.dat fixup_db.dat fixup_x.dat overlays start.elf start_cd.elf \
+    start_db.elf start_x.elf"
 IMAGE_SIZE=$((3 * 1000 * 1000 * 1000)) # 1 GB too small - go with 3 GB default
 TARGET_ARCH=armv6
 
