@@ -9,7 +9,8 @@ RPI_FIRMWARE_FILES="bootcode.bin bcm2709-rpi-2-b.dtb config.txt fixup.dat \
     fixup_cd.dat fixup_db.dat fixup_x.dat overlays start.elf start_cd.elf \
     start_db.elf start_x.elf"
 IMAGE_SIZE=$((3 * 1000 * 1000 * 1000)) # 1 GB too small - go with 3 GB default
-TARGET_ARCH=armv6
+TARGET_ARCH=armv7
+TARGET_CPUTYPE=cortex-a7
 
 UBOOT_PATH="/usr/local/share/u-boot/${RPI_UBOOT}"
 
