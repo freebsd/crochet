@@ -15,7 +15,7 @@
 board_setup BeagleBone
 board_setup RaspberryPi
 
-KERNCONF=GENERIC
+KERNCONF=GENERIC-NODEBUG
 
 board_partition_image ( ) {
     disk_partition_mbr

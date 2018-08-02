@@ -1,4 +1,4 @@
-KERNCONF=GENERIC
+KERNCONF=GENERIC-NODEBUG
 PINE64_UBOOT_PORT="u-boot-pine64"
 PINE64_UBOOT_BIN="u-boot-sunxi-with-spl.bin"
 PINE64_UBOOT_PATH="/usr/local/share/u-boot/${PINE64_UBOOT_PORT}"
