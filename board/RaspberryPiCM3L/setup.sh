@@ -1,9 +1,10 @@
-KERNCONF=GENERIC
+KERNCONF=GENERIC-NODEBUG
 RPI3_UBOOT_PORT="u-boot-rpi3"
 RPI3_UBOOT_BIN="u-boot.bin"
 RPI3_UBOOT_PATH="/usr/local/share/u-boot/${RPI3_UBOOT_PORT}"
 IMAGE_SIZE=$((2000 * 1000 * 1000))
 TARGET_ARCH=aarch64
+TARGET_CPUTYPE=cortex-a53
 TARGET=aarch64
 DTB_REPO="https://github.com/raspberrypi/firmware/blob/master/boot/"
 RPICM3_FIRMWARE_PORT="rpi-firmware"
