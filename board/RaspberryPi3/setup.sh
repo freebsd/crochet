@@ -7,6 +7,7 @@ RPI_FIRMWARE_BIN="bootcode.bin"
 RPI_FIRMWARE_PATH="${SHARE_PATH}/${RPI_FIRMWARE_PORT}"
 IMAGE_SIZE=$((3 * 1000 * 1000 * 1000))
 TARGET_ARCH=aarch64
+TARGET_CPUTYPE=cortex-a53
 TARGET=aarch64
 
 # Not used - just in case someone wants to use a manual ubldr.  Obtained
