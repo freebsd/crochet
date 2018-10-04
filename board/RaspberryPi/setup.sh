@@ -1,6 +1,6 @@
 KERNCONF=RPI-B
 RPI_UBOOT_PORT="u-boot-rpi"
-RPI_UBOOT_BIN="u-boot.img"
+RPI_UBOOT_BIN="u-boot.bin"
 RPI_FIRMWARE_SRC=/usr/local/share/u-boot/${RPI_UBOOT_PORT}
 RPI_GPU_MEM=32
 IMAGE_SIZE=$((1000 * 1000 * 1000)) # 1 GB default
@@ -62,7 +62,7 @@ raspberry_pi_populate_boot_partition ( ) {
     echo "device_tree_address=0x100" >> config.txt
 
     # Copy U-Boot to FAT partition, configure to chain-boot ubldr
-    echo "kernel=u-boot.img" >> config.txt
+    echo "kernel=u-boot.bin" >> config.txt
 
     # Install ubldr to FAT partition
     freebsd_ubldr_copy_ubldr .
