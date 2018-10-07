@@ -8,7 +8,7 @@
 # Note: Only board_setup is actually required, assuming /usr/src has
 # suitable FreeBSD sources.  Everything else below is optional.
 
-# REQUIRED: 
+# REQUIRED:
 # Uncomment one to choose the default configuration for your board.
 #
 # THIS MUST BE THE FIRST LINE IN YOUR CONFIG.SH FILE!
@@ -226,6 +226,8 @@
 # kernel builds.  Note that these are recorded in ${WORKDIR} when
 # Crochet runs a build; subsequent Crochet runs will skip the
 # corresponding build if the options are unchanged.
+# To allow quick rebuilds on changes, you may want to install ccache
+# and use FREEBSD_EXTRA_ARGS="MK_CCACHE_BUILD=yes".
 #
 # You can add your own options to any single build phase:
 #
