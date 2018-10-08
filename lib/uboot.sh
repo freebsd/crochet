@@ -232,9 +232,9 @@ uboot_port_test ( ) {
 
     UBOOT_PATH="/usr/local/share/u-boot/${1}"
     if [ ! -f "${UBOOT_PATH}/${2}" ]; then
-	echo "Please install sysutils/$1 and re-run this script."
+	echo "Please install $1 and re-run this script."
 	echo "You can do this with:"
-	echo "  $ sudo pkg install sysutils/$1"
+	echo "  $ sudo pkg install $1"
 	echo "or by building the port:"
 	echo "  $ cd /usr/ports/sysutils/$1"
 	echo "  $ make -DBATCH all install"
