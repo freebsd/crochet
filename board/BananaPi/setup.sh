@@ -1,7 +1,7 @@
 KERNCONF=GENERIC
 UBLDR_LOADADDR=0x42000000
 SUNXI_UBOOT="u-boot-bananapi"
-SUNXI_UBOOT_BIN="u-boot.img"
+SUNXI_UBOOT_BIN="u-boot-sunxi-with-spl.bin"
 IMAGE_SIZE=$((1900 * 1000 * 1000)) # 1.9 GB
 TARGET_ARCH=armv6
 
@@ -9,9 +9,7 @@ UBOOT_PATH="/usr/local/share/u-boot/${SUNXI_UBOOT}"
 
 allwinner_partition_image ( ) {
     echo "Installing U-Boot files"
-    dd if=${UBOOT_PATH}/u-boot-sunxi-with-spl.bin conv=notrunc,sync of=/dev/${DISK_MD} bs=1024 seek=8
-    dd if=${UBOOT_PATH}/u-boot.img conv=notrunc,sync of=/dev/${DISK_MD} \
-	bs=1024 seek=40
+    dd if=${UBOOT_PATH}/${SUNXI_UBOOT_BIN} conv=notrunc,sync of=/dev/${DISK_MD} bs=1024 seek=8
     disk_partition_mbr
     disk_fat_create 32m 16 1m
     disk_ufs_create
