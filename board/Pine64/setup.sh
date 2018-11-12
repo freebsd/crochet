@@ -2,7 +2,7 @@ KERNCONF=GENERIC
 PINE64_UBOOT_PORT="u-boot-pine64"
 PINE64_UBOOT_BIN="u-boot-sunxi-with-spl.bin"
 PINE64_UBOOT_PATH="/usr/local/share/u-boot/${PINE64_UBOOT_PORT}"
-IMAGE_SIZE=$((2000 * 1000 * 1000))
+IMAGE_SIZE=$((3000 * 1000 * 1000))
 TARGET_ARCH=aarch64
 TARGET=aarch64
 
