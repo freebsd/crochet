@@ -131,6 +131,15 @@
 #
 #option SwapFile <size> [deferred] [file=/swapfile0]
 
+# Install packages from a repo
+# First setup the repo with:
+#
+#option PackageInit http://pkg.example.com/armv7-svn/
+#
+# List one or many packages to be installed:
+#
+#option Package sudo nginx tmux
+
 # Uses "portsnap" to download an up-to-date ports tree and
 # install it on the image.
 #
