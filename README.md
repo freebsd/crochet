@@ -140,14 +140,14 @@ You can use `pkg` to install packages on your final crochet image if you have yo
 # Package Installation Information
 
 option PackageInit $pkg-repo
-option Package security/sudo
+option Package sudo
 
 # If you don't put a custom resolv.conf in your overlay use this
 # Otherwise pkg will not be able to resolv hostnames
 
 option Resolv
 ```
-In the example above, change `$pkg-repo` to the full URL of your package repository. Be sure to include the category for the package. Ex: `security/sudo` vs. `sudo`. You can also specify more than one package at a time. Ex: `option Package security/sudo sysutils/tmux`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
+In the example above, change `$pkg-repo` to the full URL of your package repository. You can also specify more than one package at a time. Ex: `option Package sudo tmux`. In order for `pkg` to communicate with a remote package repo, you either need a custom `resolv.conf` in your board overlay, or use `option Resolv` in your config. 
 
 ## Potential Projects
 
