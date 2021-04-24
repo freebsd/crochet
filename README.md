@@ -246,10 +246,10 @@ git clone https://github.com/freebsd/crochet.git
 
 ```sh
 cd crochet-freebsd
-svn co http://svn.freebsd.org/base/head src
+git clone https://git.freebsd.org/src.git
 ```
 
-Note:  If you have everything set up properly, you should be able to perform the above three steps from Mac OS or FreeBSD.  (On FreeBSD, use the built-in 'svnlite' command instead of installing the standard subversion package.)
+Note:  If you have everything set up properly, you should be able to perform the above three steps from Mac OS or FreeBSD.
 
 4) Build a new VM on FreeBSD:
 
@@ -271,7 +271,8 @@ In particular, you can now log into the VM you just built and use it to build th
 
 ```sh
 cd crochet-freebsd
-svnlite up src
+cd src && git pull
+cd ..
 rm -rf work/*
 ./crochet -c vmware.config.sh
 ```
