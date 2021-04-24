@@ -236,20 +236,26 @@ A twist:  You can also build your first FreeBSD VM on any other FreeBSD system y
 
 1) Get a copy of Crochet:
 
-    git clone https://github.com/freebsd/crochet.git
+```sh
+git clone https://github.com/freebsd/crochet.git
+```
 
 2) Adjust the vmware.config.sh file at the bottom of this article to match your expectations.
 
 3) Check out FreeBSD source into the Crochet directory:
 
-    cd crochet-freebsd
-    svn co http://svn.freebsd.org/base/head src
+```sh
+cd crochet-freebsd
+svn co http://svn.freebsd.org/base/head src
+```
 
 Note:  If you have everything set up properly, you should be able to perform the above three steps from Mac OS or FreeBSD.  (On FreeBSD, use the built-in 'svnlite' command instead of installing the standard subversion package.)
 
 4) Build a new VM on FreeBSD:
 
-    ./crochet -c vmware.config.sh
+```sh
+./crochet -c vmware.config.sh
+```
 
 This should put the new VM into a directory called
 
@@ -263,10 +269,12 @@ At this point, you should be able to open the new VM from the Mac side and have 
 
 In particular, you can now log into the VM you just built and use it to build the next one:
 
-    cd crochet-freebsd
-    svnlite up src
-    rm -rf work/*
-    ./crochet -c vmware.config.sh
+```sh
+cd crochet-freebsd
+svnlite up src
+rm -rf work/*
+./crochet -c vmware.config.sh
+```
 
 Each new VM is a completely clean "from scratch" system
 build, so this approach avoids propagating any leftover
