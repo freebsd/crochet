@@ -1,0 +1,30 @@
+NanoPi NEO has been tested to work with FreeBSD 12/current
+
+============================================================
+
+What is a NanoPi NEO?
+---------------------
+
+The NanoPi NEO is a 32-bit Quad-core Cortex-A7 single board
+computer created by FriendlyElec.
+
+Details can be found at:
+   https://wiki.friendlyarm.com/wiki/index.php/NanoPi_NEO
+
+You boot it from a MicroSDHC card with the system image.
+
+Once you have the device working, you can expand it by
+connecting it to the Ethernet, adding USB peripherals (such
+as external disk drives or wireless network interfaces), or
+attach microcontrollers to GPIO connectors on the board.
+
+============================================================
+
+Booting the device
+------------------
+
+1. Insert a microSD card with this generated image.
+
+2. Power on the board by connecting to a MicroUSB cable.
+
+3. Connect using a USB to TTL Serial Cable (115200 8N1)
