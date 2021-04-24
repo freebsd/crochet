@@ -236,7 +236,7 @@ A twist:  You can also build your first FreeBSD VM on any other FreeBSD system y
 
 1) Get a copy of Crochet:
 
-    git clone https://github.com/kientzle/crochet-freebsd.git
+    git clone https://github.com/freebsd/crochet.git
 
 2) Adjust the vmware.config.sh file at the bottom of this article to match your expectations.
 
