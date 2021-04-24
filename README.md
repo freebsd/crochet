@@ -36,7 +36,7 @@ You can also get a copy of the FreeBSD ports tree with the following commands (a
  portsnap extract
 ```
 
-You can browse the FreeBSD port collection at http://ftp.freebsd.org/pub/FreeBSD/ports/.
+You can browse the FreeBSD port collection at https://www.freshports.org.
 
 ## Supported Platforms
 
