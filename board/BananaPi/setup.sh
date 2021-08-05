@@ -3,7 +3,7 @@ UBLDR_LOADADDR=0x42000000
 SUNXI_UBOOT="u-boot-bananapi"
 SUNXI_UBOOT_BIN="u-boot-sunxi-with-spl.bin"
 IMAGE_SIZE=$((1900 * 1000 * 1000)) # 1.9 GB
-TARGET_ARCH=armv6
+TARGET_ARCH=armv7
 
 UBOOT_PATH="/usr/local/share/u-boot/${SUNXI_UBOOT}"
 
