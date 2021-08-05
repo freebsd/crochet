@@ -36,7 +36,7 @@ newfs_msdos -L 'EMMCBOOT' -F 16 /dev/mmcsd1s1
 echo
 echo 'Copying boot files to eMMC boot partition'
 mount_msdosfs /dev/mmcsd1s1 /mnt
-cp /boot/msdos/* /mnt
+cp -r /boot/msdos/* /mnt
 echo 'loaderdev=disk1' >>/mnt/bb-uenv.txt
 sync
 umount /mnt
