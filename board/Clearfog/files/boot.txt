@@ -1,0 +1,3 @@
+load ${devtype} ${devnum}:${distro_bootpart} ${fdt_addr_r} ${fdtfile}
+load ${devtype} ${devnum}:${distro_bootpart} ${kernel_addr_r} ubldr.bin
+go ${kernel_addr_r}

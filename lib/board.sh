@@ -251,6 +251,8 @@ board_mountpoint ( ) {
 	MOUNTPOINT_PREFIX=${BOARD_BOOT_MOUNTPOINT_PREFIX}
     elif board_is_freebsd_partition ${ABSINDEX}; then
 	MOUNTPOINT_PREFIX=${BOARD_FREEBSD_MOUNTPOINT_PREFIX}
+    elif [ $TYPE == "RESERVED" ]; then
+        MOUNTPOINT_PREFIX=/dev/null
     else
 	MOUNTPOINT_PREFIX=`eval echo \\$BOARD_${TYPE}_MOUNTPOINT_PREFIX`
     fi
