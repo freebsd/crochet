@@ -249,7 +249,7 @@ uboot_port_test ( ) {
 #  $2 name of script file
 #  $3 output file
 # 
-uboot_mkimage ( ) (
+uboot_mkimage ( ) {
     echo "Building and Installing U-Boot script"
     
     # location of input file
@@ -263,5 +263,4 @@ uboot_mkimage ( ) (
 
     # execute mkimage
     eval "$MKIMAGE -A arm -O FreeBSD -T script -C none -d $MKIMAGE_INPUT $MKIMAGE_OUTPUT" > ${WORKDIR}/_.mkimage.log
-)
-
+}
