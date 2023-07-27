@@ -15,7 +15,7 @@ to support many more.
 
 The default configuration of FreeBSD doesn't allow root to log in over ssh.  You have two options
 
-* You can use [option User](https://github.com/freebsd/crochet/tree/master/option/User) in your Crochet configuration file to create a non-root user than can log in over ssh.
+* You can use [option User](https://github.com/freebsd/crochet/tree/master/option/User) in your Crochet configuration file to create a non-root user that can log in over ssh.
 
 * If your platform has a serial console, log into the console using a serial cable and create yourself a user other than root.
 
@@ -94,12 +94,12 @@ Using the script to build an image consists of a few steps:
 
    `$ sudo /bin/sh crochet.sh -c <config file>`
 
-   The script will first check that you have any needed sources.
+   The script will first check that you have the needed sources.
    If you don't, the script will tell you exactly how to obtain the
    missing pieces.  Follow the instructions and re-run the script
    until you have everything.
 
-   As soon as it finds all the required pieces, the script will then
+   As soon as it finds all the required pieces, the script will
    compile everything and build the disk image.  This part of the
    process can take many hours.
 
@@ -135,7 +135,7 @@ Using the script to build an image consists of a few steps:
 
 ## Using pkg
 
-You can use `pkg` to install packages on your final crochet image if you have your own package repository. Add the following to your config:
+You can use `pkg` to install packages on your final Crochet image. If you have your own package repository, add the following to your config:
 
 ```
 # Package Installation Information
@@ -144,7 +144,7 @@ option PackageInit $pkg-repo
 option Package sudo
 
 # If you don't put a custom resolv.conf in your overlay use this
-# Otherwise pkg will not be able to resolv hostnames
+# Otherwise pkg will not be able to resolve hostnames
 
 option Resolv
 ```
@@ -158,7 +158,7 @@ be improved:
 * More boards.  Crochet should be able to support any board for
   which the FreeBSD source tree can build a working kernel.
   The hardest part is working out the various boot pieces required.
-  Look at board/NewBoardExample for explanations for adding support
+  Look at board/NewBoardExample for explanations about adding support
   for a new board.
 
 * Out-of-tree kernel configuration.  Right now, these scripts assume
@@ -188,7 +188,7 @@ Some time back, I added some code to Crochet to build VMWare images directly.  I
 
 So far, it seems to work pretty well; I thought I'd share what I've done so far and see if other people have ideas for improving this.
 
-Warning:  I've tried to be complete, but I know the following instructions omit a lot of details.  I've listed some of the known bugs at the bottom of this article.  Help in fixing them is appreciated.
+Warning:  I've tried to be complete, but I know the following instructions omit a lot of details.  I've listed some of the known bugs at the bottom of this article.  Help with fixing them is appreciated.
 
 Basic idea:
 * Share /Users between Mac OS and FreeBSD VMs.
