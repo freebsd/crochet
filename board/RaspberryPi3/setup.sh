@@ -15,7 +15,7 @@ RPI_FIRMWARE_FILES="bootcode.bin \
 if [ ${TARGET} == "aarch64" ]; then
     RPI_FIRMWARE_FILES="${RPI_FIRMWARE_FILES} armstub8.bin"
 fi
-IMAGE_SIZE=$((3 * 1000 * 1000 * 1000))
+IMAGE_SIZE=$((4 * 1000 * 1000 * 1000))
 
 # Not used - just in case someone wants to use a manual ubldr.  Obtained
 # from 'printenv' in boot0: kernel_addr_r=0x42000000
