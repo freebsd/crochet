@@ -1,0 +1,5 @@
+/dev/mmcsd0s1	/boot/efi	msdosfs rw,noatime	0 0
+/dev/mmcsd0s2a	/		ufs rw,noatime		1 1
+md		/tmp		mfs rw,noatime,-s50m	0 0
+md		/var/log	mfs rw,noatime,-s15m	0 0
+md		/var/tmp	mfs rw,noatime,-s12m	0 0
