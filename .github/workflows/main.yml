@@ -1,4 +1,4 @@
-name: CI
+name: Image Build
 
 on:
   push:
@@ -8,7 +8,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: A job to run test in FreeBSD
     steps:
     - uses: actions/checkout@v4
 
