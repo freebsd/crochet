@@ -5,9 +5,6 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-env:
-  PLATFORM_CONFIG: 'config/config_i386.sh'
-  SOURCE_URL: 'https://github.com/freebsd/freebsd-src.git'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,7 +19,7 @@ jobs:
         release: "14.0"
         run: |
           pkg install -y git 
-          echo "checking out source from $SOURCE_URL"
-          git clone $SOURCE_URL /usr/src 
-          echo "building $PLATFORM_CONFIG"
-          sh crochet.sh -c $PLATFORM_CONFIG -u
+          echo "checking out source from https://github.com/freebsd/freebsd-src.git"
+          git clone https://github.com/freebsd/freebsd-src.git /usr/src 
+          echo "building config/config_i386.sh"
+          sh crochet.sh -c config/config_i386.sh -u
