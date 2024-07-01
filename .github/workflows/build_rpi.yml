@@ -22,8 +22,11 @@ jobs:
         envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT'
         usesh: true
         release: "14.0"
-        run: |
+        prepare: |
+          pkg install- y python3
           pkg install -y git 
+        run: |
+          echo "source url $SOURCE_URL"
           echo "cloning source from https://github.com/freebsd/freebsd-src.git"
           git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /usr/src 
           echo "building configs/config_rpi.sh"
