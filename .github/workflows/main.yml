@@ -16,9 +16,10 @@ jobs:
       uses: vmactions/freebsd-vm@v1.0.7
       with:
         usesh: true
+        release: "14.0"
         run: |
-          pkg install -y subversion
-          svn co https://svn.freebsd.org/base/head /usr/src
+          pkg install -y subversion 
+          svn co https://svn.freebsd.org/base/head /usr/src > svn.log
           sh crochet.sh -c configs/config_i386.sh -u
 
 
