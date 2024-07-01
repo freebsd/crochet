@@ -11,7 +11,7 @@ jobs:
     env:
       SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
       BRANCH: "stable/13"
-      PLATFORM_SCRIPT: "configs/config_rpi.sh"
+      PLATFORM_SCRIPT: "configs/config_i386.sh"
     steps:
     - uses: actions/checkout@v4
     
@@ -26,8 +26,7 @@ jobs:
           pkg install- y python3
           pkg install -y git 
         run: |
-          echo "source url $SOURCE_URL"
-          echo "cloning source from https://github.com/freebsd/freebsd-src.git"
-          git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /usr/src 
-          echo "building configs/config_i386.sh"
-          sh crochet.sh -c configs/config_i386.sh -u
+          echo "cloning source from $SOURCE_URL"
+          git clone $SOURCE_URL -b $BRANCH /usr/src 
+          echo "building $PLATFORM_SCRIPT"
+          sh crochet.sh -c $PLATFORM_SCRIPT -u
