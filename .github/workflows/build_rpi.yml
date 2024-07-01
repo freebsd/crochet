@@ -23,9 +23,9 @@ jobs:
         usesh: true
         release: "14.0"
         prepare: |
-          pkg install -y python2
           pkg install -y git 
         run: |
+          python --version
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
