@@ -19,7 +19,7 @@ jobs:
         release: "14.0"
         run: |
           pkg install -y git 
-          echo "checking out source from https://github.com/freebsd/freebsd-src.git"
-          git clone https://github.com/freebsd/freebsd-src.git /usr/src 
+          echo "cloning source from https://github.com/freebsd/freebsd-src.git"
+          git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /usr/src 
           echo "building config/config_i386.sh"
           sh crochet.sh -c config/config_i386.sh -u
