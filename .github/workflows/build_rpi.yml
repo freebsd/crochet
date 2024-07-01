@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  platform_config: config/config_i386.sh
+  platform_config: config/config_rpi.sh
   source_url: https://github.com/freebsd/freebsd-src.git
 jobs:
   build_i386:
