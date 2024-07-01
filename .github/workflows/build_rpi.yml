@@ -27,6 +27,7 @@ jobs:
           ln -s /usr/local/bin/python3 /usr/local/bin/python
           python --version
           pkg install -y git 
+          pkg install -y u-boot-rpi        
         run: |
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
