@@ -1,4 +1,4 @@
-name: Image Build
+name: RPI Image Build
 
 on:
   push:

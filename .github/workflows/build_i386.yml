@@ -1,4 +1,4 @@
-name: Image Build
+name: i386 Image Build
 
 on:
   push:
