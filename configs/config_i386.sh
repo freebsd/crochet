@@ -27,7 +27,7 @@
 #board_setup Cubieboard2
 #board_setup Chromebook
 board_setup GenericI386
-#board_setup NanoPi-NEO
+#board_setup NanoPi-NEOx
 #board_setup NanoPi-NEO2
 #board_setup OrangePi-Plus2E
 #board_setup PandaBoard

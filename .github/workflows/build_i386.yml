@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ master ]
 env:
-  platform_config: config/config_i386.sh
-  source_url: https://github.com/freebsd/freebsd-src.git
+  platform_config: 'config/config_i386.sh'
+  source_url: 'https://github.com/freebsd/freebsd-src.git'
 jobs:
   build:
     runs-on: ubuntu-latest
