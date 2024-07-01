@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
+      BRANCH: "stable/13"
+      PLATFORM_SCRIPT: "configs/config_rpi.sh"
     steps:
     - uses: actions/checkout@v4
     
@@ -15,11 +19,12 @@ jobs:
       id: build
       uses: vmactions/freebsd-vm@v1.0.7
       with:
+        envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT'
         usesh: true
         release: "14.0"
         run: |
           pkg install -y git 
           echo "cloning source from https://github.com/freebsd/freebsd-src.git"
           git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /usr/src 
-          echo "building config/config_i386.sh"
-          sh crochet.sh -c config/config_i386.sh -u
+          echo "building configs/config_i386.sh"
+          sh crochet.sh -c configs/config_i386.sh -u
