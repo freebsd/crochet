@@ -26,7 +26,7 @@ jobs:
           pkg install -y python3
           pkg install -y git 
         run: |
-          echo "cloning source from $SOURCE_URL"
+          echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
           sh crochet.sh -c $PLATFORM_SCRIPT -u
