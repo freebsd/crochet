@@ -25,6 +25,7 @@ jobs:
         prepare: |
           pkg install -y git 
           pkg install -y python3
+          ln -s /usr/local/bin/python3 /usr/local/bin/python
         run: |
           python --version
           echo "cloning source branch $BRANCH from $SOURCE_URL"
