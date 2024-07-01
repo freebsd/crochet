@@ -23,13 +23,12 @@ jobs:
         usesh: true
         release: "14.0"
         prepare: |
-          pkg install -y git 
           pkg install -y python3
           ln -s /usr/local/bin/python3 /usr/local/bin/python
-        run: |
           python --version
+          pkg install -y git 
+        run: |
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
           sh crochet.sh -c $PLATFORM_SCRIPT -u -v
-
