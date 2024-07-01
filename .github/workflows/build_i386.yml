@@ -23,7 +23,7 @@ jobs:
         usesh: true
         release: "14.0"
         prepare: |
-          pkg install- y python3
+          pkg install -y python3
           pkg install -y git 
         run: |
           echo "cloning source from $SOURCE_URL"
