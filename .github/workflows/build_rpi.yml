@@ -24,6 +24,7 @@ jobs:
         release: "14.0"
         prepare: |
           pkg install -y git 
+          pkg install -y python3
         run: |
           python --version
           echo "cloning source branch $BRANCH from $SOURCE_URL"
