@@ -1,0 +1,34 @@
+name: RPI Image Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
+      BRANCH: "stable/13"
+      PLATFORM_SCRIPT: "configs/config_rpi2.sh"
+      PACKAGES: "git python3 u-boot-rpi"
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build
+      id: build
+      uses: vmactions/freebsd-vm@v1.0.7
+      with:
+        envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
+        usesh: true
+        release: "14.0"
+        prepare: |
+          pkg install -y $PACKAGES
+          ln -s /usr/local/bin/python3 /usr/local/bin/python
+          python --version
+        run: |
+          echo "cloning source branch $BRANCH from $SOURCE_URL"
+          git clone $SOURCE_URL -b $BRANCH /usr/src 
+          echo "building $PLATFORM_SCRIPT"
+          sh crochet.sh -c $PLATFORM_SCRIPT -u -v
