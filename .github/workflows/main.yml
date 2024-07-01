@@ -20,9 +20,5 @@ jobs:
           pkg install -y curl
 
         run: |
-          pwd
-          ls -lah
-          whoami
-          env
-          freebsd-version
+          sh crochet.sh -c configs/config_i386.sh
 
