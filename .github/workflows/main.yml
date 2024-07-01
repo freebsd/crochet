@@ -11,21 +11,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: packages
-      run:  pkg install -y subversion
-    
-    - name: checkout
-      run: svn co https://svn.freebsd.org/base/head /usr/src
-
     - name: Build
       id: build
       uses: vmactions/freebsd-vm@v1.0.7
       with:
         usesh: true
-        prepare: |
-          pkg install -y curl
-
         run: |
+          pkg install -y subversion
+          svn co https://svn.freebsd.org/base/head /usr/src
           sh crochet.sh -c configs/config_i386.sh -u
 
 
