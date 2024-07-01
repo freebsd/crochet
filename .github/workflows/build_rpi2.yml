@@ -12,7 +12,7 @@ jobs:
       SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
       BRANCH: "stable/13"
       PLATFORM_SCRIPT: "configs/config_rpi2.sh"
-      PACKAGES: "git python3 u-boot-rpi"
+      PACKAGES: "git python3 u-boot-rpi2"
     steps:
     - uses: actions/checkout@v4
     
@@ -25,8 +25,6 @@ jobs:
         release: "14.0"
         prepare: |
           pkg install -y $PACKAGES
-          ln -s /usr/local/bin/python3 /usr/local/bin/python
-          python --version
         run: |
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 

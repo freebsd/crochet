@@ -3,7 +3,7 @@
 #
 
 mkimage_python_check ( ) {
-    if python --version >/dev/null 2>&1; then
+    if python3 --version >/dev/null 2>&1; then
         true
     else
         echo "Need Python to run RaspberryPi mkimage tool"
@@ -22,12 +22,12 @@ strategy_add $PHASE_CHECK mkimage_python_check
 # $2: output
 mkimage ( ) {
     if [ ${VERBOSE} -gt 0 ]; then
-        echo "python imagetool-uncompressed.py $1 - > $2"
+        echo "python3 imagetool-uncompressed.py $1 - > $2"
     fi 
     # parens here ensure paths are interpreted relative to the
     # appropriate current directory
     (
         cd ${BOARDDIR}/mkimage
-        python imagetool-uncompressed.py $1 -
+        python3 imagetool-uncompressed.py $1 -
     ) > $2
 }
