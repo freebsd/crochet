@@ -6,10 +6,16 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  test:
+  build_i386:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
+    - name: packages
+      run:  pkg install -y subversion
+    
+    - name: checkout
+      run: svn co https://svn.freebsd.org/base/head /usr/src
 
     - name: Build
       id: build
@@ -20,5 +26,6 @@ jobs:
           pkg install -y curl
 
         run: |
-          sh crochet.sh -c configs/config_i386.sh
+          sh crochet.sh -c configs/config_i386.sh -u
+
 
