@@ -22,7 +22,7 @@ jobs:
         release: "14.0"
         run: |
           pkg install -y git 
-          echo "checking out source from ${{ source_url }}"
-          git clone ${{ source_url }} /usr/src 
-          echo "building ${{ platform_config }}"
-          sh crochet.sh -c ${{ platform_config }} -u
+          echo "checking out source from $source_url"
+          git clone $source_url /usr/src 
+          echo "building $platform_config"
+          sh crochet.sh -c $platform_config -u
