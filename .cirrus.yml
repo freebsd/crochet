@@ -2,6 +2,9 @@ freebsd_instance:
   image_family: freebsd-14-0
 
 task:
-  name: build
-  build_script: /bin/sh ci.sh
-  
+  name: build soekris
+  build_script: /bin/sh ci/ci_soekris.sh
+
+task:
+  name: build i386
+  build_script: /bin/sh ci/ci_soekris.sh

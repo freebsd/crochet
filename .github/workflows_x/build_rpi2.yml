@@ -11,7 +11,7 @@ jobs:
     env:
       SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
       BRANCH: "stable/13"
-      PLATFORM_SCRIPT: "configs/config_rpi2.sh"
+      PLATFORM_SCRIPT: "ci/configs/config_rpi2.sh"
       PACKAGES: "git python3 u-boot-rpi2 rpi-firmware"
     steps:
     - uses: actions/checkout@v4
