@@ -11,6 +11,5 @@ pkg install -y git
 
 # clone FreeBSD source
 echo "cloning FreeBSD from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
-/bin/rm -rf /crochet/src
-git clone $SOURCE_URL -b $SOURCE_BRANCH /crochet/src 
-
+/bin/rm -rf $SOURCE_DIR
+git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR
