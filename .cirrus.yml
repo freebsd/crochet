@@ -1,7 +1,11 @@
 freebsd_instance:
-
+  image_family: freebsd-14-0
+  
 task:
   name: git install 
   pkg_script: pkg install -y git
 
+task:
+  name: clone freebsd
+  pkg-script: git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /usr/src 
 
