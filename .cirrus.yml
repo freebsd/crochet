@@ -5,6 +5,3 @@ task:
   name: build soekris
   build_script: /bin/sh ci/ci_soekris.sh
 
-task:
-  name: build i386
-  build_script: /bin/sh ci/ci_soekris.sh
