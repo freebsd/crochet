@@ -17,4 +17,4 @@ git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR
 # build SOEKRIS
 PLATFORM_SCRIPT=configs/config_soekris.sh
 echo "building SOEKRIS"
-sh crochet.sh -c $PLATFORM_SCRIPT -u -v
+sh crochet.sh -c $PLATFORM_SCRIPT -v
