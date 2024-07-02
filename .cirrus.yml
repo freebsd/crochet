@@ -1,6 +1,6 @@
-task:
-  freebsd_instance:
-    image_family: freebsd-14-0
+freebsd_instance:
+  image_family: freebsd-14-0
 
-  - name: packages 
-    pkg_script: pkg install git
+task:
+  name: packages 
+  pkg_script: pkg install git
