@@ -2,9 +2,6 @@ freebsd_instance:
   image_family: freebsd-14-0
 
 task:
-  name: git install 
-  rm_script: /bin/rm -rf /crochet/src
-  pkg_script: pkg install -y git
-  clone-script: git clone https://github.com/freebsd/freebsd-src.git -b stable/13 /crochet/src 
+  name: build
+  build_script: /bin/sh ci.sh
   
-
