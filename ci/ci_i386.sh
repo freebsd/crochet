@@ -16,5 +16,5 @@ git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR
 
 # build
 PLATFORM_SCRIPT=ci/configs/config_i386.sh
-echo "building i386"
+echo "building"
 sh crochet.sh -c $PLATFORM_SCRIPT -v
