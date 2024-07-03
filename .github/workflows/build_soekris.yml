@@ -19,4 +19,5 @@ jobs:
         version: '14.0'
         run: |
           echo "starting build"
+          more ci/ci_i386.sh
           sh ci/ci_i386.sh
