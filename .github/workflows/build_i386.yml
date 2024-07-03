@@ -25,10 +25,6 @@ jobs:
         environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         run: |
           sudo pkg install -y $PACKAGES
-          echo "cloning source branch $BRANCH from $SOURCE_URL"
-          sudo git config --global http.version HTTP/1.1
-          sudo rm -rf /crochet/src
-          sudo git clone $SOURCE_URL -b $BRANCH /crochet/src 
+          /bin/sh ci/git.sh
           echo "building $PLATFORM_SCRIPT"
           sudo sh crochet.sh -c $PLATFORM_SCRIPT -v
-
