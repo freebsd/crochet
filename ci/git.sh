@@ -19,7 +19,7 @@ if [ -d $SOURCE_DIR/.git ]; then
     popd
 else
     echo "Cloning FreeBSD source from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
-    sudo git  --verbose clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
+    sudo git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
 fi
 
 
