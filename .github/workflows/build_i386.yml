@@ -8,6 +8,11 @@ on:
 jobs:
   build:
     runs-on: self-hosted
+    env:
+      SOURCE_URL: "https://github.com/freebsd/freebsd-src.git"
+      BRANCH: "stable/13"
+      PLATFORM_SCRIPT: "ci/configs/config_i386.sh"
+      PACKAGES: "git"
     steps:
     - uses: actions/checkout@v4
     
@@ -17,7 +22,13 @@ jobs:
       with:
         operating_system: freebsd
         version: '14.0'
+        environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         run: |
-          echo "starting build"
-          more ci/ci_i386.sh
-          sh ci/ci_i386.sh
+          sudo pkg install -y $PACKAGES
+          echo "cloning source branch $BRANCH from $SOURCE_URL"
+          sudo git config --global http.version HTTP/1.1
+          sudo rm -rf /crochet/src
+          sudo git clone $SOURCE_URL -b $BRANCH /crochet/src 
+          echo "building $PLATFORM_SCRIPT"
+          sudo sh crochet.sh -c $PLATFORM_SCRIPT -v
+
