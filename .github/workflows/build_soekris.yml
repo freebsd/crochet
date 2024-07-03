@@ -18,6 +18,4 @@ jobs:
         operating_system: freebsd
         version: '14.0'
         run: |
-          echo "starting build"
-          more ci/ci_i386.sh
-          sh ci/ci_i386.sh
+          /bin/sh ci/ci_soekris.sh
