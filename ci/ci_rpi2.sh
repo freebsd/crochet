@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 # packages
 sudo pkg install -y git python3 u-boot-rpi2 rpi-firmware
 
 # source
-/bin/bash ci/git.sh
+/usr/bin/bash ci/git.sh
 
 # build
 PLATFORM_SCRIPT=ci/configs/config_rpi2.sh
