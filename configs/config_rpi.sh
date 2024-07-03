@@ -35,8 +35,8 @@
 #board_setup RadxaRock
 #board_setup RadxaRockLite
 #board_setup Soekris
-#board_setup RaspberryPi
-board_setup RaspberryPi2
+board_setup RaspberryPi
+#board_setup RaspberryPi2
 #board_setup RaspberryPi3
 #board_setup RaspberryPiCM3L
 #board_setup VersatilePB
@@ -185,7 +185,7 @@ board_setup RaspberryPi2
 # it will tell you how to get appropriate sources into this directory.
 # (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
 #
-FREEBSD_SRC=/crochet/src
+FREEBSD_SRC=/usr/src
 
 # You will probably never override this, but you may need to
 # understand it: WORKDIR holds all of the created and temporary files
