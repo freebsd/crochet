@@ -1,10 +1,10 @@
-#!/usr/bin/bash
+#!/usr/local/bin/bash
 
 # packages
 sudo pkg install -y git python3 u-boot-rpi
 
 # source
-/usr/bin/bash ci/git.sh
+/usr/local/bin/bash ci/git.sh
 
 # build
 PLATFORM_SCRIPT=ci/configs/config_rpi.sh

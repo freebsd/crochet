@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/local/bin/bash
 
 # vars
 SOURCE_DIR=/crochet/src
