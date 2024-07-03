@@ -13,10 +13,7 @@ sudo pkg install -y git
 sudo git config --global http.version HTTP/1.1
 if [ -d $SOURCE_DIR/.git ]; then 
     echo "updating FreeBSD"
-    pushd 
-    cd $SOURCE_DIR; 
-    sudo git pull; 
-    popd; 
+    sudo git -C $SOURCE_DIR pull; 
 else
     echo "cloning FreeBSD from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
     sudo git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
