@@ -185,7 +185,7 @@ board_setup Soekris
 # it will tell you how to get appropriate sources into this directory.
 # (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
 #
-FREEBSD_SRC=/usr/src
+FREEBSD_SRC=/crochet/src
 
 # You will probably never override this, but you may need to
 # understand it: WORKDIR holds all of the created and temporary files
