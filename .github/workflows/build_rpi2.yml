@@ -27,6 +27,7 @@ jobs:
           sudo pkg install -y $PACKAGES
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           sudo git config --global http.version HTTP/1.1
+          rm -rf /usr/src
           sudo git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
           sudo sh crochet.sh -c $PLATFORM_SCRIPT -u -v
