@@ -23,9 +23,8 @@ jobs:
         operating_system: freebsd
         version: '14.0'
         environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
-        prepare: |
-          pkg install -y $PACKAGES
         run: |
+          pkg install -y $PACKAGES
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
