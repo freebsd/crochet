@@ -18,11 +18,11 @@ jobs:
     
     - name: Build
       id: build
-      uses: vmactions/freebsd-vm@v1.0.8
+      uses: cross-platform-actions/action@v0.23.0
       with:
-        envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
-        usesh: true
-        release: "14.0"
+        operating_system: freebsd
+        version: '14.0'
+        environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         prepare: |
           pkg install -y $PACKAGES
         run: |
