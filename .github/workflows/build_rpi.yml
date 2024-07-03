@@ -18,14 +18,13 @@ jobs:
     
     - name: Build
       id: build
-      uses: vmactions/freebsd-vm@v1.0.8
+      uses: cross-platform-actions/action@v0.24.0
       with:
-        envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
-        usesh: true
-        release: "14.0"
-        prepare: |
-          pkg install -y $PACKAGES
+        operating_system: freebsd
+        version: '14.0'
+        environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         run: |
+          pkg install -y $PACKAGES
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
