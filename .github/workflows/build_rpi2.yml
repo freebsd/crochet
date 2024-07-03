@@ -30,4 +30,4 @@ jobs:
           sudo rm -rf /usr/src
           sudo git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
-          sudo sh crochet.sh -c $PLATFORM_SCRIPT -u -v
+          sudo sh crochet.sh -c $PLATFORM_SCRIPT -v
