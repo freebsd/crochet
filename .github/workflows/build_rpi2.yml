@@ -21,11 +21,11 @@ jobs:
       uses: cross-platform-actions/action@v0.24.0
       with:
         operating_system: freebsd
-        version: '14.0'
+        version: '14.1'
         environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         run: |
           sudo pkg install -y $PACKAGES
           echo "cloning source branch $BRANCH from $SOURCE_URL"
-          git clone $SOURCE_URL -b $BRANCH /usr/src 
+          sudo git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
-          sh crochet.sh -c $PLATFORM_SCRIPT -u -v
+          sudo sh crochet.sh -c $PLATFORM_SCRIPT -u -v
