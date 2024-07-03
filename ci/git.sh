@@ -6,17 +6,20 @@ SOURCE_URL=https://github.com/freebsd/freebsd-src.git
 SOURCE_BRANCH=stable/13
 
 # install git
-echo "installing git"
+echo "Installing git"
 sudo pkg install -y git
 
 # clone FreeBSD source
 sudo git config --global http.version HTTP/1.1
 if [ -d $SOURCE_DIR/.git ]; then 
-    echo "updating FreeBSD"
-    sudo git -C $SOURCE_DIR pull; 
+    echo "Updating FreeBSD source at $SOURCE_DIR"
+    pushd
+    cd $SOURCE_DIR
+    sudo git --verbose pull
+    popd
 else
-    echo "cloning FreeBSD from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
-    sudo git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
+    echo "Cloning FreeBSD source from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
+    sudo git  --verbose clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
 fi
 
 
