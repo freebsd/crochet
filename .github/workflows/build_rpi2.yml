@@ -18,4 +18,5 @@ jobs:
         operating_system: freebsd
         version: '14.0'
         run: |
-          sudo sh ci/ci_rpi2.sh
+          echo "starting build"
+          sh ci/ci_i386.sh
