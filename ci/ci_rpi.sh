@@ -15,6 +15,6 @@ echo "cloning FreeBSD from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR
 git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR
 
 # build
-PLATFORM_SCRIPT=ci/configs/config_i386.sh
+PLATFORM_SCRIPT=ci/configs/config_rpi.sh
 echo "building"
 sh crochet.sh -c $PLATFORM_SCRIPT -v
