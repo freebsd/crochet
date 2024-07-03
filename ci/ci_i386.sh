@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# packages
+sudo pkg install -y git
+
+# source
 /bin/sh ci/git.sh
 
 # build

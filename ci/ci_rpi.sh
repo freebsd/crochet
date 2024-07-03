@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# packages
+sudo pkg install -y git python3 u-boot-rpi
+
+# source
 /bin/sh ci/git.sh
 
 # build
