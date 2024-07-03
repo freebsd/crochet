@@ -18,7 +18,7 @@ jobs:
     
     - name: Build
       id: build
-      uses: vmactions/freebsd-vm@v1.0.7
+      uses: vmactions/freebsd-vm@v1.0.8
       with:
         envs: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         usesh: true
