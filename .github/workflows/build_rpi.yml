@@ -24,7 +24,7 @@ jobs:
         version: '14.0'
         environment_variables: 'SOURCE_URL BRANCH PLATFORM_SCRIPT PACKAGES'
         run: |
-          pkg install -y $PACKAGES
+          sudo pkg install -y $PACKAGES
           echo "cloning source branch $BRANCH from $SOURCE_URL"
           git clone $SOURCE_URL -b $BRANCH /usr/src 
           echo "building $PLATFORM_SCRIPT"
