@@ -11,6 +11,8 @@ sudo pkg install -y git
 
 # clone FreeBSD source
 sudo git config --global http.version HTTP/1.1
+sudo git config --global http.postBuffer 524288000
+sudo git config --global core.compression 0
 if [ -d $SOURCE_DIR/.git ]; then 
     echo "Updating FreeBSD source at $SOURCE_DIR"
     pushd
@@ -19,7 +21,7 @@ if [ -d $SOURCE_DIR/.git ]; then
     popd
 else
     echo "Cloning FreeBSD source from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
-    sudo git clone $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
+    sudo git clone --depth=1 $SOURCE_URL -b $SOURCE_BRANCH $SOURCE_DIR 
 fi
 
 
