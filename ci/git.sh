@@ -17,7 +17,7 @@ if [ -d $SOURCE_DIR/.git ]; then
     echo "Updating FreeBSD source at $SOURCE_DIR"
     pushd
     cd $SOURCE_DIR
-    sudo git --verbose pull
+    sudo git pull
     popd
 else
     echo "Cloning FreeBSD source from $SOURCE_BRANCH branch $SOURCE_BRANCH into $SOURCE_DIR"
