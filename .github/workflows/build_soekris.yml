@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: self-hosted
-    timeout-minutes: 600
+    timeout-minutes: 1200
     steps:
     - uses: actions/checkout@v4
     
