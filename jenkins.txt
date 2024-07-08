@@ -3,9 +3,7 @@ if [ -d ~/freebsd-src/.git ]; then
 	cd ~/freebsd-src
 	git pull
 else
-	git clone --depth=1 https://github.com/freebsd/freebsd-src.git -b stable/14 ~/freebsd-src
+	git clone --depth=1 https://github.com/freebsd/freebsd-src.git -b stable/13 ~/freebsd-src
 fi
 cd ${WORKSPACE}
-${WORKSPACE}/crochet.sh -c ci/configs/config_i386.sh
-
-
+sudo ${WORKSPACE}/crochet.sh -c ci/configs/config_soekris.sh

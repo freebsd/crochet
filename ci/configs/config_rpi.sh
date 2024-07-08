@@ -59,7 +59,7 @@ board_setup RaspberryPi
 #
 # Suggested: option ImageSize
 #option ImageSize 100mb # for kernel-only images
-#option ImageSize 1950mb # for 2 Gigabyte card
+option ImageSize 1950mb # for 2 Gigabyte card
 #option ImageSize 3900mb # for 4 Gigabyte card
 
 #
@@ -115,7 +115,7 @@ board_setup RaspberryPi
 #option CompressImage <xz|gzip>
 
 # Same as 'CompressImage gzip'
-#option GzipImage
+option GzipImage
 
 # Create a user account with the specified username.
 # Password will be the same as the user name.
