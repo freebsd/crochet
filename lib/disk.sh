@@ -460,6 +460,9 @@ disk_mount ( ) {
 	UFS)
 	    disk_ufs_mount ${MOUNTPOINT} ${RELINDEX}
 	    ;;
+        RESERVED)
+            # just don't do anything
+            ;;
 	*)
 	    echo "Attempt to mount ${TYPE} partition ${RELINDEX} at ${MOUNTPOINT} failed."
 	    echo "Do not know how to mount partitions of type ${TYPE}."
