@@ -19,9 +19,17 @@ strategy_add $PHASE_PARTITION_LWW allwinner_partition_image
 allwinner_check_uboot ( ) {
     uboot_port_test ${SUNXI_UBOOT} ${SUNXI_UBOOT_BIN}
 }
+
+allwinner_install_boot_script () {
+	# Install boot_script to boot partition
+	echo "Installing u-boot-script"
+    cp ${UBOOT_PATH}/boot.scr ./boot.scr.uimg || exit 1
+}
+
 strategy_add $PHASE_CHECK allwinner_check_uboot
 
 strategy_add $PHASE_BUILD_OTHER freebsd_ubldr_build UBLDR_LOADADDR=${UBLDR_LOADADDR}
+strategy_add $PHASE_BOOT_START allwinner_install_boot_script  
 strategy_add $PHASE_BOOT_INSTALL freebsd_ubldr_copy_ubldr .
 
 # Put the kernel on the FreeBSD UFS partition.
