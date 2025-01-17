@@ -6,12 +6,16 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: CI 14.2
+    env:
+      BRANCH : releng/14.2
+      CONFIG: ci/configs/config_i386.sh
     steps:
     - uses: actions/checkout@v4
     - name: CI
       id: ci
       uses: vmactions/freebsd-vm@v1
       with:
+        envs: 'BRANCH CONFIG'
         usesh: true
         prepare: |
           pkg install -y sudo
