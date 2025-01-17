@@ -6,7 +6,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     name: FreeBSD CI
-     steps:
+    steps:
     - uses: actions/checkout@v4
     - name: CI
       id: ci
