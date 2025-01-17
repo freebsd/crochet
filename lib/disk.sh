@@ -285,6 +285,7 @@ disk_fat_partition ( ) {
 # $2: '12', '16', or '32' for FAT type (-1 or empty for default, which depends on $1)
 # $3: start block (-1 or empty for default of 63)
 # $4: label, empty for default of "BOOT"
+# $5: cluster size (-1 or empty for newfs_msdos default)
 disk_fat_create ( ) {
     local SIZE_ARG
     local SIZE_DISPLAY="n auto-sized"
@@ -292,6 +293,7 @@ disk_fat_create ( ) {
     local NEW_FAT_SLICE
     local NEW_FAT_DEVICE
     local NEW_FAT_SLICE_NUMBER
+    local CLUSTER_SIZE_ARG
 
     if [ -n "$1" -a \( "$1" != "-1" \) ]; then
 	SIZE_ARG="-s $1"
@@ -300,6 +302,10 @@ disk_fat_create ( ) {
 
     if [ -z "${FAT_LABEL}" ]; then
 	FAT_LABEL="BOOT"
+    fi
+
+    if [ -n "$5" -a \( "$1" != "-1" \) ]; then
+        CLUSTER_SIZE_ARG="-c $5"
     fi
 
     # start block
@@ -330,9 +336,9 @@ disk_fat_create ( ) {
     fi
 
     if [ "${FAT_LABEL}" = "-" ]; then
-        newfs_msdos -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+        newfs_msdos ${CLUSTER_SIZE_ARG} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
     else
-        newfs_msdos -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
+        newfs_msdos ${CLUSTER_SIZE_ARG} -L ${FAT_LABEL} -F ${_FAT_TYPE} ${NEW_FAT_DEVICE} >/dev/null
     fi
 
     disk_created_new FAT ${NEW_FAT_SLICE}
@@ -460,6 +466,9 @@ disk_mount ( ) {
 	UFS)
 	    disk_ufs_mount ${MOUNTPOINT} ${RELINDEX}
 	    ;;
+        RESERVED)
+            # just don't do anything
+            ;;
 	*)
 	    echo "Attempt to mount ${TYPE} partition ${RELINDEX} at ${MOUNTPOINT} failed."
 	    echo "Do not know how to mount partitions of type ${TYPE}."

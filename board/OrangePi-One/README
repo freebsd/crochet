@@ -1,0 +1,39 @@
+Orange Pi One
+
+The Orange Pi One is a single board computer (SBC) based on the
+Allwinner H3 system on a chip (SoC) with 512 MB DDR3 RAM.  It has one
+10/100 mbit Ethernet, UART, one USB 2.0 host port, one USB 2.0 OTG
+port, and one micro SD card slot.  It also has a CSI camera interface
+(which I have not tried).  It draws up to 5V/2A power from a barrel
+connector.
+
+These boards are very inexpensive (about $10 plus you'll need case and
+power cord or power supply).  See orangepi.org for details.
+
+Video over the HDMI does not work due to lack of completed support for
+the ARM Mali-400 GPU in FreeBSD.
+
+To build you need FreeBSD source (preferably in /usr/src) and you need
+to build the port sysutils/u-boot-orangepi-one.
+
+It is handy to have a USB serial adaptor for degugging since HDMI
+doesn't work.
+
+============================================================
+
+Build instructions:
+
+  Get latest source (if you don't already have it).
+
+    ( cd /usr && svn co https://svn.freebsd.org/base/head )
+    ( cd /usr && svn co https://svn.freebsd.org/ports/head )
+
+  Build u-boot port.
+
+    ( cd /usr/ports/sysutils/u-boot-orangepi-one && make install )
+
+  Build crochet image.
+
+    sh crochet.sh -v -b OrangePi-One
+
+  Follow directions to use dd to copy an image to micro SD.
