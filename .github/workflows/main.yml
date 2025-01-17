@@ -5,7 +5,7 @@ on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: FreeBSD CI
+    name: CI 14.2
     steps:
     - uses: actions/checkout@v4
     - name: CI
@@ -14,7 +14,11 @@ jobs:
       with:
         usesh: true
         prepare: |
-          pkg install -y curl
+          sudo pkg install -y git
 
         run: |
           pwd
+          sudo pkg install -y git
+          sudo git clone -b releng/14.2 https://git.freebsd.org/src.git /usr/src
+
+
