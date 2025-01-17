@@ -1,1 +1,0 @@
-These files are the result of trying to get GH CI working.

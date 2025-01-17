@@ -27,7 +27,7 @@
 #board_setup Cubieboard2
 #board_setup Chromebook
 board_setup GenericI386
-#board_setup NanoPi-NEOx
+#board_setup NanoPi-NEO
 #board_setup NanoPi-NEO2
 #board_setup OrangePi-Plus2E
 #board_setup PandaBoard
@@ -60,7 +60,7 @@ board_setup GenericI386
 # Suggested: option ImageSize
 #option ImageSize 100mb # for kernel-only images
 #option ImageSize 1950mb # for 2 Gigabyte card
-option ImageSize 3900mb # for 4 Gigabyte card
+#option ImageSize 3900mb # for 4 Gigabyte card
 
 #
 # How to Customize Your Build
@@ -115,7 +115,7 @@ option ImageSize 3900mb # for 4 Gigabyte card
 #option CompressImage <xz|gzip>
 
 # Same as 'CompressImage gzip'
-option GzipImage
+#option GzipImage
 
 # Create a user account with the specified username.
 # Password will be the same as the user name.
@@ -185,7 +185,7 @@ option GzipImage
 # it will tell you how to get appropriate sources into this directory.
 # (I find FREEBSD_SRC=${TOPDIR}/src to be useful.)
 #
-FREEBSD_SRC=/usr/local/jenkins/freebsd-src
+#FREEBSD_SRC=/usr/src
 
 # You will probably never override this, but you may need to
 # understand it: WORKDIR holds all of the created and temporary files

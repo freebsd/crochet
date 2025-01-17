@@ -1,7 +1,0 @@
-freebsd_instance:
-  image_family: freebsd-14-0
-
-task:
-  name: build soekris
-  build_script: /bin/sh ci/ci_soekris.sh
-
