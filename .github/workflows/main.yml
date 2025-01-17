@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: FreeBSD CI
+     steps:
+    - uses: actions/checkout@v4
+    - name: CI
+      id: ci
+      uses: vmactions/freebsd-vm@v1
+      with:
+        usesh: true
+        prepare: |
+          pkg install -y curl
+
+        run: |
+          pwd
