@@ -59,7 +59,7 @@ board_setup GenericI386
 #
 # Suggested: option ImageSize
 #option ImageSize 100mb # for kernel-only images
-#option ImageSize 1950mb # for 2 Gigabyte card
+option ImageSize 1950mb # for 2 Gigabyte card
 #option ImageSize 3900mb # for 4 Gigabyte card
 
 #

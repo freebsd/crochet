@@ -17,9 +17,11 @@ jobs:
       with:
         envs: 'BRANCH CONFIG'
         usesh: true
+        sync: rsync
+        copyback: true
         prepare: |
           pkg install -y sudo
 
         run: |
           sh ci/build_14.2_i386.sh
-          
+
