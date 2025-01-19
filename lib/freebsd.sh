@@ -236,7 +236,7 @@ fi
     CONF=${TARGET_ARCH}-${KERNCONF}
     echo make  ${_FREEBSD_KERNEL_ARGS} ${FREEBSD_BUILDKERNEL_EXTRA_ARGS} ${FREEBSD_KERNEL_BOARD_ARGS} "$@" $KERNJOBS buildkernel > ${WORKDIR}/_.buildkernel.${CONF}.sh
     if [ -n "${FREEBSD_FORCE_BUILDKERNEL}" ]; then
-        rm -f ${WORKDIR}/_.built-kernel.${CONF}
+        rm -f ${WORKDIR}/_.buildkernel.${CONF}
     fi
     _freebsd_build kernel ${CONF}
 }

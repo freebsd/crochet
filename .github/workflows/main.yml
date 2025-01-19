@@ -1,0 +1,38 @@
+name: CI
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: CI 14.2
+    env:
+      BRANCH : releng/14.2
+      CONFIG: ci/configs/config_i386.sh
+    steps:
+    - uses: actions/checkout@v4
+    - name: CI
+      id: ci
+      uses: vmactions/freebsd-vm@v1
+      with:
+        envs: 'BRANCH CONFIG'
+        usesh: true
+        sync: rsync
+        copyback: true
+        prepare: |
+          pkg install -y sudo
+
+        run: |
+          sh ci/build_14.2_i386.sh  
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: logs
+        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.log
+        overwrite: true
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: image
+        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.img
+        overwrite: true
