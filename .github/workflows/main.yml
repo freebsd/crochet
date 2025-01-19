@@ -28,11 +28,11 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: logs
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.log
+        path: /home/runner/work/crochet/crochet/work/*.log
         overwrite: true
 
     - uses: actions/upload-artifact@v4
       with:
         name: image
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.img
+        path: /home/runner/work/crochet/crochet/work/*.img
         overwrite: true
