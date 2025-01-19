@@ -23,40 +23,16 @@ jobs:
           pkg install -y sudo
 
         run: |
-          sh ci/build_14.2_i386.sh
+          sh ci/build_14.2_i386.sh  
 
     - uses: actions/upload-artifact@v4
       with:
-        name: _.buildworld.i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.buildworld.i386.log
+        name: logs
+        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.log
         overwrite: true
 
     - uses: actions/upload-artifact@v4
       with:
-        name: _.buildkernel.i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.buildkernel.i386.log
-        overwrite: true
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: _.installworld.i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.installworld.i386.log
-        overwrite: true
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: _.distrib-dirs..i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.distrib-dirs..i386.log
-        overwrite: true
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: _.distribution.i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.distribution.i386.log
-        overwrite: true
-
-    - uses: actions/upload-artifact@v4
-      with:
-        name: _.installkernel.i386.log
-        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/_.installkernel.i386.log
+        name: image
+        path: /home/runner/work/crochet-freebsd/crochet-freebsd/work/*.img
         overwrite: true
