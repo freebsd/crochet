@@ -20,7 +20,7 @@ strategy_add $PHASE_CHECK rpi3_check_uboot
 
 rpi_cm3_check_firmware ( ) {
     if [ ! -d ${RPICM3_FIRMWARE_PATH} ]; then
-        echo "please install sysutils/${RPICM3_FIRMWARE_PORT} and re-run this script."
+        echo "Please install sysutils/${RPICM3_FIRMWARE_PORT} and re-run this script."
 	echo "You can do this with:"
 	echo "$ sudo pkg install sysutils/${RPICM3_FIRMWARE_PORT}"
 	echo "or by building the port:"

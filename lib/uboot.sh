@@ -19,7 +19,7 @@ _uboot_download_instructions ( ) (
 	local UBOOT_VERSION=`uboot_version_from_dir ${_UBOOT_SRC}`
 
 	if [ ${UBOOT_VERSION} = "unknown" ]; then
-	    UBOOT_VERSION = ${UBOOT_PATCH_VERSION}
+	    UBOOT_VERSION=${UBOOT_PATCH_VERSION}
 	fi
 
 	if [ ${UBOOT_VERSION} = "master" ]; then
